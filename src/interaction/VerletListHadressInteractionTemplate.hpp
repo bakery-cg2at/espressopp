@@ -34,7 +34,7 @@
 #include "Real3D.hpp"
 #include "Tensor.hpp"
 #include "Particle.hpp"
-#include "VerletListAdress.hpp"
+#include "VerletListHadress.hpp"
 #include "FixedTupleListAdress.hpp"
 #include "esutil/Array2D.hpp"
 #include "SystemAccess.hpp"
@@ -50,7 +50,7 @@ namespace espressopp {
     
     public:
       VerletListHadressInteractionTemplate
-      (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList)
+      (shared_ptr<VerletListHadress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList)
                 : verletList(_verletList), fixedtupleList(_fixedtupleList) {
 
           potentialArrayAT = esutil::Array2D<PotentialAT, esutil::enlarge>(0, 0, PotentialAT());
@@ -68,11 +68,11 @@ namespace espressopp {
       }
                 
       void
-      setVerletList(shared_ptr < VerletListAdress > _verletList) {
+      setVerletList(shared_ptr < VerletListHadress > _verletList) {
         verletList = _verletList;
       }
 
-      shared_ptr<VerletListAdress> getVerletList() {
+      shared_ptr<VerletListHadress> getVerletList() {
         return verletList;
       }
 
@@ -125,7 +125,7 @@ namespace espressopp {
       
     protected: 
       int ntypes;
-      shared_ptr<VerletListAdress> verletList;
+      shared_ptr<VerletListHadress> verletList;
       shared_ptr<FixedTupleListAdress> fixedtupleList;
       esutil::Array2D<PotentialAT, esutil::enlarge> potentialArrayAT;
       esutil::Array2D<PotentialCG, esutil::enlarge> potentialArrayCG;

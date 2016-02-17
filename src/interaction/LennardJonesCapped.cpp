@@ -28,6 +28,7 @@
 #include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -42,6 +43,8 @@ namespace espressopp {
         CellListLennardJonesCapped;
     typedef class FixedPairListInteractionTemplate <LennardJonesCapped>
         FixedPairListLennardJonesCapped;
+    typedef class FixedPairListAdressInteractionTemplate <LennardJonesCapped>
+        FixedPairListAdressLennardJonesCapped;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -78,7 +81,7 @@ namespace espressopp {
 
       class_< VerletListHadressLennardJonesCapped, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesCapped",
-         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+         init< shared_ptr<VerletListHadress>, shared_ptr<FixedTupleListAdress> >())
          .def("setPotentialAT", &VerletListHadressLennardJonesCapped::setPotentialAT)
          .def("setPotentialCG", &VerletListHadressLennardJonesCapped::setPotentialCG)
          .def("getPotentialAT", &VerletListHadressLennardJonesCapped::getPotentialAT,
@@ -99,6 +102,13 @@ namespace espressopp {
           .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesCapped> >())
           .def("setPotential", &FixedPairListLennardJonesCapped::setPotential);
       ;
+      class_< FixedPairListAdressLennardJonesCapped, bases< Interaction > >
+        ("interaction_FixedPairListAdressLennardJonesCapped",
+          init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesCapped>, bool >())
+          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesCapped>, bool >())
+          .def("setPotential", &FixedPairListAdressLennardJonesCapped::setPotential);
+      ;
+
     }
     
   }

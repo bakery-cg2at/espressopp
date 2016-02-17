@@ -34,6 +34,7 @@ from espressopp.interaction.LennardJones import *
 from espressopp.interaction.LennardJonesAutoBonds import *
 from espressopp.interaction.LennardJonesCapped import *
 from espressopp.interaction.LennardJonesEnergyCapped import *
+from espressopp.interaction.LennardJonesForceCapped import *
 from espressopp.interaction.LennardJonesExpand import *
 from espressopp.interaction.LennardJonesGromacs import *
 from espressopp.interaction.LennardJonesGeneric import *

@@ -30,6 +30,7 @@
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
+#include "FixedQuadrupleListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
     namespace interaction {
@@ -60,6 +61,8 @@ namespace espressopp {
 
         typedef class FixedQuadrupleListTypesInteractionTemplate<TabulatedDihedral>
             FixedQuadrupleListTypesTabulatedDihedral;
+        typedef class FixedQuadrupleListAdressInteractionTemplate <TabulatedDihedral>
+                FixedQuadrupleListAdressTabulatedDihedral;
 
         //////////////////////////////////////////////////
         // REGISTRATION WITH PYTHON
@@ -89,7 +92,19 @@ namespace espressopp {
                 .def("setFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedDihedral::setFixedQuadrupleList)
                 .def("getFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedDihedral::getFixedQuadrupleList);
 
+            class_ <FixedQuadrupleListAdressTabulatedDihedral, bases <Interaction> > 
+                ("interaction_FixedQuadrupleListAdressTabulatedDihedral",
+                        init <shared_ptr<System>,
+                              shared_ptr<FixedQuadrupleList>,
+                              shared_ptr<TabulatedDihedral>, bool >())
+                .def(init< shared_ptr<System>,
+                           shared_ptr<FixedQuadrupleListAdress>,
+                           shared_ptr<TabulatedDihedral>, bool
+                         >())
+                .def("setPotential", &FixedQuadrupleListAdressTabulatedDihedral::setPotential)
+                .def("getFixedQuadrupleList", &FixedQuadrupleListAdressTabulatedDihedral::getFixedQuadrupleList);
+
         }
         
-    } // ns interaction
-} // ns espressopp
+    } // namespace interaction
+} // namespace espressopp

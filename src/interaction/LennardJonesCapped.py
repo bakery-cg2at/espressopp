@@ -199,7 +199,8 @@ from _espressopp import interaction_LennardJonesCapped, \
                       interaction_VerletListAdressLennardJonesCapped, \
                       interaction_VerletListHadressLennardJonesCapped, \
                       interaction_CellListLennardJonesCapped, \
-                      interaction_FixedPairListLennardJonesCapped
+                      interaction_FixedPairListLennardJonesCapped, \
+                      interaction_FixedPairListAdressLennardJonesCapped
 
 class LennardJonesCappedLocal(PotentialLocal, interaction_LennardJonesCapped):
 
@@ -300,6 +301,21 @@ class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPa
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
 
+class FixedPairListAdressLennardJonesCappedLocal(InteractionLocal, interaction_FixedPairListAdressLennardJonesCapped):
+    'The (local) Lennard-Jones interaction using FixedPair lists.'
+    def __init__(self, system, vl, potential, is_cg=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListAdressLennardJonesCapped, system, vl, potential, is_cg)
+
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
+    def getPotential(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self)
+
+
 if pmi.isController:
     class LennardJonesCapped(Potential):
         'The Lennard-Jones potential.'
@@ -340,5 +356,12 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListLennardJonesCappedLocal',
+            pmicall = ['setPotential']
+            )
+
+    class FixedPairListAdressLennardJonesCapped(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListAdressLennardJonesCappedLocal',
             pmicall = ['setPotential']
             )

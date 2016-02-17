@@ -73,7 +73,7 @@ namespace espressopp {
 
       class_< VerletListHadressZero, bases< Interaction > >
         ("interaction_VerletListHadressZero",
-           init< shared_ptr<VerletListAdress>,
+           init< shared_ptr<VerletListHadress>,
                   shared_ptr<FixedTupleListAdress> >())
         .def("setFixedTupleList", &VerletListHadressZero::setFixedTupleList)
         .def("setPotentialAT", &VerletListHadressZero::setPotentialAT)

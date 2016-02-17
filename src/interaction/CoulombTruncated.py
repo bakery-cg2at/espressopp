@@ -93,7 +93,8 @@ from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
 from _espressopp import interaction_CoulombTruncated, \
                       interaction_VerletListCoulombTruncated, \
-                      interaction_FixedPairListTypesCoulombTruncated
+                      interaction_FixedPairListTypesCoulombTruncated, \
+                      interaction_VerletListAdressCoulombTruncated
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
     def __init__(self, prefactor=1.0, cutoff=infinity):
@@ -122,6 +123,21 @@ class FixedPairListTypesCoulombTruncatedLocal(InteractionLocal, interaction_Fixe
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
+class VerletListAdressCoulombTruncatedLocal(InteractionLocal, interaction_VerletListAdressCoulombTruncated):
+    'The (local) CoulombTruncated interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListAdressCoulombTruncated, vl, fixedtupleList)
+
+    def setPotentialAT(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
+
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialCG(self, type1, type2, potential)
+
+
 if pmi.isController:
     class CoulombTruncated(Potential):
         'The CoulombTruncated potential.'
@@ -142,5 +158,11 @@ if pmi.isController:
             pmicall = ['setPotential']
             )
 
+    class VerletListAdressCoulombTruncated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListAdressCoulombTruncatedLocal',
+            pmicall = ['setPotentialAT','setPotentialCG']
+            )
 
 

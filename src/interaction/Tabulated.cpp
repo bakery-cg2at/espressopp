@@ -33,6 +33,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -64,6 +65,7 @@ namespace espressopp {
     typedef class CellListAllPairsInteractionTemplate <Tabulated> CellListTabulated;
     typedef class FixedPairListInteractionTemplate <Tabulated> FixedPairListTabulated;
     typedef class FixedPairListTypesInteractionTemplate <Tabulated> FixedPairListTypesTabulated;
+    typedef class FixedPairListAdressInteractionTemplate <Tabulated> FixedPairListAdressTabulated;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -94,7 +96,7 @@ namespace espressopp {
         
       class_ <VerletListHadressTabulated, bases <Interaction> >
         ("interaction_VerletListHadressTabulated",
-           init <shared_ptr<VerletListAdress>,
+           init <shared_ptr<VerletListHadress>,
                  shared_ptr<FixedTupleListAdress> >()
                 )
             .def("setPotentialAT", &VerletListHadressTabulated::setPotentialAT)
@@ -125,6 +127,25 @@ namespace espressopp {
           .def("getPotential", &FixedPairListTypesTabulated::getPotentialPtr)
           .def("setFixedPairList", &FixedPairListTypesTabulated::setFixedPairList)
           .def("getFixedPairList", &FixedPairListTypesTabulated::getFixedPairList);
+
+      class_ <FixedPairListAdressTabulated, bases <Interaction> > 
+        ("interaction_FixedPairListAdressTabulated", 
+          init < shared_ptr<System>, 
+                 shared_ptr<FixedPairList>, 
+                 shared_ptr<Tabulated>,
+                 bool
+               >()
+        )
+        .def(init< shared_ptr<System>, 
+                   shared_ptr<FixedPairListAdress>, 
+                   shared_ptr<Tabulated>,
+                   bool
+                 >())
+        .def("setPotential", &FixedPairListAdressTabulated::setPotential)
+        .def("setFixedPairList", &FixedPairListAdressTabulated::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListAdressTabulated::getFixedPairList);
+        ;
+
     }
     
   }

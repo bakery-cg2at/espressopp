@@ -167,6 +167,7 @@ from _espressopp import interaction_Tabulated, \
                       interaction_CellListTabulated, \
                       interaction_FixedPairListTabulated, \
                       interaction_FixedPairListTypesTabulated
+from _espressopp import interaction_FixedPairListAdressTabulated
 
 class TabulatedLocal(PotentialLocal, interaction_Tabulated):
 
@@ -260,6 +261,17 @@ class FixedPairListTypesTabulatedLocal(InteractionLocal, interaction_FixedPairLi
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
 
+class FixedPairListAdressTabulatedLocal(InteractionLocal, interaction_FixedPairListAdressTabulated):
+    'The (local) tabulated interaction using FixedPair lists.'
+    def __init__(self, system, vl, potential, is_cg=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListAdressTabulated, system, vl, potential, is_cg)
+
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
+
 
 if pmi.isController:
     class Tabulated(Potential):
@@ -303,6 +315,7 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedPairListTabulatedLocal',
             pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )
+        
 
     class FixedPairListTypesTabulated(Interaction):
         __metaclass__ = pmi.Proxy
@@ -310,3 +323,10 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedPairListTypesTabulatedLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
         )
+
+    class FixedPairListAdressTabulated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListAdressTabulatedLocal',
+            pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
+            )

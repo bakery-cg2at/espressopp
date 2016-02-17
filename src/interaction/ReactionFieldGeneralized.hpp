@@ -132,7 +132,6 @@ namespace espressopp {
                 real _computeEnergy(const Particle& p1, const Particle& p2) const {
                     Real3D dist = p1.position() - p2.position();
                     real distSqr = dist.sqr();
-                    //std::cout << "qq" << distSqr << " " << p1.id() << " " << p2.id() << "\n";
                     if (distSqr>rc2) return 0.0;
                     real qq = p1.q()*p2.q();
                     /* Note: this implementation counts minus integral of the force as energy
@@ -144,29 +143,8 @@ namespace espressopp {
                     
                     real energy = prefactor*qq * (1.0 / sqrt(distSqr) - B1_half*distSqr -crf);     
                     return energy;
-
-                    // FORCE CAPPING HACK (was temporarily used for some ideal gas test simulations)
-                    /*real caprad = 0.1;
-                    real capradSqr = caprad * caprad;
-                    
-                    if (distSqr > capradSqr) {
-                        real energy = prefactor*qq * (1.0 / sqrt(distSqr) - B1_half*distSqr -crf);     
-                        return energy;                
-                    }
-                    else{
-                        real energy = prefactor*qq * (1.0 / sqrt(capradSqr) - B1_half*capradSqr -crf);
-                        real forcepart = prefactor*qq* (1.0/(caprad*capradSqr) + B1) *caprad;
-                        real out = energy + forcepart*(caprad-sqrt(distSqr));
-                        return out;                                        
-                    }*/
              
                 }
-
-
-                /*real _computeEnergySqrRaw(real distSqr) const {
-                    return qq * (1.0 / sqrt(distSqr) + B0);
-                }*/
-
 
                 
                 bool _computeForce(Real3D& force, const Particle &p1,
@@ -183,24 +161,6 @@ namespace espressopp {
                     force = dist * ffactor;
                     return true;
                                
-                    // FORCE CAPPING HACK (was temporarily used for some ideal gas test simulations)
-                    /*real caprad = 0.1;
-                    real capradSqr = caprad * caprad;
-                    real r = sqrt(r2);
-                    real qq = p1.q()*p2.q();
-                    
-                    if (r2 > capradSqr) {
-                        real ffactor = prefactor*qq* (1.0/(r*r2) + B1);
-                        force = dist * ffactor;
-                        return true;                
-                    }
-                    else{
-                        real ffactor = prefactor*qq* (1.0/(caprad*capradSqr) + B1);
-                        force = dist * ffactor * (caprad/r);
-                        //std::cout << "ReactionField, capped Force: " << sqrt(dist.sqr()) * ffactor * (caprad/r) << "\n"; 0.1 LEADS TO 2492.93
-                        return true;                                         
-                    }*/
-
                 }
                 
                 real _computeEnergySqrRaw(real distSqr) const {
@@ -213,15 +173,6 @@ namespace espressopp {
                         exit(0);
                         return false;
                 }
-                /*bool _computeForceRaw(Real3D& force,
-                        const Real3D& dist, real distSqr) const {
-
-                    real r = sqrt(distSqr);
-                    real ffactor = qq * ((1/(r*distSqr)) + B1);
-                    force = dist * ffactor;
-
-                    return true;
-                }*/
         };
 
         // provide pickle support

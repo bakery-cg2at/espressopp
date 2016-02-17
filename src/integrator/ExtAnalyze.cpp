@@ -33,11 +33,10 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ExtAnalyze::theLogger, "ExtAnalyze");
 
-    //ExtAnalyze::ExtAnalyze(shared_ptr< AnalysisBase > _analysis, int _interval) : Extension(_analysis->getSystem()), interval(_interval)
-    ExtAnalyze::ExtAnalyze(shared_ptr< ParticleAccess > _particle_access, int _interval) : Extension(_particle_access->getSystem()), interval(_interval){
+    ExtAnalyze::ExtAnalyze(shared_ptr<ParticleAccess > particle_access, int interval):
+        Extension(particle_access->getSystem()), interval_(interval){
       LOG4ESPP_INFO(theLogger, "Analyze observable in integrator");
-      //analysis     = _analysis;
-      particle_access     = _particle_access;
+      particle_access_ = particle_access;
       type = Extension::ExtAnalysis;
     }
 
@@ -47,17 +46,15 @@ namespace espressopp {
 
     void ExtAnalyze::connect(){
       // connection to end of integrator
-      _aftIntV  = integrator->aftIntV.connect( boost::bind(&ExtAnalyze::perform_action, this));
-      counter = 0;
+      _aftIntV  = integrator->aftIntV.connect( boost::bind(&ExtAnalyze::perform_action, this), boost::signals2::at_front);
     }
 
     //void ExtAnalyze::performMeasurement() {
     void ExtAnalyze::perform_action() {
-      LOG4ESPP_INFO(theLogger, "performing measurement in integrator");
-      if (counter % interval == 0) {
-          particle_access->perform_action();
+      if ((integrator->getStep() % interval_) == 0) {
+          LOG4ESPP_INFO(theLogger, "performing measurement in integrator " << integrator->getStep() << " " << interval_ << " " << integrator->getStep() % interval_);
+          particle_access_->perform_action();
       }
-      counter++;
     }
 
     /****************************************************
@@ -66,9 +63,10 @@ namespace espressopp {
     void ExtAnalyze::registerPython() {
       using namespace espressopp::python;
       class_<ExtAnalyze, shared_ptr<ExtAnalyze>, bases<Extension> >
-        ("integrator_ExtAnalyze", init< shared_ptr< ParticleAccess > , int >())
+        ("integrator_ExtAnalyze", init< shared_ptr<ParticleAccess>, int >())
         .def("connect", &ExtAnalyze::connect)
         .def("disconnect", &ExtAnalyze::disconnect)
+        .add_property("interval", &ExtAnalyze::interval, &ExtAnalyze::set_interval)
         ;
     }
   }

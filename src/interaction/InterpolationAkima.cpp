@@ -72,12 +72,15 @@ namespace espressopp {
         mpi::broadcast(comm, force, N, root);
         
         delta = radius[1] - radius[0];
-        if (delta <= 0.0) LOG4ESPP_ERROR(theLogger, "illegal distance for entries")
+        if (delta <= 0.0) LOG4ESPP_ERROR(theLogger, "illegal distance for entries in file: " << file)
         
         // check if delta is the same between all entries
         for (int i = 2; i < N; i++) {
             real r = radius[i] - radius[i-1];
-            if (fabs(r - delta) > 0.0001) LOG4ESPP_ERROR(theLogger, "delta " << r << " not same as " << delta);
+            if (fabs(r - delta) > 0.0001)
+              LOG4ESPP_ERROR(theLogger,
+                "file: " << file <<
+                " delta: " << r << " in line: " << i << " not same as " << delta);
         }
         
         inner = radius[0];
@@ -85,7 +88,7 @@ namespace espressopp {
         delta  = (outer - inner) / (N-1);
         invdelta = 1.0 / delta;
         
-        LOG4ESPP_INFO(theLogger, "tab file has range " << inner << " - "
+        LOG4ESPP_INFO(theLogger, "tab file " << file << " has range " << inner << " - "
                                 << outer << ", delta = " << delta);
         
         spline(radius, energy, N, p0e, p1e, p2e, p3e);

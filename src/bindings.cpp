@@ -30,6 +30,7 @@
 #include <System.hpp>
 #include <VerletList.hpp>
 #include <VerletListAdress.hpp>
+#include <VerletListHadress.hpp>
 #include <VerletListTriple.hpp>
 #include <FixedSingleList.hpp>
 #include <FixedPairList.hpp>
@@ -68,6 +69,7 @@ void espressopp::registerPython() {
   espressopp::DynamicExcludeList::registerPython();
   espressopp::VerletList::registerPython();
   espressopp::VerletListAdress::registerPython();
+  espressopp::VerletListHadress::registerPython();
   espressopp::VerletListTriple::registerPython();
   espressopp::FixedSingleList::registerPython();
   espressopp::FixedPairList::registerPython();

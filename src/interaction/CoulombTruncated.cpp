@@ -24,6 +24,8 @@
 #include "CoulombTruncated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
+#include "VerletListAdressInteractionTemplate.hpp"
+#include "Tabulated.hpp"
 
 //For a Coulombic FixedPairList interaction, it's necessary to use FixedPairListTypesInteractionTemplate.hpp instead of FixedPairListInteractionTemplate.hpp
 //so that we can use _computeForce and _computeEnergy which take both particles and distance vector as arguments
@@ -36,6 +38,8 @@ namespace espressopp {
     typedef class FixedPairListTypesInteractionTemplate< CoulombTruncated >
     FixedPairListTypesCoulombTruncated;
 
+    typedef class VerletListAdressInteractionTemplate<CoulombTruncated, Tabulated>
+        VerletListAdressCoulombTruncated;
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -54,6 +58,13 @@ namespace espressopp {
         .def("setPotential", &VerletListCoulombTruncated::setPotential)
         .def("getPotential", &VerletListCoulombTruncated::getPotentialPtr)
         ;
+
+      class_<VerletListAdressCoulombTruncated, bases<Interaction> >
+          ("interaction_VerletListAdressCoulombTruncated",
+                  init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+          .def("setPotentialAT", &VerletListAdressCoulombTruncated::setPotentialAT)
+          .def("setPotentialCG", &VerletListAdressCoulombTruncated::setPotentialCG);
+      ;
 
       class_< FixedPairListTypesCoulombTruncated, bases< Interaction > >
         ("interaction_FixedPairListTypesCoulombTruncated",

@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2014,2016
-      Jakub Krajniak
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -26,6 +26,7 @@
 #include "DihedralHarmonicNCos.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
+#include "FixedQuadrupleListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -68,6 +69,18 @@ namespace espressopp {
           .def("getPotential", &FixedQuadrupleListTypesDihedralHarmonicNCos::getPotentialPtr)
           .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonicNCos::setFixedQuadrupleList)
           .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonicNCos::getFixedQuadrupleList);
+
+      typedef class FixedQuadrupleListAdressInteractionTemplate <DihedralHarmonicNCos>
+          FixedQuadrupleListAdressDihedralHarmonicNCos;
+
+      class_ <FixedQuadrupleListAdressDihedralHarmonicNCos, bases <Interaction> >
+        ("interaction_FixedQuadrupleListAdressDihedralHarmonicNCos", init< shared_ptr<System>,
+            shared_ptr<FixedQuadrupleList>, shared_ptr<DihedralHarmonicNCos>, bool >())
+        .def(init< shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
+            shared_ptr<DihedralHarmonicNCos>, bool>())
+        .def("setPotential", &FixedQuadrupleListAdressDihedralHarmonicNCos::setPotential)
+        .def("getFixedQuadrupleList",
+            &FixedQuadrupleListAdressDihedralHarmonicNCos::getFixedQuadrupleList);
     }
   }
 }

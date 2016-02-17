@@ -38,9 +38,12 @@ namespace espressopp {
     /** ExtAnalyze */
     class ExtAnalyze : public Extension {
       public:
-        //ExtAnalyze(shared_ptr< AnalysisBase > _analysis, int _interval);
-        ExtAnalyze(shared_ptr< ParticleAccess > _particle_access, int _interval);
+        ExtAnalyze(shared_ptr<ParticleAccess> particle_access, int interval);
         virtual ~ExtAnalyze() {};
+        
+        int interval() { return interval_; }
+        void set_interval(int interval) { interval_ = interval; }
+
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
@@ -49,11 +52,9 @@ namespace espressopp {
         void connect();
         void disconnect();
         void perform_action();
-        //void performMeasurement();
 
-        shared_ptr< ParticleAccess > particle_access;
-        int interval;
-        int counter;
+        shared_ptr<ParticleAccess> particle_access_;
+        int interval_;
 
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);

@@ -28,6 +28,7 @@
 #include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -42,6 +43,8 @@ namespace espressopp {
         CellListLennardJonesForceCapped;
     typedef class FixedPairListInteractionTemplate <LennardJonesForceCapped>
         FixedPairListLennardJonesForceCapped;
+    typedef class FixedPairListAdressInteractionTemplate <LennardJonesForceCapped>
+        FixedPairListAdressLennardJonesForceCapped;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -78,7 +81,7 @@ namespace espressopp {
 
       class_< VerletListHadressLennardJonesForceCapped, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesForceCapped",
-         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+         init< shared_ptr<VerletListHadress>, shared_ptr<FixedTupleListAdress> >())
          .def("setPotentialAT", &VerletListHadressLennardJonesForceCapped::setPotentialAT)
          .def("setPotentialCG", &VerletListHadressLennardJonesForceCapped::setPotentialCG)
          .def("getPotentialAT", &VerletListHadressLennardJonesForceCapped::getPotentialAT,
@@ -99,6 +102,14 @@ namespace espressopp {
           .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesForceCapped> >())
           .def("setPotential", &FixedPairListLennardJonesForceCapped::setPotential);
       ;
+
+      class_< FixedPairListAdressLennardJonesForceCapped, bases< Interaction > >
+        ("interaction_FixedPairListAdressLennardJonesForceCapped",
+          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJonesForceCapped>, bool >())
+          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesForceCapped>, bool >())
+          .def("setPotential", &FixedPairListAdressLennardJonesForceCapped::setPotential);
+      ;
+
     }
     
   }

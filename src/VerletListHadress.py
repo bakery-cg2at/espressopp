@@ -1,6 +1,4 @@
-#  Copyright (C) 2015-2016
-#      Jakub Krajniak (jkrajniak at gmail.com)
-#  Copyright (C) 2012,2013,2015
+#  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -21,17 +19,17 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-**************************************
-**VerletListAdress** - Object
-**************************************
+"""
+************************************
+**VerletListHadress** - Object
+************************************
 
-The VerletListAdress is the Verlet List to be used for AdResS or H-AdResS
-simulations. When creating the VerletListAdress one has to provide the system 
+The VerletListHadress is the Verlet List to be used for AdResS or H-AdResS
+simulations. When creating the VerletListHadress one has to provide the system 
 and specify both cutoff for the CG interaction and adrcutoff for the atomistic
 interaction. Often, it is important to set the atomistic adrcutoff much bigger
 than the actual interaction's cutoff would be, since also the atomistic part of
-the VerletListAdress (adrPairs) is built based on the coarse-grained particle
+the VerletListHadress (adrPairs) is built based on the coarse-grained particle
 positions. For a much larger coarse-grained cutoff it is for example possible
 to also set the atomistic cutoff on the same value as the coarse-grained one.
 
@@ -51,64 +49,21 @@ Bascially the VerListAdress provides 4 lists:
 * vlPairs: A list which holds all pairs which have both particles in the cgZone,
   i.e. in the coarse-grained region
 
-Example - creating the VerletListAdress for a slab-type adress region fixed in space (only the x value of adrCenter is used):
+Example - creating the VerletListHadress for a slab-type adress region fixed in space (only the x value of adrCenter is used):
 
->>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2])
+>>> vl      = espressopp.VerletListHadress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2])
 
 or
 
->>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2], sphereAdr=False)
+>>> vl      = espressopp.VerletListHadress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2], sphereAdr=False)
 
-Example - creating the VerletListAdress for a spherical adress region centered on adrCenter and fixed in space:
+Example - creating the VerletListHadress for a spherical adress region centered on adrCenter and fixed in space:
 
->>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2], sphereAdr=True)
+>>> vl      = espressopp.VerletListHadress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2], sphereAdr=True)
 
-Example - creating the VerletListAdress for a spherical adress region centered on a particle and moving with the particle
+Example - creating the VerletListHadress for a spherical adress region centered on a particle and moving with the particle
 
->>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, pids=[adrCenterPID], sphereAdr=True)
-
-.. function:: espressopp.VerletListAdress(system, cutoff, adrcut, dEx, dHy, adrCenter, pids, exclusionlist, sphereAdr)
-
-		:param system: 
-		:param cutoff: 
-		:param adrcut: 
-		:param dEx: 
-		:param dHy: 
-		:param adrCenter: (default: [])
-		:param pids: (default: [])
-		:param exclusionlist: (default: [])
-		:param sphereAdr: (default: False)
-		:type system: 
-		:type cutoff: 
-		:type adrcut: 
-		:type dEx: 
-		:type dHy: 
-		:type adrCenter: 
-		:type pids: 
-		:type exclusionlist: 
-		:type sphereAdr: 
-
-.. function:: espressopp.VerletListAdress.addAdrParticles(pids, rebuild)
-
-		:param pids: 
-		:param rebuild: (default: True)
-		:type pids: 
-		:type rebuild: 
-		:rtype: 
-
-.. function:: espressopp.VerletListAdress.exclude(exclusionlist)
-
-		:param exclusionlist: 
-		:type exclusionlist: 
-		:rtype: 
-
-.. function:: espressopp.VerletListAdress.rebuild()
-
-		:rtype: 
-
-.. function:: espressopp.VerletListAdress.totalSize()
-
-		:rtype: 
+>>> vl      = espressopp.VerletListHadress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, pids=[adrCenterPID], sphereAdr=True)
 """
 
 from espressopp import pmi
@@ -116,13 +71,13 @@ import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
-class VerletListAdressLocal(_espressopp.VerletListAdress):
-
+class VerletListHadressLocal(_espressopp.VerletListHadress):
+    'The (local) verlet list AdResS'
 
     def __init__(self, system, cutoff, adrcut, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[], sphereAdr=False):
-
+        'Local construction of a verlet list for AdResS'
         if pmi.workerIsActive():
-            cxxinit(self, _espressopp.VerletListAdress, system, cutoff, adrcut, False, dEx, dHy)
+            cxxinit(self, _espressopp.VerletListHadress, system, cutoff, adrcut, False, dEx, dHy)
             #self.cxxclass.setAtType(self, atType)
             # check for exclusions
             if (exclusionlist != []):
@@ -145,25 +100,11 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
                 
             
     def totalSize(self):
-
+        'count number of pairs in VerletList, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
 
-    def totalAdrSize(self):
-        """Count number of AT pairs in VerletList - globally."""
-        if pmi.workerIsActive():
-            return self.cxxclass.totalAdrSize(self)
-
-    def localSize(self):
-        'count number of pairs in local VerletList'
-        if pmi.workerIsActive():
-            return self.cxxclass.localSize(self)
-
-    def localAdrSize(self):
-        """Count number of AT pairs in local VerletList."""
-        if pmi.workerIsActive():
-            return self.cxxclass.localAdrSize(self)
-
+        
     def exclude(self, exclusionlist):
         """
         Each processor takes the broadcasted exclusion list
@@ -193,31 +134,11 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
         if pmi.workerIsActive():
             self.cxxclass.rebuild(self)
 
-    def getAllPairs(self):
-        """Returns the pairs of the local Verlet list."""
-        if pmi.workerIsActive():
-            pairs = [self.cxxclass.getPair(self, i) for i in range(self.localSize())]
-            pairs.extend([
-                self.cxxclass.getAdrPair(self, i) for i in range(self.localAdrSize())])
-            return pairs
-
-    def getAllCGPairs(self):
-        """Returns the pairs of the local Verlet list."""
-        if pmi.workerIsActive():
-            return [self.cxxclass.getPair(self, i) for i in range(self.localSize())]
-
-    def getAllAdrPairs(self):
-        """Returns the AT pairs of the local Verlet list."""
-        if pmi.workerIsActive():
-            return [self.cxxclass.getAdrPair(self, i) for i in range(self.localAdrSize())]
-
 if pmi.isController:
-    class VerletListAdress(object):
+    class VerletListHadress(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espressopp.VerletListAdressLocal',
+            cls = 'espressopp.VerletListHadressLocal',
             pmiproperty = [ 'builds' ],
-            pmicall = ['localSize', 'totalSize', 'localAdrSize', 'totalAdrSize',
-                       'exclude', 'addAdrParticles', 'rebuild' ],
-            pmiinvoke = ['getAllPairs', 'getAllCGPairs', 'getAllAdrPairs']
+            pmicall = [ 'totalSize', 'exclude', 'addAdrParticles', 'rebuild' ]
             )

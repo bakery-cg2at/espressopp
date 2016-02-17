@@ -27,6 +27,7 @@
 //#include <stdexcept>
 #include "Potential.hpp"
 #include "Interpolation.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
 

@@ -29,6 +29,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -49,6 +50,8 @@ namespace espressopp {
         FixedPairListLennardJones;
     typedef class FixedPairListTypesInteractionTemplate <LennardJones> 
         FixedPairListTypesLennardJones;
+    typedef class FixedPairListAdressInteractionTemplate <LennardJones> 
+        FixedPairListAdressLennardJones;
     LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
     // LOG4ESPP_LOGGER(VerletListLennardJones::theLogger, "VerletListLennardJones");
 
@@ -93,7 +96,7 @@ namespace espressopp {
 
       class_< VerletListHadressLennardJones, bases< Interaction > >
         ("interaction_VerletListHadressLennardJones",
-           init< shared_ptr<VerletListAdress>,
+           init< shared_ptr<VerletListHadress>,
                   shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressLennardJones::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones::setPotentialCG);
@@ -101,7 +104,7 @@ namespace espressopp {
       
       class_< VerletListHadressLennardJones2, bases< Interaction > >
         ("interaction_VerletListHadressLennardJones2",
-           init< shared_ptr<VerletListAdress>,
+           init< shared_ptr<VerletListHadress>,
                   shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressLennardJones2::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones2::setPotentialCG);
@@ -129,6 +132,15 @@ namespace espressopp {
          .def("getFixedPairList", &FixedPairListTypesLennardJones::getFixedPairList)
          .def("setPotential", &FixedPairListTypesLennardJones::setPotential)
          .def("getPotential", &FixedPairListTypesLennardJones::getPotentialPtr)
+      ;
+      class_< FixedPairListAdressLennardJones, bases< Interaction > >
+        ("interaction_FixedPairListAdressLennardJones",
+          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJones>, bool >())
+          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJones>, bool >())
+          .def("setPotential", &FixedPairListLennardJones::setPotential)
+          .def("getPotential", &FixedPairListLennardJones::getPotential)
+          .def("setFixedPairList", &FixedPairListLennardJones::setFixedPairList)
+          .def("getFixedPairList", &FixedPairListLennardJones::getFixedPairList)
       ;
     }
     

@@ -1,6 +1,4 @@
 /*
-  Copyright (C) 2015-2016
-      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -23,12 +21,11 @@
 */
 
 // ESPP_CLASS
-#ifndef _VERLETLISTADRESS_HPP
-#define _VERLETLISTADRESS_HPP
+#ifndef _VERLETLISTHADRESS_HPP
+#define _VERLETLISTHADRESS_HPP
 
 #include "log4espp.hpp"
 #include "types.hpp"
-#include "FixedTupleListAdress.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
 #include "boost/signals2.hpp"
@@ -42,7 +39,7 @@ namespace espressopp {
 
 */
 
-  class VerletListAdress : public SystemAccess {
+  class VerletListHadress : public SystemAccess {
 
   public:
 
@@ -54,9 +51,9 @@ namespace espressopp {
 
     */
 
-    VerletListAdress(shared_ptr< System >, real cut, real adrcut, bool rebuildVL, real _dEx, real _dHy);
+    VerletListHadress(shared_ptr< System >, real cut, real adrcut, bool rebuildVL, real _dEx, real _dHy);
 
-    ~VerletListAdress();
+    ~VerletListHadress();
 
     PairList& getPairs() { return vlPairs; }
 
@@ -82,20 +79,11 @@ namespace espressopp {
     //void setAtType(size_t type);
 
 
-    std::vector<Real3D*> adrPositions; // positions of centres of adress zone (either from adrCenter in VerletListAdress.cpp or at each step from adrList in integrator/Adress.cpp
+    std::vector<Real3D*> adrPositions; // positions of centres of adress zone (either from adrCenter in VerletListHadress.cpp or at each step from adrList in integrator/Adress.cpp
     void rebuild();
 
     /** Get the total number of pairs for the Verlet list */
     int totalSize() const;
-
-    /** Get the total AT number of pairs for the Verlet list. */
-    int totalAdrSize() const;
-
-    int localSize() const;
-    int localAdrSize() const;
-
-    python::tuple getPair(int i);
-    python::tuple getAdrPair(int i);
 
     /** Add pairs to exclusion list */
     bool exclude(longint pid1, longint pid2);
@@ -126,7 +114,7 @@ namespace espressopp {
     //size_t atType; // types above this number are considered atomistic
     //void isPairInAdrZone(Particle &pt1, Particle &pt2); // not used anymore
 
-    shared_ptr<FixedTupleListAdress> fixedtupleList;
+
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list

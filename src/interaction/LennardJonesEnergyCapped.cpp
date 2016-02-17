@@ -78,7 +78,7 @@ namespace espressopp {
 
       class_< VerletListHadressLennardJonesEnergyCapped, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesEnergyCapped",
-         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+         init< shared_ptr<VerletListHadress>, shared_ptr<FixedTupleListAdress> >())
          .def("setPotentialAT", &VerletListHadressLennardJonesEnergyCapped::setPotentialAT)
          .def("setPotentialCG", &VerletListHadressLennardJonesEnergyCapped::setPotentialCG)
          .def("getPotentialAT", &VerletListHadressLennardJonesEnergyCapped::getPotentialAT,

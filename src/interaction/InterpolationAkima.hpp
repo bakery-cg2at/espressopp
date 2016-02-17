@@ -86,17 +86,24 @@ namespace espressopp {
                             const real* p0, const real* p1, const real* p2, const real* p3) const {
             int index;
             index = static_cast<int>((r - inner) * invdelta);
+            std::stringstream ss;
+            ss << "InterpolationAkima.hpp:99 ";
             if (index < 0) {
-              std::stringstream ss;
               ss << "Distance " << r << " out of range " << inner << " - " << inner + (N-1) * delta;
+              ss << " index(" << index << ") < 0 ";
+              ss << " Nothing to do, exit(1)";
               LOG4ESPP_ERROR(theLogger, ss.str());
-              throw std::runtime_error(ss.str());
+              index = 0;
+              exit(1);
             }
             if (index >= N) {
-              std::stringstream ss;
               ss << "Distance " << r << " out of range " << inner << " - "
                  << inner + (N-1)*delta;
-              throw std::runtime_error(ss.str());
+              ss << " index(" << index << ") >= N(" << N << ") ";
+              ss << " Nothing to do, exit(1)";
+              LOG4ESPP_ERROR(theLogger, ss.str());
+              index = N;
+              exit(1);
             }
             
             real z = r - radius[index];

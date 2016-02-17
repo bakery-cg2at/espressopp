@@ -138,6 +138,7 @@ namespace espressopp {
           sh =pot.getShift();
           return boost::python::make_tuple(eps, sig, rc, sh);
       }
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
 

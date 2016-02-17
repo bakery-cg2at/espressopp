@@ -62,22 +62,24 @@ namespace espressopp {
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
+      protected:
+        virtual void connect();
+        virtual void disconnect();
+        virtual void SetPosVel();
+        static LOG4ESPP_DECL_LOGGER(theLogger);
+
       private:
 
         boost::signals2::connection _SetPosVel, _initForces, _integrate1, _inIntP, _integrate2, _recalc2, _befIntV;  //_aftCalcF;
         
         void integrate1(real&);
         void initForces();
-        void SetPosVel();
         void integrate2();
         void aftCalcF();
         void communicateAdrPositions();
 
-        void connect();
-        void disconnect();
-        
-        real weight(real);
-        real weightderivative(real);
+        virtual real weight(real);
+        virtual real weightderivative(real);
 
       };
 

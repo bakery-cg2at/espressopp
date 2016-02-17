@@ -23,6 +23,7 @@
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
+#include "FixedQuadrupleListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
 namespace interaction {
@@ -50,6 +51,17 @@ void DihedralRB::registerPython() {
       .def("getPotential", &FixedQuadrupleListTypesDihedralRB::getPotentialPtr)
       .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::setFixedQuadrupleList)
       .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::getFixedQuadrupleList);
+
+  typedef class FixedQuadrupleListAdressInteractionTemplate <DihedralRB> FixedQuadrupleListAdressDihedralRB;
+  class_ <FixedQuadrupleListAdressDihedralRB, bases <Interaction> >
+  ("interaction_FixedQuadrupleListAdressDihedralRB",
+	  init< shared_ptr<System>,
+	        shared_ptr<FixedQuadrupleList>,
+	        shared_ptr<DihedralRB>, bool >())
+  .def(init< shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
+      shared_ptr<DihedralRB>, bool>())
+  .def("setPotential", &FixedQuadrupleListAdressDihedralRB::setPotential);
+
 
 }
 

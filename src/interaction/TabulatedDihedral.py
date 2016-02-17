@@ -1,4 +1,4 @@
-#  Copyright (C) 2016
+#  Copyright (C) 2015,2016
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
@@ -86,7 +86,7 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_TabulatedDihedral, \
                         interaction_FixedQuadrupleListTabulatedDihedral, \
                         interaction_FixedQuadrupleListTypesTabulatedDihedral
-
+from _espressopp import interaction_FixedQuadrupleListAdressTabulatedDihedral
 
 class TabulatedDihedralLocal(DihedralPotentialLocal, interaction_TabulatedDihedral):
 
@@ -125,6 +125,17 @@ class FixedQuadrupleListTypesTabulatedDihedralLocal(InteractionLocal, interactio
         if pmi.workerIsActive():
             return self.cxxclass.getFixedQuadrupleList(self)
 
+class FixedQuadrupleListAdressTabulatedDihedralLocal(InteractionLocal, interaction_FixedQuadrupleListAdressTabulatedDihedral):
+    'The (local) tanulated dihedral interaction using FixedQuadruple lists.'
+    def __init__(self, system, fpl, potential, is_cg=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedQuadrupleListAdressTabulatedDihedral, system, fpl, potential, is_cg)
+
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
+
 if pmi.isController:
     class TabulatedDihedral(DihedralPotential):
         'The TabulatedDihedral potential.'
@@ -146,3 +157,10 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedQuadrupleListTypesTabulatedDihedralLocal',
             pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']
         )
+
+    class FixedQuadrupleListAdressTabulatedDihedral(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedQuadrupleListAdressTabulatedDihedralLocal',
+            pmicall = ['setPotential', 'getFixedQuadrupleList']
+            )

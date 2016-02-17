@@ -125,7 +125,6 @@ namespace espressopp {
 
         Real3D force(0.0);
         if(potential._computeForce(force, p1, p2)) {
-        //if(potential->_computeForce(force, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
           LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
@@ -147,9 +146,7 @@ namespace espressopp {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        // shared_ptr<Potential> potential = getPotential(type1, type2);
         e   = potential._computeEnergy(p1, p2);
-        // e   = potential->_computeEnergy(p1, p2);
         es += e;
         LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }

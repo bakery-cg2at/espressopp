@@ -24,13 +24,15 @@
 #include "Harmonic.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
+#include "VerletListInteractionTemplate.hpp"
+#include "FixedPairListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
-    void 
+    void
     Harmonic::registerPython() {
       using namespace espressopp::python;
 
@@ -41,10 +43,14 @@ namespace espressopp {
 	.add_property("r0", &Harmonic::getR0, &Harmonic::setR0)
     	;
 
+      typedef class VerletListInteractionTemplate< Harmonic >
+        VerletListHarmonic;
       typedef class FixedPairListInteractionTemplate< Harmonic >
         FixedPairListHarmonic;
       typedef class FixedPairListTypesInteractionTemplate< Harmonic >
         FixedPairListTypesHarmonic;
+      typedef class FixedPairListAdressInteractionTemplate< Harmonic >
+        FixedPairListAdressHarmonic;
 
       class_< FixedPairListHarmonic, bases< Interaction > >
         ("interaction_FixedPairListHarmonic",
@@ -63,8 +69,29 @@ namespace espressopp {
         .def("getPotential", &FixedPairListTypesHarmonic::getPotentialPtr)
         .def("setFixedPairList", &FixedPairListTypesHarmonic::setFixedPairList)
         .def("getFixedPairList", &FixedPairListTypesHarmonic::getFixedPairList);
-     ; 
-    }
+     ;
+
+    class_< FixedPairListAdressHarmonic, bases< Interaction > >
+          ("interaction_FixedPairListAdressHarmonic",
+      init< shared_ptr<System>,
+            shared_ptr<FixedPairList>,
+            shared_ptr<Harmonic>,
+            bool
+          >())
+      .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Harmonic>, bool >())
+      .def("setPotential", &FixedPairListAdressHarmonic::setPotential)
+      .def("getPotential", &FixedPairListAdressHarmonic::getPotential)
+      .def("setFixedPairList", &FixedPairListAdressHarmonic::setFixedPairList)
+      .def("getFixedPairList", &FixedPairListAdressHarmonic::getFixedPairList);
+
+    class_< VerletListHarmonic, bases< Interaction > >("interaction_VerletListHarmonic",
+        init< shared_ptr<VerletList> >())
+      .def("getVerletList", &VerletListHarmonic::getVerletList)
+      .def("setPotential", &VerletListHarmonic::setPotential,
+          return_value_policy< reference_existing_object >())
+      .def("getPotential", &VerletListHarmonic::getPotential,
+          return_value_policy< reference_existing_object >());
+  }
 
   }
 }

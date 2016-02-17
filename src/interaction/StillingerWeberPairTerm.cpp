@@ -73,7 +73,7 @@ namespace espressopp {
 
       class_< VerletListHadressStillingerWeberPairTerm, bases< Interaction > >
         ("interaction_VerletListHadressStillingerWeberPairTerm",
-            init< shared_ptr<VerletListAdress>,
+            init< shared_ptr<VerletListHadress>,
             shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressStillingerWeberPairTerm::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressStillingerWeberPairTerm::setPotentialCG);

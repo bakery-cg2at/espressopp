@@ -72,7 +72,7 @@ namespace espressopp {
 
       class_< VerletListHadressLJcos, bases< Interaction > >
         ("interaction_VerletListHadressLJcos",
-           init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+           init< shared_ptr<VerletListHadress>, shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressLJcos::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLJcos::setPotentialCG);
       ;

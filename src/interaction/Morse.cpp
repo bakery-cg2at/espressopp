@@ -73,7 +73,7 @@ namespace espressopp {
         
       class_< VerletListHadressMorse, bases< Interaction > >
         ("interaction_VerletListHadressMorse",
-                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+                init< shared_ptr<VerletListHadress>, shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressMorse::setPotentialCG);
         ;

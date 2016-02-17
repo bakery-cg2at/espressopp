@@ -23,6 +23,7 @@
 #include "python.hpp"
 #include "AngularHarmonic.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
+#include "FixedTripleListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -42,6 +43,9 @@ namespace espressopp {
       typedef class FixedTripleListInteractionTemplate<AngularHarmonic>
         FixedTripleListAngularHarmonic;
         
+      typedef class FixedTripleListAdressInteractionTemplate<AngularHarmonic>
+        FixedTripleListAdressAngularHarmonic;
+
       class_ <FixedTripleListAngularHarmonic, bases <Interaction> >
         ("interaction_FixedTripleListAngularHarmonic",
            init<shared_ptr<System>,
@@ -51,6 +55,19 @@ namespace espressopp {
         .def("setPotential", &FixedTripleListAngularHarmonic::setPotential)
         .def("getFixedTripleList", &FixedTripleListAngularHarmonic::getFixedTripleList);
       ;
+
+      class_ <FixedTripleListAdressAngularHarmonic, bases <Interaction> >
+        ("interaction_FixedTripleListAdressAngularHarmonic",
+           init<shared_ptr<System>,
+                shared_ptr<FixedTripleList>,
+                shared_ptr<AngularHarmonic>, 
+                bool >())
+        .def(init< shared_ptr<System>, shared_ptr<FixedTripleListAdress>, shared_ptr<AngularHarmonic>, bool >())
+        .def("setPotential", &FixedTripleListAdressAngularHarmonic::setPotential)
+        .def("getFixedTripleList", &FixedTripleListAdressAngularHarmonic::getFixedTripleList);
+      ;
+
+      
     }
   }
 }

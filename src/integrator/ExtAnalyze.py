@@ -65,4 +65,5 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.ExtAnalyzeLocal',
+            pmiproperty = ['interval']
         )
