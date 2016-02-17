@@ -79,6 +79,8 @@ class DynamicResolution : public Adress {
 
   // Signals
   boost::signals2::connection _aftIntV;
+
+  static LOG4ESPP_DECL_LOGGER(theLogger);
 };
 }  // namespace integrator
 }  // namespace espressopp

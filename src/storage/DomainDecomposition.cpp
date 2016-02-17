@@ -507,7 +507,7 @@ namespace espressopp {
                               ss << "Particle " << part.id() << " has moved to outer "
                                  << "space (one or more coordinates are nan)";
                               LOG4ESPP_ERROR(logger, ss.str());
-                              throw std::runtime_error(ss.str());
+                              exit(1);
                             } else {
                                 // particle stays where it is, and will be sorted in the next round
                                 finished = false;

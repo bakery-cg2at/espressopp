@@ -41,6 +41,8 @@ namespace espressopp {
 
     using namespace espressopp::iterator;
 
+    LOG4ESPP_LOGGER(Adress::theLogger, "Adress");
+
     Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI /*= false*/)
         : Extension(_system), verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI){
         LOG4ESPP_INFO(theLogger, "construct Adress");

@@ -66,10 +66,8 @@ namespace espressopp {
         virtual void connect();
         virtual void disconnect();
         virtual void SetPosVel();
-        static LOG4ESPP_DECL_LOGGER(theLogger);
 
       private:
-
         boost::signals2::connection _SetPosVel, _initForces, _integrate1, _inIntP, _integrate2, _recalc2, _befIntV;  //_aftCalcF;
         
         void integrate1(real&);
@@ -81,6 +79,7 @@ namespace espressopp {
         virtual real weight(real);
         virtual real weightderivative(real);
 
+        static LOG4ESPP_DECL_LOGGER(theLogger);
       };
 
   }

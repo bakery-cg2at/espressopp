@@ -189,7 +189,7 @@ class ParticlePropertiesLocal(_espressopp._ParticleProperties):
     def __init__(self, type, mass, q):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive()) or
                 pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
-            cxxinit(self, _espressopp._ParticleProperties)
+            esutil.cxxinit(self, _espressopp._ParticleProperties)
             self.cxxclass.init(self)
             self.type = int(type)
             self.mass = mass

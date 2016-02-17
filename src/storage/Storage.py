@@ -246,7 +246,8 @@ class StorageLocal(object):
             index_lambda_adr  = -1
             index_lambda_adrd = -1
             index_state       = -1
-            
+            index_res_id      = -1
+
             last_pos = toReal3DFromVector([-99,-99,-99])
 
             if properties == None:
@@ -271,6 +272,7 @@ class StorageLocal(object):
                     elif val.lower() == "lambda_adr": index_lambda_adr = nindex
                     elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
                     elif val.lower() == "state": index_state = nindex
+                    elif val.lower() == "res_id": index_res_id = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
 
@@ -312,7 +314,12 @@ class StorageLocal(object):
                     
                 if storedParticle != None:
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi.rank, id))
-                    self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i radius=%i lambda_adr=%i lambda_adrd=%i state=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q,index_radius,index_lambda_adr,index_lambda_adrd,index_state))
+                    self.logger.debug((
+                        "particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i "
+                        "radius=%i lambda_adr=%i lambda_adrd=%i state=%i res_id=%i"
+                        ) % (index_id, index_pos, index_type, index_mass, index_v, index_f,
+                             index_q, index_radius, index_lambda_adr, index_lambda_adrd,
+                             index_state, index_res_id))
 
                     # only the owner processor writes other properties
 
@@ -373,6 +380,7 @@ class StorageLocal(object):
                   elif property.lower() == "lambda_adr" : particle.lambda_adr = value
                   elif property.lower() == "lambda_adrd" : particle.lambda_adrd = value
                   elif property.lower() == "state" : particle.state = value
+                  elif property.lower() == "res_id" : particle.res_id = value
                   else: raise SyntaxError( 'unknown particle property: %s' % property) # UnknownParticleProperty exception is not implemented
               #except ParticleDoesNotExistHere:
                # self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))

@@ -142,9 +142,17 @@ namespace espressopp {
 
       /** Lookup whether data for a given adress real AT particle is available on this node.
       \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
-      Particle* lookupAdrATParticle(longint id) {
+      Particle* lookupAdrATParticle(longint id, bool canBeGhost = false) {
         IdParticleMap::iterator it = localAdrATParticles.find(id);
-        return (it != localAdrATParticles.end()) ? it->second : 0;
+        if (it != localAdrATParticles.end()) {
+          return it->second;
+        } else if (canBeGhost) {
+          IdParticleMap::iterator it2 = localAdrATParticlesG.find(id);
+          if (it2 != localAdrATParticlesG.end()) {
+            return it2->second;
+          }
+        }
+        return 0;
       }
 
 
@@ -169,6 +177,7 @@ namespace espressopp {
       CellList &getGhostCells() { return ghostCells; }
 
       python::list getRealParticleIDs();
+      void printAllParticles();
 
       const Cell* getFirstCell() const { return &(cells[0]); }
 
@@ -363,7 +372,14 @@ namespace espressopp {
        */
       void updateInLocalParticles(Particle*, bool weak = false);
 
-      void updateInLocalAdrATParticles(Particle *);
+      void updateInLocalAdrATParticles(Particle *p) {
+        localAdrATParticles[p->id()] = p;
+      }
+
+      /** Updates information in the local ghost list of adres particles */
+      void updateInLocalAdrATParticlesG(Particle *p) {
+        localAdrATParticlesG[p->id()] = p;
+      }
 
       // reserve space for nCells cells
       void resizeCells(longint nCells);
@@ -406,8 +422,7 @@ namespace espressopp {
       void clearAdrATParticlesG() {
           //std::cout << "size of AdrATParticlesG: " << AdrATParticlesG.size() << ", clearing... \n";
           AdrATParticlesG.clear();
-          //std::cout << " new size of AdrATParticlesG: " << AdrATParticlesG.size() << "\n";
-
+          localAdrATParticlesG.clear();
       }
       
       void savePosition(size_t id);
@@ -427,7 +442,8 @@ namespace espressopp {
 
       // map particle id to Particle * for all adress real AT particles on this node
       boost::unordered_map<longint, Particle*> localAdrATParticles;
-      
+      boost::unordered_map<longint, Particle*> localAdrATParticlesG;
+
       // we need to snap shot the particle coordinates
       std::map< size_t, Real3D > savedRealPositions;
       std::map< size_t, Int3D > savedImages;

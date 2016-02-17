@@ -38,6 +38,8 @@ namespace espressopp {
 namespace integrator {
 using namespace espressopp::iterator;  //NOLINT
 
+LOG4ESPP_LOGGER(DynamicResolution::theLogger, "DynamicResolution");
+
 DynamicResolution::DynamicResolution(
   shared_ptr<System> _system,
   shared_ptr<VerletListAdress> _verletList,

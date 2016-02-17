@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2015-2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -444,31 +446,13 @@ namespace espressopp {
                 // read the AT partcles
                 //std::cout << getSystem()->comm->rank() << ": buf.read(AT particle, extradata) (unpackPosEtc), i: " << i << "\n";
 
-                /*
-                buf.read(tmpatg, 1); // we force extradata to 1
-
-                atg = appendUnindexedAdrParticle(getAdrATParticlesG(), tmpatg);
-                atg->ghost() = 1;
-
-                tmp.push_back(atg);*/
-
                 Particle &atg = *itv2;
                 buf.read(atg, extradata);
 
                 atg.ghost() = 1;
                 tmp.push_back(&atg);
-
-
-
-                /*std::cout << getSystem()->comm->rank() << ":  <2--- " << atg.id() << "-" << atg.ghost() <<
-                                    " (" << atg.getPos() << ") type " << atg.getType() <<
-                                    " extradata: " << extradata << "\n";*/
-
-                /*if (atg->getType() == dst->getType()) { // for testing purposes
-                    std::cout << "SERIOUS ERROR, particle is of wrong type\n";
-                    exit(-1);
-                    return;
-                }*/
+                
+                updateInLocalAdrATParticlesG(&atg);
             }
 
             fixedtupleList->insert(std::make_pair(&(*dst), tmp));
@@ -526,6 +510,7 @@ namespace espressopp {
                     Particle &atg = *itv2;
                     atg.copyAsGhost(at, extradata, shift);
                     tmp.push_back(&atg);
+                    updateInLocalAdrATParticlesG(&atg);
                 }
                 fixedtupleList->insert(std::make_pair(&dst, tmp));
                 tmp.clear();
@@ -551,40 +536,6 @@ namespace espressopp {
         }
     }
 
-  /* -- this is now solved in FixedTupleList.cpp in onparticleschanged()
-  void DomainDecompositionAdress::foldAdrPartCoor(Particle& part, Real3D& oldpos, int coord) {
-
-      if (part.position()[coord] != oldpos[coord]) {
-          real moved = oldpos[coord] - part.position()[coord];
-
-          FixedTupleList::iterator it;
-          it = fixedtupleList->find(&part);
-          if (it != fixedtupleList->end()) {
-              std::vector<Particle*> atList;
-              atList = it->second;
-
-              for (std::vector<Particle*>::iterator itv = atList.begin();
-                    itv != atList.end(); ++itv) {
-                  Particle &at = **itv;
-
-                  //std::cout << " updating position for AT part " << at.id() << " (" << at.position() << ") ";
-
-                  at.position()[coord] = at.position()[coord] - moved;
-                  //getSystem()->bc->foldCoordinate(at.position(), at.image(), coord);
-
-                  //std::cout << "to (" << at.position() << ")\n";
-              }
-          }
-          else {
-              std::cout << getSystem()->comm->rank() << ": foldAdrPartCoor "
-                      << "VP particle "<< part.id() << "-" << part.ghost() << " not found in tuples!\n";
-              exit(1);
-              return;
-          }
-      }
-  }
-  */
-
   void DomainDecompositionAdress::packForces(OutBuffer &buf, Cell &_ghosts) {
 
     ParticleList &ghosts = _ghosts.particles;
@@ -595,13 +546,7 @@ namespace espressopp {
 
       LOG4ESPP_TRACE(logger, "from particle " << src->id() << ": packing force " << src->force());
 
-
-      /*std::cout << getSystem()->comm->rank() << ": " << " from particle " << src->id()
-              << " packing force " << src->force() << "\n";*/
-
-
-
-      // for AdResS
+      // For AdResS
       // write all AT particle forces belonging to this VP into the buffer
       FixedTupleListAdress::iterator it;
       it = fixedtupleList->find(&(*src));
@@ -609,18 +554,14 @@ namespace espressopp {
           std::vector<Particle*> atList;
           atList = it->second;
 
-          for (std::vector<Particle*>::iterator itv = atList.begin();
-                itv != atList.end(); ++itv) {
-              Particle &at = **itv;
-
-              /*std::cout << getSystem()->comm->rank() << ":  ---> " << at.id() << "-" << at.ghost() <<
-                      " (" << at.position() << ") type " << at.type() << " \n";*/
-
-              buf.write(at.particleForce());
+          for (std::vector<Particle*>::iterator itv = atList.begin(); itv != atList.end(); ++itv) {
+            Particle &at = **itv;
+            buf.write(at.particleForce());
           }
-      }
-      else {
-          std::cout << getSystem()->comm->rank() << ": packforces " << "VP particle "<< src->id() << "-" << src->ghost() << " not found in tuples!\n";
+      } else {
+          std::cout << getSystem()->comm->rank() << ": packforces "
+                    << "VP particle "<< src->id() << "-"
+                    << src->ghost() << " not found in tuples!\n";
           exit(1);
           return;
       }
@@ -642,15 +583,7 @@ namespace espressopp {
              << f.f() << " and adding to " << dst->force());
         dst->particleForce() += f;
 
-
-
-        /*std::cout << getSystem()->comm->rank() << ": " << " for particle " << dst->id() << " unpacking force "
-            << " and adding to " << dst->force() << "\n";*/
-
-
-        // for AdResS
-
-        // iterate through atomistic particles in fixedtuplelist
+        // For AdResS.
         FixedTupleListAdress::iterator it;
         it = fixedtupleList->find(&(*dst));
 
@@ -831,10 +764,19 @@ namespace espressopp {
                                 << " @ " << pos <<
                                 " is not inside node domain after neighbor exchange");
                         // isnan function is C99 only, x != x is only true if x == nan
-                        if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
+                        if (pos.isNaNInf()) {
                             // TODO: error handling
-                            LOG4ESPP_ERROR(logger, "particle " << part.id() <<
-                                    " has moved to outer space (one or more coordinates are nan)");
+                            std::stringstream ss;
+                            ss << "Particle (id=" << part.id() << ", type=" << part.type() << ")";
+                            ss << " has moved to outer space ";
+                            ss << "(one or more coordinates are nan)\n";
+                            ss << "pos[0]: " << pos[0] << " pos[1]: " << pos[1] << " pos[2]: ";
+                            ss << pos[2];
+                            ss << " ghost=" << part.ghost();
+                            ss << " id=" << part.id();
+                            ss << " type=" << part.type();
+                            LOG4ESPP_ERROR(logger, ss.str());
+                            exit(1);
                         } else {
                             // particle stays where it is, and will be sorted in the next round
                             finished = false;
@@ -896,9 +838,12 @@ namespace espressopp {
                                 << " is not inside node domain after neighbor exchange");
                         const Real3D& pos = part.position();
                         // isnan function is C99 only, x != x is only true if x == nan
-                        if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
-                            LOG4ESPP_ERROR(logger, "particle " << part.id() <<
-                                    " has moved to outer space (one or more coordinates are nan)");
+                        if (pos.isNaNInf()) {
+                          std::stringstream ss;
+                          ss << "Particle " << part.id() << " has moved to outer space (one or more coordinates are nan)";
+                          LOG4ESPP_ERROR(logger, ss.str());
+                          throw std::runtime_error(ss.str());
+                          exit(1);
                         } else {
                             // particle stays where it is, and will be sorted in the next round
                             finished = false;

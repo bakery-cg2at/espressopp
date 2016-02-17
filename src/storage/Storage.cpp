@@ -111,6 +111,24 @@ namespace espressopp {
       return pids;
     }
 
+    void Storage::printAllParticles() {
+      int rank = getSystemRef().comm->rank();
+      FixedTupleListAdress::iterator it;
+      std::vector<Particle*>::iterator ftla_it;
+      for (CellListIterator cit(localCells); !cit.isDone(); ++cit) {
+        std::cout << "CPU: " << rank << " pid=" << cit->id() << " ghost=" << cit->ghost() << std::endl;
+        if (fixedtupleList) {
+          it = fixedtupleList->find(&(*cit));
+          if (it != fixedtupleList->end()) {
+            for (ftla_it = it->second.begin(); ftla_it != it->second.end(); ++ftla_it) {
+              Particle *p = *ftla_it;
+              std::cout << "CPU: " << rank << " adr pid=" << p->id() << " ghost=" << p->ghost() << " vp=" << cit->id() << std::endl;
+            }
+          }
+        }
+      }
+    }
+
     // TODO find out why python crashes if inlined
     //inline
     void Storage::removeFromLocalParticles(Particle *p, bool weak) {
@@ -190,46 +208,13 @@ namespace espressopp {
       if (!weak || localParticles.find(p->id()) == localParticles.end()) {
           LOG4ESPP_TRACE(logger, "updating local pointer for particle id="
 		       << p->id() << " @ " << p);
-
-
           localParticles[p->id()] = p;
-
-          /*
-          // AdResS testing TODO
-          Particle* oldp = localParticles[p->id()];
-          Particle* newp = p;
-
-          localParticles[p->id()] = p;
-
-          //std::cout << "old *p " << oldp << "\n";
-          //std::cout << "new *p " << newp << "\n";
-
-          // TODO reorganize
-          if (oldp && fixedtupleList) {
-              FixedTupleList::iterator it;
-              it = fixedtupleList->find(oldp);
-              if (it != fixedtupleList->end()) {
-                  std::vector<Particle*> tmp;
-                  tmp = it->second;
-                  fixedtupleList->insert(std::make_pair(newp, tmp));
-                  fixedtupleList->erase(it);
-              }
-              else {
-                  //std::cout << "updateInLocalParticles: Particle not found in tuples!\n";
-              }
-          }
-          */
       }
       else {
           LOG4ESPP_TRACE(logger, "NOT updating local pointer for particle id="
 		       << p->id() << " @ " << p << " has already pointer @ "
 		       << localParticles[p->id()]);
       }
-    }
-
-    inline
-    void Storage::updateInLocalAdrATParticles(Particle *p) {
-          localAdrATParticles[p->id()] = p;
     }
 
     void Storage::updateLocalParticles(ParticleList &list, bool adress) {
@@ -765,6 +750,7 @@ namespace espressopp {
 	    .def("decompose", &Storage::decompose)
 	    .def("getRealParticleIDs", &Storage::getRealParticleIDs)
         .add_property("system", &Storage::getSystem)
+      .def("printAllParticles", &Storage::printAllParticles)
 	    ;
     }
   }

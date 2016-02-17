@@ -80,6 +80,7 @@ from espressopp.interaction.Interaction import *
 # pylint: disable=F0401
 from _espressopp import interaction_DihedralHarmonicNCos
 from _espressopp import interaction_FixedQuadrupleListDihedralHarmonicNCos
+from _espressopp import interaction_FixedQuadrupleListAdressDihedralHarmonicNCos
 
 
 class DihedralHarmonicNCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicNCos):
@@ -149,7 +150,6 @@ class FixedQuadrupleListAdressDihedralHarmonicNCosLocal(
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             return self.cxxclass.getFixedQuadrupleList(self)
-
 
 
 if pmi.isController:

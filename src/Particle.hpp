@@ -194,6 +194,7 @@ namespace espressopp {
     */
 
     enum ExtraDataElements {
+      DATA_ALL = 0,
       DATA_PROPERTIES=1,
       DATA_MOMENTUM=2,
       DATA_LOCAL=4
@@ -349,6 +350,18 @@ namespace espressopp {
         l = src.l;
       }
       ghost() = 1;
+    }
+
+    bool operator<(Particle other) const {
+      return p.id < other.id();
+    }
+
+    bool operator<(const Particle &other) {
+      return p.id < other.id();
+    }
+
+    bool operator<(Particle *other) {
+      return p.id < other->id();
     }
 
   private:

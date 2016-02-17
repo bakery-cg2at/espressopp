@@ -68,6 +68,7 @@
 #include "SystemMonitor.hpp"
 #include "PotentialEnergy.hpp"
 #include "KineticEnergy.hpp"
+#include "Resolution.hpp"
 #include "NFixedListEntries.hpp"
 
 namespace espressopp {
@@ -118,6 +119,7 @@ namespace espressopp {
 
       SystemMonitorOutputCSV::registerPython();
       SystemMonitor::registerPython();
+      Resolution::registerPython();
       PotentialEnergy::registerPython();
       KineticEnergy::registerPython();
       NFixedPairListEntries::registerPython();
