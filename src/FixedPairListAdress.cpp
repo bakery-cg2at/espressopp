@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2015-2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -51,7 +53,6 @@ namespace espressopp {
   }
 
   FixedPairListAdress::~FixedPairListAdress() {
-
     LOG4ESPP_INFO(theLogger, "~FixedPairListAdress");
 
     sigBeforeSendAT.disconnect();
@@ -61,7 +62,6 @@ namespace espressopp {
 
   // override parent function (use lookupAdrATParticle)
   bool FixedPairListAdress::add(longint pid1, longint pid2) {
-
     if (pid1 > pid2)
       std::swap(pid1, pid2);
 
@@ -71,12 +71,10 @@ namespace espressopp {
     
     // ADD THE LOCAL PAIR
     Particle *p1 = storage->lookupAdrATParticle(pid1);
-    Particle *p2 = storage->lookupAdrATParticle(pid2);
-    if (!p1){
-      // Particle does not exist here, return false
+    Particle *p2 = storage->lookupAdrATParticle(pid2, true);
+    if (!p1) {  // p1 not found on this processor
       returnVal = false;
-    }
-    else{
+    } else {
       if (!p2) {
         std::stringstream msg;
         msg << "Atomistic bond particle p2 (id=" << pid2 << ") does not exists here "
@@ -92,23 +90,22 @@ namespace espressopp {
       this->add(p1, p2);
       // ADD THE GLOBAL PAIR
       // see whether the particle already has pairs
-      std::pair<GlobalPairs::const_iterator,
-        GlobalPairs::const_iterator> equalRange
-        = globalPairs.equal_range(pid1);
+      std::pair<GlobalPairs::const_iterator, GlobalPairs::const_iterator> equalRange
+          = globalPairs.equal_range(pid1);
       if (equalRange.first == globalPairs.end()) {
-        // if it hasn't, insert the new pair
         globalPairs.insert(std::make_pair(pid1, pid2));
       }
       else {
-        // otherwise test whether the pair already exists
-        for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+        bool found = false;
+        for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second && !found; ++it) {
   	      if (it->second == pid2) {
-  	        // TODO: Pair already exists, generate error!
-  	        ;
+            found = true;
+            LOG4ESPP_ERROR(theLogger, "found pair " << pid1 << "-" << pid2);
   	      }
         }
         // if not, insert the new pair
-        globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
+        if (!found)
+          globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
       }
       LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     }
@@ -118,8 +115,6 @@ namespace espressopp {
 
   void FixedPairListAdress::beforeSendATParticles(std::vector<longint>& atpl,
           OutBuffer& buf) {
-
-        //std::cout << "beforeSendATParticles() fixed pl (size " << atpl.size() << ")\n";
 
         std::vector< longint > toSend;
 
@@ -167,7 +162,6 @@ namespace espressopp {
   void FixedPairListAdress::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   }
 
-
   // override parent function (use lookupAdrATParticle())
   void FixedPairListAdress::onParticlesChanged() {
 
@@ -181,9 +175,7 @@ namespace espressopp {
     Particle *p1;
     Particle *p2;
 
-    for (GlobalPairs::const_iterator it = globalPairs.begin();
-	 it != globalPairs.end(); ++it) {
-
+    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); ++it) {
         if (it->first != lastpid1) {
             p1 = storage->lookupAdrATParticle(it->first);
             if (p1 == NULL) {
@@ -195,15 +187,13 @@ namespace espressopp {
             lastpid1 = it->first;
         }
 
-        p2 = storage->lookupAdrATParticle(it->second);
+        p2 = storage->lookupAdrATParticle(it->second, true);
         if (p2 == NULL) {
             std::stringstream msg;
-            msg << "FixedPairListAdress ";
+            msg << "FixedPairListAdress.onParticlesChanged ";
             msg << "Atomistic bond particle p2 (id=" << it->second << ") does not exists here.";
             err.setException( msg.str() );
         }
-
-        //std::cout << " adding (" << p1->getId() << ", " << p2->getId() << ")\n";
         this->add(p1, p2);
     }
     err.checkException();

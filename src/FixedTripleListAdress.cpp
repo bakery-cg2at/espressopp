@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2015-2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -69,13 +71,13 @@ FixedTripleListAdress::~FixedTripleListAdress() {
     System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
-    //if (pid1 > pid2)
-      //std::swap(pid1, pid2);
+    if (pid1 > pid2 && pid1 > pid3)
+      std::swap(pid1, pid3);
 
     // ADD THE LOCAL TRIPLES
-    Particle *p1 = storage->lookupAdrATParticle(pid1);
+    Particle *p1 = storage->lookupAdrATParticle(pid1, true);
     Particle *p2 = storage->lookupAdrATParticle(pid2);
-    Particle *p3 = storage->lookupAdrATParticle(pid3);
+    Particle *p3 = storage->lookupAdrATParticle(pid3, true);
 
     // middle particle is the reference particle and must exist here
     if (!p2){
@@ -115,13 +117,15 @@ FixedTripleListAdress::~FixedTripleListAdress() {
       }
       else {
         // otherwise test whether the triple already exists
-        for (GlobalTriples::const_iterator it = equalRange.first;
-             it != equalRange.second; ++it)
-          if (it->second == std::pair<longint, longint>(pid1, pid3))
+        bool found = false;
+        for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second && !found; ++it)
+          if (it->second == std::pair<longint, longint>(pid1, pid3) ||
+              (it->second == std::pair<longint, longint>(pid3, pid1)))
+            found = true;
           // TODO: Triple already exists, generate error!
-        ;
         // if not, insert the new triple
-        globalTriples.insert(equalRange.first, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+        if (!found)
+          globalTriples.insert(equalRange.first, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
       }
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     }
@@ -209,13 +213,13 @@ FixedTripleListAdress::~FixedTripleListAdress() {
             }
     	    lastpid2 = it->first;
           }
-          p1 = storage->lookupAdrATParticle(it->second.first);
+          p1 = storage->lookupAdrATParticle(it->second.first, true);
           if (p1 == NULL) {
             std::stringstream msg;
             msg<< "atomistic triple particle p1 " << it->second.first << " does not exists here";
             err.setException( msg.str() );
           }
-          p3 = storage->lookupAdrATParticle(it->second.second);
+          p3 = storage->lookupAdrATParticle(it->second.second, true);
           if (p3 == NULL) {
             std::stringstream msg;
             msg << "atomistic triple particle p3 " << it->second.second << " does not exists here";

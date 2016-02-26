@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2014
+  Copyright (c) 2014-2016
       Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
@@ -66,9 +66,9 @@ bool FixedQuadrupleListAdress::add(longint pid1, longint pid2, longint pid3, lon
 
   // ADD THE LOCAL QUADRUPLET
   Particle *p1 = storage->lookupAdrATParticle(pid1);
-  Particle *p2 = storage->lookupAdrATParticle(pid2);
-  Particle *p3 = storage->lookupAdrATParticle(pid3);
-  Particle *p4 = storage->lookupAdrATParticle(pid4);
+  Particle *p2 = storage->lookupAdrATParticle(pid2, true);  // this can also be a ghost particle
+  Particle *p3 = storage->lookupAdrATParticle(pid3, true);  // this can also be a ghost particle
+  Particle *p4 = storage->lookupAdrATParticle(pid4, true);  // this can also be a ghost particle
   if (!p1){
     // Particle does not exist here, return false
     returnVal = false;
@@ -76,16 +76,19 @@ bool FixedQuadrupleListAdress::add(longint pid1, longint pid2, longint pid3, lon
     if (!p2) {
       std::stringstream msg;
       msg << "Quadruple particle p2 " << pid2 << " does not exists here and cannot be added.";
+      msg << " quadruplet: " << pid1 << "-" << pid2 << "-" << pid3 << "-" << pid4;
       err.setException( msg.str() );
     }
     if (!p3) {
       std::stringstream msg;
       msg << "Quadruple particle p3 " << pid3 << " does not exists here and cannot be added.";
+      msg << " quadruplet: " << pid1 << "-" << pid2 << "-" << pid3 << "-" << pid4;
       err.setException( msg.str() );
     }
     if (!p4) {
       std::stringstream msg;
       msg << "Quadruple particle p4 " << pid4 << " does not exists here and cannot be added.";
+      msg << " quadruplet: " << pid1 << "-" << pid2 << "-" << pid3 << "-" << pid4;
       err.setException( msg.str() );
     }
   }
@@ -106,13 +109,14 @@ bool FixedQuadrupleListAdress::add(longint pid1, longint pid2, longint pid3, lon
         Triple<longint, longint, longint>(pid2, pid3, pid4)));
     } else {
       // otherwise test whether the quadruple already exists
-      for (GlobalQuadruples::const_iterator it = equalRange.first; it != equalRange.second; ++it)
-        if (it->second == Triple<longint, longint, longint>(pid2, pid3, pid4))
-          // TODO: Quadruple already exists, generate error!
-        ;
+      bool found_quadruplet = false;
+      for (GlobalQuadruples::const_iterator it = equalRange.first; 
+          it != equalRange.second && !found_quadruplet; ++it)
+          found_quadruplet = (it->second == Triple<longint, longint, longint>(pid2, pid3, pid4));
       // if not, insert the new quadruple
-      globalQuadruples.insert(equalRange.first,
-        std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
+      if (!found_quadruplet)
+        globalQuadruples.insert(equalRange.first,
+          std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
     }
   }
   LOG4ESPP_INFO(theLogger, "Added fixed quadruple to local quadruple list.");
@@ -186,19 +190,19 @@ void FixedQuadrupleListAdress::onParticlesChanged() {
       }
       lastpid1 = it->first;
     }
-    p2 = storage->lookupAdrATParticle(it->second.first);
+    p2 = storage->lookupAdrATParticle(it->second.first, true);
     if (p2 == NULL) {
       std::stringstream msg;
       msg << "Quadruple particle p2 " << it->second.first << " does not exists here.";
       err.setException( msg.str() );
     }
-    p3 = storage->lookupAdrATParticle(it->second.second);
+    p3 = storage->lookupAdrATParticle(it->second.second, true);
     if (p3 == NULL) {
       std::stringstream msg;
       msg << "Quadruple particle p3 " << it->second.second << " does not exists here.";
       err.setException( msg.str() );
     }
-    p4 = storage->lookupAdrATParticle(it->second.third);
+    p4 = storage->lookupAdrATParticle(it->second.third, true);
     if (p4 == NULL) {
       std::stringstream msg;
       msg << "Quadruple particle p4 " << it->second.third << " does not exists here.";
