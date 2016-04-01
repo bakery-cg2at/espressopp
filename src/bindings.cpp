@@ -61,6 +61,8 @@
 #include <analysis/bindings.hpp>
 #include <io/bindings.hpp>
 
+#include <VerletListHybrid.hpp>
+
 void espressopp::registerPython() {
   espressopp::Particle::registerPython();
   espressopp::ParticleProperties::registerPython();
@@ -98,6 +100,9 @@ void espressopp::registerPython() {
   espressopp::interaction::registerPython();
   espressopp::analysis::registerPython();
   espressopp::io::registerPython();
+
+  espressopp::VerletListHybridAT::registerPython();
+  espressopp::VerletListHybridCG::registerPython();
 
   log4espp::PyLogger::registerPython();
 }

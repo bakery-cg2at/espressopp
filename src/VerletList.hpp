@@ -80,7 +80,7 @@ class DynamicExcludeList {
     VerletList(shared_ptr< System >, real cut,
         shared_ptr<DynamicExcludeList> dynamic_ex_list, bool rebuildVL);
 
-    ~VerletList();
+    virtual ~VerletList();
 
     PairList& getPairs() { return vlPairs; }
 
@@ -114,7 +114,7 @@ class DynamicExcludeList {
 
   protected:
 
-    void checkPair(Particle &pt1, Particle &pt2);
+    virtual void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
     shared_ptr<ExcludeList> exList; // exclusion list
     bool dynamicExList;

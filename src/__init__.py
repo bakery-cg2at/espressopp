@@ -57,6 +57,7 @@ from espressopp.ParallelTempering import *
 from espressopp.Version import *
 from espressopp.PLogger import *
 
+from espressopp.VerletListHybrid import *
 
 infinity=float("inf")
 nan=float("nan")

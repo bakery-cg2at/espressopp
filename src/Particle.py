@@ -141,6 +141,11 @@ class ParticleLocal(object):
     def isGhost(self): return self.__getTmp().isGhost
     @isGhost.setter
     def isGhost(self, val): self.__getTmp().isGhost = val
+
+    @property
+    def isVP(self): return self.__getTmp().isVP
+    @isVP.setter
+    def isVP(self, val): self.__getTmp().isVP = val
     
     @property
     def lambda_adr(self): return self.__getTmp().lambda_adr
