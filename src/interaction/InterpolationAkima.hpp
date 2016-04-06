@@ -94,7 +94,7 @@ namespace espressopp {
               ss << " Nothing to do, exit(1)";
               LOG4ESPP_ERROR(theLogger, ss.str());
               index = 0;
-              exit(1);
+              throw std::runtime_error(ss.str());
             }
             if (index >= N) {
               ss << "Distance " << r << " out of range " << inner << " - "
@@ -103,7 +103,7 @@ namespace espressopp {
               ss << " Nothing to do, exit(1)";
               LOG4ESPP_ERROR(theLogger, ss.str());
               index = N;
-              exit(1);
+              throw std::runtime_error(ss.str());
             }
             
             real z = r - radius[index];

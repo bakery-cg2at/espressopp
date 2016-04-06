@@ -134,6 +134,9 @@ namespace espressopp {
 
       readAll<ParticlePosition>(p.r);
 
+      readAll<bool>(p.vp());
+      readAll<real>(p.lambda());
+
       if (extradata & DATA_PROPERTIES) {
         readAll<ParticleProperties>(p.p);
       }
@@ -255,6 +258,9 @@ namespace espressopp {
       p.r.copyShifted(r, shift);
 
       writeAll<ParticlePosition>(r);
+
+      writeAll<bool>(p.vp());
+      writeAll<real>(p.lambda());
 
       if (extradata & DATA_PROPERTIES) {
         writeAll<ParticleProperties>(p.p);

@@ -62,6 +62,7 @@
 #include <io/bindings.hpp>
 
 #include <VerletListHybrid.hpp>
+#include <FixedVSList.hpp>
 
 void espressopp::registerPython() {
   espressopp::Particle::registerPython();
@@ -103,6 +104,8 @@ void espressopp::registerPython() {
 
   espressopp::VerletListHybridAT::registerPython();
   espressopp::VerletListHybridCG::registerPython();
+
+  espressopp::FixedVSList::registerPython();
 
   log4espp::PyLogger::registerPython();
 }

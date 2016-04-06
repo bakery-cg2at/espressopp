@@ -360,6 +360,7 @@ namespace espressopp {
       }
       ghost() = 1;
       l.vp = src.getVP();
+      lambda() = src.lambda();
     }
 
     bool operator<(Particle other) const {
@@ -372,6 +373,15 @@ namespace espressopp {
 
     bool operator<(Particle *other) {
       return p.id < other->id();
+    }
+
+    friend std::ostream& operator<<(std::ostream &output, const Particle &p) {
+      output << "P.id=" << p.id() << " type=" << p.type()
+          << " pos=" << p.position() << " v=" << p.velocity()
+          << " f=" << p.force() << " ghost=" << p.ghost()
+          << " lmb=" << p.lambda() << " state=" << p.state()
+          << " resid=" << p.res_id();
+      return output;
     }
 
   private:

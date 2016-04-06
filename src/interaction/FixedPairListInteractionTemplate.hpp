@@ -119,13 +119,20 @@ namespace espressopp {
         	fixedpairList->setLongtimeMaxBondSqr(d);
         	ltMaxBondSqr = d;
         }
-        if(potential->_computeForce(force, dist)) {
-          p1.force() += force;
-          p2.force() -= force;
-          LOG4ESPP_DEBUG(_Potential::theLogger, "p" << p1.id() << "(" << p1.position()[0] << "," << p1.position()[1] << "," << p1.position()[2] << ") "
-        		                             << "p" << p2.id() << "(" << p2.position()[0] << "," << p2.position()[1] << "," << p2.position()[2] << ") "
-        		                             << "dist=" << sqrt(dist*dist) << " "
-        		                             << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
+        try {
+          if(potential->_computeForce(force, dist)) {
+            p1.force() += force;
+            p2.force() -= force;
+            LOG4ESPP_DEBUG(_Potential::theLogger, "p" << p1.id() << "(" << p1.position()[0] << "," << p1.position()[1] << "," << p1.position()[2] << ") "
+                                               << "p" << p2.id() << "(" << p2.position()[0] << "," << p2.position()[1] << "," << p2.position()[2] << ") "
+                                               << "dist=" << sqrt(dist*dist) << " "
+                                               << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
+          }
+        } catch (const std::exception &ex) {
+          LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+                                                << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+          throw ex;
         }
       }
     }
@@ -144,7 +151,14 @@ namespace espressopp {
         const Particle &p2 = *it->second;
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-        e += potential->_computeEnergy(r21);
+        try {
+          e += potential->_computeEnergy(r21);
+        }  catch (const std::exception &ex) {
+          LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+              << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+          throw ex;
+        }
       }
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
@@ -188,8 +202,15 @@ namespace espressopp {
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         Real3D force;
-        if(potential->_computeForce(force, r21)) {
-          w += r21 * force;
+        try {
+          if (potential->_computeForce(force, r21)) {
+            w += r21 * force;
+          }
+        } catch (const std::exception &ex) {
+          LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+              << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+          throw ex;
         }
       }
       
@@ -211,8 +232,15 @@ namespace espressopp {
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         Real3D force;
-        if(potential->_computeForce(force, r21)) { 
-          wlocal += Tensor(r21, force);
+        try {
+          if (potential->_computeForce(force, r21)) {
+            wlocal += Tensor(r21, force);
+          }
+        } catch (const std::exception &ex) {
+          LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+              << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+          throw ex;
         }
       }
       
@@ -241,8 +269,15 @@ namespace espressopp {
           Real3D r21;
           bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
           Real3D force;
-          if(potential->_computeForce(force, r21)) { 
-            wlocal += Tensor(r21, force);
+          try {
+            if (potential->_computeForce(force, r21)) {
+              wlocal += Tensor(r21, force);
+            }
+          } catch (const std::exception &ex) {
+            LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+                << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+            throw ex;
           }
         }
       }
@@ -279,8 +314,15 @@ namespace espressopp {
         bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
         Real3D force;
         Tensor ww;
-        if(potential->_computeForce(force, r21)) { 
-          ww = Tensor(r21, force);
+        try {
+          if (potential->_computeForce(force, r21)) {
+            ww = Tensor(r21, force);
+          }
+        } catch (const std::exception &ex) {
+          LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+              << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+          throw ex;
         }
         
         int i = minpos + 1;

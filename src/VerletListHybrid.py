@@ -23,8 +23,7 @@ r"""
 *******************************
 """
 from espressopp import pmi
-import _espressopp 
-import espressopp
+import _espressopp
 from espressopp.esutil import cxxinit
 
 
@@ -35,8 +34,6 @@ class VerletListHybridATLocal(_espressopp.VerletListHybridAT):
             if exclusionlist is None:
                 # rebuild list in constructor
                 cxxinit(self, _espressopp.VerletListHybridAT, system, cutoff, True)
-            elif isinstance(exclusionlist, DynamicExcludeListLocal):
-                cxxinit(self, _espressopp.VerletListHybridAT, system, cutoff, exclusionlist, True)
             else:
                 # do not rebuild list in constructor
                 cxxinit(self, _espressopp.VerletListHybridAT, system, cutoff, False)
@@ -84,8 +81,6 @@ class VerletListHybridCGLocal(_espressopp.VerletListHybridCG):
             if exclusionlist is None:
                 # rebuild list in constructor
                 cxxinit(self, _espressopp.VerletListHybridCG, system, cutoff, True)
-            elif isinstance(exclusionlist, DynamicExcludeListLocal):
-                cxxinit(self, _espressopp.VerletListHybridCG, system, cutoff, exclusionlist, True)
             else:
                 # do not rebuild list in constructor
                 cxxinit(self, _espressopp.VerletListHybridCG, system, cutoff, False)
@@ -136,11 +131,11 @@ if pmi.isController:
         pmiinvoke = [ 'getAllPairs' ]
       )
 
-      class VerletListHybridCG(object):
+    class VerletListHybridCG(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls = 'espressopp.VerletListHybridCGLocal',
-          pmiproperty = [ 'builds' ],
-          pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
-          pmiinvoke = [ 'getAllPairs' ]
+            cls = 'espressopp.VerletListHybridCGLocal',
+            pmiproperty = [ 'builds' ],
+            pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
+            pmiinvoke = [ 'getAllPairs' ]
         )

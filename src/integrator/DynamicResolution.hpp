@@ -26,11 +26,8 @@
 #include "types.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
-#include "VerletListAdress.hpp"
-#include "FixedTupleListAdress.hpp"
+#include "FixedVSList.hpp"
 #include "Extension.hpp"
-#include "VelocityVerlet.hpp"
-#include "Adress.hpp"
 
 #include "boost/signals2.hpp"
 
@@ -41,12 +38,9 @@ namespace integrator {
 /*
  * This module implement dynamic resolution extension.
  */
-class DynamicResolution : public Adress {
+class DynamicResolution : public Extension {
  public:
-  DynamicResolution(shared_ptr<System> _system,
-    shared_ptr<VerletListAdress> _verletList,
-    shared_ptr<FixedTupleListAdress> _fixedtupleList,
-    real _rate);
+  DynamicResolution(shared_ptr<System> _system, shared_ptr<FixedVSList> _vslist, real _rate);
 
   ~DynamicResolution();
   real resolution() { return resolution_; }
@@ -64,10 +58,7 @@ class DynamicResolution : public Adress {
   static void registerPython();
 
  private:
-  real weight(real) { return resolution_; }
-  real weightderivative(real) { return 0.0; }
   void updateWeights();
-  void SetPosVel();
 
   void ChangeResolution();
   real rate_;
@@ -77,8 +68,10 @@ class DynamicResolution : public Adress {
   void connect();
   void disconnect();
 
+  shared_ptr<FixedVSList> vs_list;
+
   // Signals
-  boost::signals2::connection _aftIntV;
+  boost::signals2::connection _aftIntV, _runInit;
 
   static LOG4ESPP_DECL_LOGGER(theLogger);
 };

@@ -58,6 +58,7 @@ from espressopp.Version import *
 from espressopp.PLogger import *
 
 from espressopp.VerletListHybrid import *
+from espressopp.FixedVSList import *
 
 infinity=float("inf")
 nan=float("nan")

@@ -24,12 +24,14 @@
 #include "MDIntegrator.hpp"
 #include "VelocityVerlet.hpp"
 #include "VelocityVerletOnGroup.hpp"
+#include "VelocityVerletHybrid.hpp"
 
 #include "Extension.hpp"
 #include "TDforce.hpp"
 #include "FreeEnergyCompensation.hpp"
 #include "OnTheFlyFEC.hpp"
 #include "Adress.hpp"
+#include "AdressNew.hpp"
 #include "BerendsenBarostat.hpp"
 #include "BerendsenBarostatAnisotropic.hpp"
 #include "BerendsenThermostat.hpp"
@@ -67,8 +69,10 @@ namespace espressopp {
       MDIntegrator::registerPython();
       VelocityVerlet::registerPython();
       VelocityVerletOnGroup::registerPython();
+      VelocityVerletHybrid::registerPython();
       Extension::registerPython();
       Adress::registerPython();
+      AdressNew::registerPython();
       BerendsenBarostat::registerPython();
       BerendsenBarostatAnisotropic::registerPython();
       BerendsenThermostat::registerPython();

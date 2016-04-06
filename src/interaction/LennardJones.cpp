@@ -24,6 +24,7 @@
 #include "LennardJones.hpp"
 #include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
+#include "VerletListHybridInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
@@ -36,6 +37,8 @@ namespace espressopp {
 
     typedef class VerletListInteractionTemplate <LennardJones>
         VerletListLennardJones;
+    typedef class VerletListHybridInteractionTemplate <LennardJones>
+      VerletListHybridLennardJones;
     typedef class VerletListAdressInteractionTemplate <LennardJones, Tabulated>
         VerletListAdressLennardJones;
     typedef class VerletListAdressInteractionTemplate <LennardJones, LennardJones>
@@ -77,6 +80,13 @@ namespace espressopp {
         .def("setPotential", &VerletListLennardJones::setPotential)
         .def("getPotential", &VerletListLennardJones::getPotentialPtr)
       ;
+
+      class_< VerletListHybridLennardJones, bases< Interaction > >
+          ("interaction_VerletListHybridLennardJones", init< shared_ptr<VerletList>, bool >())
+          .def("getVerletList", &VerletListHybridLennardJones::getVerletList)
+          .def("setPotential", &VerletListHybridLennardJones::setPotential)
+          .def("getPotential", &VerletListHybridLennardJones::getPotentialPtr)
+          ;
 
       class_< VerletListAdressLennardJones, bases< Interaction > >
         ("interaction_VerletListAdressLennardJones",

@@ -30,7 +30,6 @@
 #include "System.hpp"
 #include "storage/Storage.hpp"
 #include "bc/BC.hpp"
-#include "FixedTupleListAdress.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 #include "iterator/CellListIterator.hpp"
 
@@ -40,22 +39,11 @@ using namespace espressopp::iterator;  //NOLINT
 
 LOG4ESPP_LOGGER(DynamicResolution::theLogger, "DynamicResolution");
 
-DynamicResolution::DynamicResolution(
-  shared_ptr<System> _system,
-  shared_ptr<VerletListAdress> _verletList,
-  shared_ptr<FixedTupleListAdress> _fixedtupleList,
-  real _rate)
-      : Adress(_system, _verletList, _fixedtupleList, false), rate_(_rate) {
+DynamicResolution::DynamicResolution(shared_ptr<System> _system, shared_ptr<FixedVSList> _vslist, real _rate)
+    : Extension(_system), vs_list(_vslist), rate_(_rate) {
     LOG4ESPP_INFO(theLogger, "construct DynamicResolution");
 
     type = Extension::Adress;
-
-    // In this case the whole simulation box is treat as a single
-    // resolution domain. Therefore there is no need to set the spatial dimensions.
-    dhy = getSystem()->bc->getBoxL()[0];
-    verletList->setHyEx(dhy, 0.0, true);
-    verletList->setAdrCenter(dhy/2.0, 0.0, 0.0);
-    verletList->setAdrRegionType(false);
     resolution_ = 0.0;
 }
 
@@ -66,15 +54,20 @@ DynamicResolution::~DynamicResolution() {
 }
 
 void DynamicResolution::connect() {
-  Adress::connect();
+  LOG4ESPP_INFO(theLogger, "connect");
   _aftIntV = integrator->aftIntV.connect(
       boost::bind(&DynamicResolution::ChangeResolution, this),
       boost::signals2::at_back);
+  _runInit = integrator->runInit.connect(
+      boost::bind(&DynamicResolution::updateWeights, this),
+      boost::signals2::at_back
+  );
 }
 
 void DynamicResolution::disconnect() {
-  Adress::disconnect();
+  LOG4ESPP_INFO(theLogger, "disconnect");
   _aftIntV.disconnect();
+  _runInit.disconnect();
 }
 
 void DynamicResolution::set_active(bool active) {
@@ -97,77 +90,30 @@ void DynamicResolution::ChangeResolution() {
   updateWeights();
 }
 
-void DynamicResolution::SetPosVel() {
-  System& system = getSystemRef();
-  // Set the positions and velocity of CG particles & update weights.
-  for (CellListIterator cit(system.storage->getLocalCells()); !cit.isDone(); ++cit) {
-    Particle &vp = *cit;
-    FixedTupleListAdress::iterator it3;
-    it3 = fixedtupleList->find(&vp);
-
-    if (it3 != fixedtupleList->end()) {
-      std::vector<Particle*> atList;
-      atList = it3->second;
-
-      // Compute center of mass
-      Real3D cmp(0.0, 0.0, 0.0);  // center of mass position
-      Real3D cmv(0.0, 0.0, 0.0);  // center of mass velocity
-
-      for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2) {
-        Particle &at = **it2;
-        cmp += at.mass() * at.position();
-        cmv += at.mass() * at.velocity();
-        at.lambda() = resolution_;
-        at.lambdaDeriv() = 0.0;
-      }
-
-      cmp /= vp.mass();
-      cmv /= vp.mass();
-
-      // Fold position.
-      system.bc->foldPosition(cmp);
-
-      // update (overwrite) the position and velocity of the VP
-      vp.position() = cmp;
-      vp.velocity() = cmv;
-
-      vp.lambda() = resolution_;
-      vp.lambdaDeriv() = 0.0;
-    } else {
-      std::stringstream msg;
-      msg << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
-      msg << " (" << vp.position() << ")";
-      throw std::runtime_error(msg.str());
-    }
-  }
-}
-
-
 void DynamicResolution::updateWeights() {
-  System& system = getSystemRef();
-  for (CellListIterator cit(system.storage->getLocalCells()); !cit.isDone(); ++cit) {
-    Particle &vp = *cit;
-    FixedTupleListAdress::iterator it3;
-    it3 = fixedtupleList->find(&vp);
+  LOG4ESPP_INFO(theLogger, "updateWeights");
+  System &system = getSystemRef();
 
-    vp.lambda() = resolution_;
-    vp.lambdaDeriv() = 0.0;
+  // Update weights of the particles.
+  FixedVSList::GlobalTuples vs = vs_list->globalTuples;
+  FixedVSList::GlobalTuples::iterator it = vs.begin();
+  for (; it != vs.end(); ++it) {
+    Particle *vp = system.storage->lookupRealParticle(it->first);
+    if (vp) {
+      vp->lambda() = resolution_;
 
-    if (it3 != fixedtupleList->end()) {
-      std::vector<Particle*> atList;
-      atList = it3->second;
-
-      // Propagate lambda/lambdaDeriv downstream to underlying atoms
-      for (std::vector<Particle*>::iterator it2 = atList.begin(); it2 != atList.end(); ++it2) {
-        Particle &at = **it2;
-        at.lambda() = resolution_;
-        at.lambdaDeriv() = 0.0;
+      // Update weights for all underlying particles.
+      for (FixedVSList::tuple::iterator itp = it->second.begin(); itp != it->second.end(); ++itp) {
+        Particle *at = system.storage->lookupLocalParticle(*itp);
+        if (at) {
+          at->lambda() = resolution_;
+        } else {
+          std::cout << " AT particle (" << *itp << ") of VP " << vp->id() << "-"
+              << vp->ghost() << " not found in tuples ";
+          std::cout << " (" << vp->position() << ")" << std::endl;
+          exit(1);
+        }
       }
-    } else {
-      std::stringstream msg;
-      msg << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
-      msg << " (" << vp.position() << ")";
-      throw std::runtime_error(msg.str());
     }
   }
 }
@@ -179,14 +125,12 @@ void DynamicResolution::updateWeights() {
 void DynamicResolution::registerPython() {
   using namespace espressopp::python;  // NOLINT
   class_<DynamicResolution, shared_ptr<DynamicResolution>, bases<Extension> >
-    ("integrator_DynamicResolution", init<shared_ptr<System>, shared_ptr<VerletListAdress>,
-                                          shared_ptr<FixedTupleListAdress>, real >())
+    ("integrator_DynamicResolution", init<shared_ptr<System>, shared_ptr<FixedVSList>, real >())
     .add_property("active", &DynamicResolution::active, &DynamicResolution::set_active)
     .add_property("resolution", &DynamicResolution::resolution, &DynamicResolution::set_resolution)
     .add_property("rate", &DynamicResolution::rate, &DynamicResolution::set_rate)
     .def("connect", &DynamicResolution::connect)
-    .def("disconnect", &DynamicResolution::disconnect)
-    .def("SetPosVel", &DynamicResolution::SetPosVel);
+    .def("disconnect", &DynamicResolution::disconnect);
 }
 }  // end namespace integrator
 }  // end namespace espressopp

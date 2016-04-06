@@ -247,6 +247,7 @@ class StorageLocal(object):
             index_lambda_adrd = -1
             index_state       = -1
             index_res_id      = -1
+            index_vp          = -1
 
             last_pos = toReal3DFromVector([-99,-99,-99])
 
@@ -273,6 +274,7 @@ class StorageLocal(object):
                     elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
                     elif val.lower() == "state": index_state = nindex
                     elif val.lower() == "res_id": index_res_id = nindex
+                    elif val.lower() == "vp": index_vp = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
 
@@ -355,6 +357,9 @@ class StorageLocal(object):
 
                     if index_state >= 0:
                         storedParticle.state = particle[index_state]
+
+                    if index_vp >= 0:
+                        storedParticle.isVP = particle[index_vp]
  
     def modifyParticle(self, pid, property, value):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

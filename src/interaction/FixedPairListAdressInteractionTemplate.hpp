@@ -132,9 +132,17 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::addForces() {
     }
 
     if (forcescale12 > 0.0) {
-      if (potential->_computeForce(force, dist)) {
-        p1.force() += forcescale12 * force;
-        p2.force() -= forcescale12 * force;
+      try {
+        if (potential->_computeForce(force, dist)) {
+          p1.force() += forcescale12 * force;
+          p2.force() -= forcescale12 * force;
+        }
+      } catch (const std::exception &ex) {
+        LOG4ESPP_ERROR(_Potential::theLogger,
+                       "p1 " << p1 <<
+                       " p2 " << p2
+        );
+        throw ex;
       }
     }
   }
@@ -157,7 +165,14 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeEnergy
     if (energyscale12 > 0.0) {
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-      e_local += energyscale12*potential->_computeEnergy(r21);
+      try {
+        e_local += energyscale12 * potential->_computeEnergy(r21);
+      } catch (const std::exception &ex) {
+        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+        throw ex;
+      }
     }
   }
   real esum;
@@ -208,8 +223,15 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
       Real3D force;
-      if (potential->_computeForce(force, r21)) {
-        w_virial += r21 * forcescale*force;
+      try {
+        if (potential->_computeForce(force, r21)) {
+          w_virial += r21 * forcescale * force;
+        }
+      } catch (const std::exception &ex) {
+        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+        throw ex;
       }
     }
   }
@@ -238,8 +260,15 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
       Real3D force;
-      if (potential->_computeForce(force, r21)) {
-        w_wlocal += Tensor(r21, forcescale*force);
+      try {
+        if (potential->_computeForce(force, r21)) {
+          w_wlocal += Tensor(r21, forcescale * force);
+        }
+      } catch (const std::exception &ex) {
+        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+        throw ex;
       }
     }
   }
@@ -278,8 +307,15 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
         Real3D force;
-        if (potential->_computeForce(force, r21)) {
-          wlocal += Tensor(r21, forcescale*force);
+        try {
+          if (potential->_computeForce(force, r21)) {
+            wlocal += Tensor(r21, forcescale * force);
+          }
+        } catch (const std::exception &ex) {
+          LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+              << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+          throw ex;
         }
       }
     }
@@ -326,8 +362,15 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
       bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
       Real3D force;
       Tensor ww;
-      if (potential->_computeForce(force, r21)) {
-        ww = Tensor(r21, forcescale*force);
+      try {
+        if (potential->_computeForce(force, r21)) {
+          ww = Tensor(r21, forcescale * force);
+        }
+      }  catch (const std::exception &ex) {
+        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
+            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
+
+        throw ex;
       }
 
       int i = minpos + 1;
