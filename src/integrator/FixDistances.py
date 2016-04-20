@@ -46,6 +46,11 @@ class FixDistancesLocal(ExtensionLocal, integrator_FixDistances):
             for anchor_id, target_id, dist in cs_list:
                 self.cxxclass.add_triplet(self, anchor_id, target_id, dist)
 
+    def addTuples(self, tuple_list, dist):
+        if pmi.workerIsActive():
+            for anchor_id, target_id in tuple_list:
+                self.cxxclass.add_triplet(self, anchor_id, target_id, dist)
+
     def totalSize(self):
         if pmi.workerIsActive():
             return self.cxxclass.get_size(self)
@@ -56,6 +61,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.integrator.FixDistancesLocal',
-            pmicall=['addConstraints', 'add_postprocess', 'totalSize'],
+            pmicall=['addConstraints', 'addTuples', 'add_postprocess', 'totalSize'],
             pmiinvoke=['print_triplets'])
 
