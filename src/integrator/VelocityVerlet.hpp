@@ -171,6 +171,8 @@ namespace espressopp {
         real timeAftIntVS;
 
         static LOG4ESPP_DECL_LOGGER(theLogger);
+
+      void checkConsistence(int postfix = 0);
     };
   }
 }

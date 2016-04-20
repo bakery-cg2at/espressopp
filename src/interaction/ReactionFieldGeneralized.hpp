@@ -152,9 +152,7 @@ namespace espressopp {
                     Real3D dist = p1.position() - p2.position();
                     real r2 = dist.sqr();
                     if (r2>rc2) return true;
-                    
-                    
-                                      
+
                     real r = sqrt(r2);
                     real qq = p1.q()*p2.q();
                     real ffactor = prefactor*qq* (1.0/(r*r2) + B1);

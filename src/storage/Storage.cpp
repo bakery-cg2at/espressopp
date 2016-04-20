@@ -259,8 +259,7 @@ namespace espressopp {
 
       LOG4ESPP_TRACE(logger, "got particle id ="
 		     << id << " @ " << p << " ; put it into cell " << cell - getFirstCell());
-      LOG4ESPP_TRACE(logger, "folded it to "
-		     << n.r.p[0] << " " << n.r.p[1] << " " << n.r.p[2] );
+      LOG4ESPP_TRACE(logger, "folded it to " << n.position());
       LOG4ESPP_TRACE(logger, "cell size is now " << cell->particles.size());
 
       return &cell->particles.back();
@@ -636,7 +635,7 @@ namespace espressopp {
 
     	  ParticleForce f;
     	  buf.read(f);
-    	  LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": unpacking force " << f.force());
+    	  LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": unpacking force " << f.f);
     	  dst->particleForce() = f;
       }
     }
@@ -652,7 +651,7 @@ namespace espressopp {
     	  ParticleForce f;
     	  buf.read(f);
     	  LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": unpacking force "
-		       << f.f() << " and adding to " << dst->force());
+		       << f.f << " and adding to " << dst->force());
     	  dst->particleForce() += f;
       }
     }

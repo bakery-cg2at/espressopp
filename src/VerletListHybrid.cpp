@@ -36,8 +36,13 @@ LOG4ESPP_LOGGER(VerletListHybridAT::theLogger, "VerletListHybridAT");
 LOG4ESPP_LOGGER(VerletListHybridCG::theLogger, "VerletListHybridCG");
 
 void VerletListHybridAT::checkPair(Particle &pt1, Particle &pt2) {
-  if (pt1.lambda()*pt2.lambda() <= ALMOST_ZERO)
+  if (pt1.vp() || pt2.vp()) {  // only AT pairs
+    LOG4ESPP_DEBUG(
+        theLogger,
+        " at skip pair " << pt1.id() << "-" << pt2.id()
+            << " vp1=" << pt1.vp() << " vp2=" << pt2.vp());
     return;
+  }
 
   Real3D d = pt1.position() - pt2.position();
   real distsq = d.sqr();
@@ -45,7 +50,7 @@ void VerletListHybridAT::checkPair(Particle &pt1, Particle &pt2) {
   LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id()
       << " @ " << pt1.position()
       << " - p2: " << pt2.id() << " @ " << pt2.position()
-      << " -> distsq = " << distsq);
+      << " -> distsq = " << distsq << " cutsq=" << cutsq);
 
   if (distsq > cutsq) return;
 
@@ -57,9 +62,13 @@ void VerletListHybridAT::checkPair(Particle &pt1, Particle &pt2) {
 }
 
 void VerletListHybridCG::checkPair(Particle &pt1, Particle &pt2) {
-  /// Generates only CG pairs, so lambda*lambda == 0.0.
-  if (pt1.lambda()*pt2.lambda() > ALMOST_ZERO)
+  if ((!pt1.vp()) || (!pt2.vp())) {  // only CG pairs
+    LOG4ESPP_DEBUG(
+        theLogger,
+        "cg skip pair " << pt1.id() << "-" << pt2.id()
+            << " vp1=" << pt1.vp() << " vp2=" << pt2.vp());
     return;
+  }
 
   Real3D d = pt1.position() - pt2.position();
   real distsq = d.sqr();
@@ -87,7 +96,6 @@ void VerletListHybridAT::registerPython() {
   bool (VerletListHybridAT::*pyExclude)(longint pid1, longint pid2)
       = &VerletListHybridAT::exclude;
 
-
   class_ < VerletListHybridAT, shared_ptr < VerletListHybridAT >, bases<VerletList> >
       ("VerletListHybridAT", init < shared_ptr < System >, real, bool > ())
           .add_property("system", &SystemAccess::getSystem)
@@ -99,7 +107,6 @@ void VerletListHybridAT::registerPython() {
           .def("rebuild", &VerletListHybridAT::rebuild)
           .def("connect", &VerletListHybridAT::connect)
           .def("disconnect", &VerletListHybridAT::disconnect)
-
           .def("getVerletCutoff", &VerletListHybridAT::getVerletCutoff);
 }
 
@@ -108,7 +115,6 @@ void VerletListHybridCG::registerPython() {
 
   bool (VerletListHybridCG::*pyExclude)(longint pid1, longint pid2)
       = &VerletListHybridCG::exclude;
-
 
   class_ < VerletListHybridCG, shared_ptr<VerletListHybridCG>, bases<VerletList> >
       ("VerletListHybridCG", init<shared_ptr <System>, real, bool > ())
@@ -121,7 +127,6 @@ void VerletListHybridCG::registerPython() {
           .def("rebuild", &VerletListHybridCG::rebuild)
           .def("connect", &VerletListHybridCG::connect)
           .def("disconnect", &VerletListHybridCG::disconnect)
-
           .def("getVerletCutoff", &VerletListHybridCG::getVerletCutoff);
 }
 

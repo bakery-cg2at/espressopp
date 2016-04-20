@@ -26,6 +26,7 @@
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "VerletListHadressInteractionTemplate.hpp"
+#include "VerletListHybridInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 //#include "FixedPairListInteractionTemplate.hpp"
 
@@ -34,6 +35,9 @@ namespace espressopp {
 
         typedef class VerletListInteractionTemplate<ReactionFieldGeneralized>
             VerletListReactionFieldGeneralized;
+
+        typedef class VerletListHybridInteractionTemplate<ReactionFieldGeneralized>
+            VerletListHybridReactionFieldGeneralized;
 
         typedef class VerletListAdressInteractionTemplate<ReactionFieldGeneralized, Tabulated>
             VerletListAdressReactionFieldGeneralized;
@@ -65,6 +69,14 @@ namespace espressopp {
                 .def("setPotential", &VerletListReactionFieldGeneralized::setPotential)
                 .def("getPotential", &VerletListReactionFieldGeneralized::getPotentialPtr)
             ;
+
+            class_<VerletListHybridReactionFieldGeneralized, bases<Interaction> >
+                ("interaction_VerletListHybridReactionFieldGeneralized", init< shared_ptr<VerletList>, bool >())
+                .def("setPotential", &VerletListHybridReactionFieldGeneralized::setPotential)
+                .def("getPotential", &VerletListHybridReactionFieldGeneralized::getPotentialPtr)
+                .add_property("scale_factor", &VerletListHybridReactionFieldGeneralized::scaleFactor,
+                              &VerletListHybridReactionFieldGeneralized::setScaleFactor)
+                ;
 
             class_<VerletListAdressReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListAdressReactionFieldGeneralized",

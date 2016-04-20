@@ -20,12 +20,12 @@
 
 
 r"""
-****************************************
-**espressopp.integrator.VelocityVerletHybrid**
-****************************************
+***************************************************
+**espressopp.integrator.LangevinThermostatOnGroup**
+***************************************************
 
 
-.. function:: espressopp.integrator.VelocityVerletHybrid(system)
+.. function:: espressopp.integrator.LangevinThermostatOnGroup(system)
 
 		:param system: 
 		:type system: 
@@ -33,24 +33,19 @@ r"""
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
-from espressopp.integrator.MDIntegrator import *
-from _espressopp import integrator_VelocityVerletHybrid
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_LangevinThermostatOnGroup
 
-class VelocityVerletHybridLocal(MDIntegratorLocal, integrator_VelocityVerletHybrid):
+class LangevinThermostatOnGroupLocal(ExtensionLocal, integrator_LangevinThermostatOnGroup):
 
-    def __init__(self, system, vs_list):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_VelocityVerletHybrid, system, vs_list)
-
-    def checkConsistence(self, prefix):
+    def __init__(self, system, particle_group):
         if pmi.workerIsActive():
-            self.cxxclass.checkConsistence(self, prefix)
+            cxxinit(self, integrator_LangevinThermostatOnGroup, system, particle_group)
 
 if pmi.isController :
-    class VelocityVerletHybrid(MDIntegrator):
+    class LangevinThermostatOnGroup(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espressopp.integrator.VelocityVerletHybridLocal',
-          pmicall = ['resetTimers', 'checkConsistence'],
-          pmiinvoke = ['getTimers']
-        )
+            cls =  'espressopp.integrator.LangevinThermostatOnGroupLocal',
+            pmiproperty = [ 'gamma', 'temperature']
+            )

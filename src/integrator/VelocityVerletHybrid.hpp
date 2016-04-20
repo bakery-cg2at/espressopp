@@ -44,7 +44,7 @@ class VelocityVerletHybrid: public MDIntegrator {
   void run(int nsteps);
 
   /** Load timings in array to export to Python as a tuple. */
-  void loadTimers(std::vector<real> &return_vector);
+  void loadTimers(std::vector<real> &return_vector, std::vector<std::string> &return_labels);
 
   /** Clean up all timers.*/
   void resetTimers();
@@ -67,14 +67,6 @@ class VelocityVerletHybrid: public MDIntegrator {
   void updateForces();
 
   void calcForces();
-
-  void printPositions(bool withGhost);
-
-  void printForces(bool withGhost);
-
-  void setUp();   //!< set up for a new run
-
-  void printTimers();
 
   esutil::WallTimer timeIntegrate;  //!< used for timing
 
@@ -100,6 +92,10 @@ class VelocityVerletHybrid: public MDIntegrator {
   real timeBefIntVS;
   real timeAftIntVS;
 
+  real timeVS;
+  real timeVSvel;
+  real timeVSdistrF;
+
   static LOG4ESPP_DECL_LOGGER(theLogger);
 
  private:
@@ -109,6 +105,7 @@ class VelocityVerletHybrid: public MDIntegrator {
 
   real skinHalf;
   shared_ptr<FixedVSList> vs_list_;
+  void checkConsistence(int postfix = 0);
 };
 }
 }

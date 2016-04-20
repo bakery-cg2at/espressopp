@@ -49,6 +49,11 @@ namespace espressopp {
   typedef boost::lagged_fibonacci607 RNGType;
   // If you REALLY need speed use the line below instead
   //typedef boost::rand48 RNGType;
+
+  inline bool is_almost_zero(real value1) {
+    return (std::abs(value1-ALMOST_ZERO) < 10e-16);
+  }
+
 }
 
 #endif

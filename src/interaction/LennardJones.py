@@ -429,7 +429,8 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHybridLennardJonesLocal',
-            pmicall = ['setPotential', 'getPotential', 'getVerletList']
+            pmicall = ['setPotential', 'getPotential', 'getVerletList'],
+            pmiproperty = ['scale_factor']
         )
 
     class VerletListAdressLennardJones(Interaction):

@@ -40,6 +40,7 @@ from espressopp.integrator.BerendsenBarostat import *
 from espressopp.integrator.BerendsenBarostatAnisotropic import *
 from espressopp.integrator.BerendsenThermostat import *
 from espressopp.integrator.LangevinThermostat import *
+from espressopp.integrator.LangevinThermostatOnGroup import *
 from espressopp.integrator.LangevinThermostatHybrid import *
 from espressopp.integrator.LangevinThermostat1D import *
 from espressopp.integrator.GeneralizedLangevinThermostat import *
@@ -59,4 +60,7 @@ from espressopp.integrator.ExtAnalyze import *
 from espressopp.integrator.Settle import *
 from espressopp.integrator.VelocityVerletOnRadius import *
 from espressopp.integrator.AssociationReaction import *
+
+from espressopp.integrator.FixDistances import *
+
 from espressopp.integrator.EmptyExtension import *

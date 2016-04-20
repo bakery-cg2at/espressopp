@@ -112,13 +112,13 @@ inline void FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     Particle &p3 = *it->third;
     Particle &p4 = *it->fourth;
 
-    real w1234 = p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda();
+    real w1234 = pow(p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda(), 0.5);
     real forcescale1234 = w1234;
     if (cgPotential) {
       forcescale1234 = (1.0-w1234);
     }
 
-    if (forcescale1234 > 0.0) {
+    if (!is_almost_zero(forcescale1234)) {
       LOG4ESPP_DEBUG(theLogger, "scalling quadruple list force with weight " << forcescale1234);
       Real3D dist21, dist32, dist43;
 
@@ -148,19 +148,20 @@ inline real FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     const Particle &p2 = *it->second;
     const Particle &p3 = *it->third;
     const Particle &p4 = *it->fourth;
-    real w1234 = p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda();
-    real energyscale1234 = w1234;
+    real w1234 = pow(p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda(), 0.5);
+    real forcescale1234 = w1234;
     if (cgPotential) {
-      energyscale1234 = (1.0-w1234);
+      forcescale1234 = (1.0-w1234);
     }
-    if (energyscale1234 > 0.0) {
+
+    if (!is_almost_zero(forcescale1234)) {
       Real3D dist21, dist32, dist43;
 
       bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
       bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
       bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
 
-      e += energyscale1234*potential->_computeEnergy(dist21, dist32, dist43);
+      e += forcescale1234*potential->_computeEnergy(dist21, dist32, dist43);
     }
   }
   real esum;
@@ -204,18 +205,26 @@ inline real FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     const Particle &p3 = *it->third;
     const Particle &p4 = *it->fourth;
 
-    Real3D dist21, dist32, dist43;
+    real w1234 = pow(p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda(), 0.5);
+    real forcescale1234 = w1234;
+    if (cgPotential) {
+      forcescale1234 = (1.0-w1234);
+    }
 
-    bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
-    bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-    bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+    if (!is_almost_zero(forcescale1234)) {
+      Real3D dist21, dist32, dist43;
 
-    Real3D force1, force2, force3, force4;
+      bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+      bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+      bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
 
-    potential->_computeForce(force1, force2, force3, force4,
-                            dist21, dist32, dist43);
+      Real3D force1, force2, force3, force4;
 
-    w += dist21 * force1 + dist32 * force2;
+      potential->_computeForce(force1, force2, force3, force4,
+                               dist21, dist32, dist43);
+
+      w += dist21 * force1 + dist32 * force2;
+    }
   }
 
   real wsum;

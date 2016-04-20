@@ -114,13 +114,13 @@ FixedTripleListAdressInteractionTemplate <_AngularPotential>::addForces() {
     Particle &p2 = *it->second;
     Particle &p3 = *it->third;
 
-    real w123 = p1.lambda() * p2.lambda() * p3.lambda();
+    real w123 = pow(p1.lambda() * p2.lambda() * p3.lambda(), 2.0/3.0);
     real forcescale123 = w123;
     if (cgPotential) {
-      forcescale123 = (1-w123);
+      forcescale123 = (1.0-w123);
     }
 
-    if (forcescale123 > 0.0) {
+    if (!is_almost_zero(forcescale123)) {
       LOG4ESPP_DEBUG(theLogger, "scalling triple list potential with weight: " << forcescale123);
       Real3D dist12, dist32;
       bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
@@ -146,18 +146,18 @@ FixedTripleListAdressInteractionTemplate < _AngularPotential >::computeEnergy() 
     const Particle &p1 = *it->first;
     const Particle &p2 = *it->second;
     const Particle &p3 = *it->third;
-    real w123 = p1.lambda() * p2.lambda() * p3.lambda();
+    real w123 = pow(p1.lambda() * p2.lambda() * p3.lambda(), 2.0/3.0);
     real energyscale123 = w123;
     if (cgPotential) {
-      energyscale123 = (1-w123);
+      energyscale123 = (1.0-w123);
     }
-    if (energyscale123 > 0.0) {
+    if (!is_almost_zero(energyscale123)) {
       Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
       Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
       e += energyscale123*potential->_computeEnergy(dist12, dist32);
     }
   }
-  real esum;
+  real esum = 0.0;
   boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
   return esum;
 }
@@ -199,13 +199,21 @@ computeVirial() {
     const Particle &p1 = *it->first;
     const Particle &p2 = *it->second;
     const Particle &p3 = *it->third;
-    const bc::BC& bc = *getSystemRef().bc;
-    Real3D dist12, dist32;
-    bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
-    bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-    Real3D force12, force32;
-    potential->_computeForce(force12, force32, dist12, dist32);
-    w += dist12 * force12 + dist32 * force32;
+
+    real w123 = pow(p1.lambda() * p2.lambda() * p3.lambda(), 2.0/3.0);
+    real forcescale123 = w123;
+    if (cgPotential) {
+      forcescale123 = (1.0-w123);
+    }
+    if (!is_almost_zero(forcescale123)) {
+      const bc::BC &bc = *getSystemRef().bc;
+      Real3D dist12, dist32;
+      bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+      bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+      Real3D force12, force32;
+      potential->_computeForce(force12, force32, dist12, dist32);
+      w += dist12 * force12 + dist32 * force32;
+    }
   }
   real wsum;
   boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
@@ -223,12 +231,19 @@ computeVirialTensor(Tensor& w) {
     const Particle &p1 = *it->first;
     const Particle &p2 = *it->second;
     const Particle &p3 = *it->third;
-    Real3D r12, r32;
-    bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
-    bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
-    Real3D force12, force32;
-    potential->_computeForce(force12, force32, r12, r32);
-    wlocal += Tensor(r12, force12) + Tensor(r32, force32);
+    real w123 = pow(p1.lambda() * p2.lambda() * p3.lambda(), 2.0/3.0);
+    real forcescale123 = w123;
+    if (cgPotential) {
+      forcescale123 = (1.0-w123);
+    }
+    if (!is_almost_zero(forcescale123)) {
+      Real3D r12, r32;
+      bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
+      bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
+      Real3D force12, force32;
+      potential->_computeForce(force12, force32, r12, r32);
+      wlocal += Tensor(r12, force12) + Tensor(r32, force32);
+    }
   }
 
   // reduce over all CPUs
@@ -262,12 +277,6 @@ template < typename _AngularPotential >
 inline real
 FixedTripleListAdressInteractionTemplate< _AngularPotential >::
 getMaxCutoff() {
-  /*real cutoff = 0.0;
-  for (int i = 0; i < ntypes; i++) {
-    for (int j = 0; j < ntypes; j++) {
-      cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
-    }
-  }*/
   return potential->getCutoff();
 }
 }  // namespace interaction

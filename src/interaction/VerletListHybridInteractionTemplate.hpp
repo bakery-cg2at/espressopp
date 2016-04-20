@@ -22,9 +22,6 @@
 #ifndef _INTERACTION_VERLETLISTHYBRIDINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTHYBRIDINTERACTIONTEMPLATE_HPP
 
-//#include <typeinfo>
-
-
 #include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
@@ -49,12 +46,13 @@ class VerletListHybridInteractionTemplate: public Interaction {
       : verletList(_verletList), cgPotential(_cg_potential) {
     potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
     ntypes = 0;
+    scaleFactor_ = 1.0;
+    LOG4ESPP_DEBUG(_Potential::theLogger, "initialize hybrid potential cg=" << cgPotential);
   }
 
   virtual ~VerletListHybridInteractionTemplate() { };
 
-  void
-  setVerletList(shared_ptr<VerletList> _verletList) {
+  void setVerletList(shared_ptr<VerletList> _verletList) {
     verletList = _verletList;
   }
 
@@ -62,8 +60,7 @@ class VerletListHybridInteractionTemplate: public Interaction {
     return verletList;
   }
 
-  void
-  setPotential(int type1, int type2, const Potential &potential) {
+  void setPotential(int type1, int type2, const Potential &potential) {
     // typeX+1 because i<ntypes
     ntypes = std::max(ntypes, std::max(type1 + 1, type2 + 1));
     potentialArray.at(type1, type2) = potential;
@@ -85,6 +82,16 @@ class VerletListHybridInteractionTemplate: public Interaction {
     return make_shared<Potential>(potentialArray.at(type1, type2));
   }
 
+  void setScaleFactor(real s) {
+    scaleFactor_ = s;
+    if (scaleFactor_ >= 1.0)
+      scaleFactor_ = 1.0;
+    else if (scaleFactor_ <= 0.0)
+      scaleFactor_ = 0.0;
+    std::cout << "set scale factor to=" << scaleFactor_ << std::endl;
+  }
+
+  real scaleFactor() { return scaleFactor_; }
 
   virtual void addForces();
   virtual real computeEnergy();
@@ -104,6 +111,7 @@ class VerletListHybridInteractionTemplate: public Interaction {
   esutil::Array2D<Potential, esutil::enlarge> potentialArray;
 
   bool cgPotential;
+  real scaleFactor_;
   // not needed esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
 };
 
@@ -121,14 +129,17 @@ addForces() {
     Particle &p2 = *it->second;
     int type1 = p1.type();
     int type2 = p2.type();
-    const Potential &potential = getPotential(type1, type2);
+
     real w12 = p1.lambda() * p2.lambda();
     real forcescale12 = w12;
     if (cgPotential) {
       forcescale12 = (1 - w12);
     }
 
-    if (forcescale12 > 0.0) {
+    forcescale12 *= scaleFactor_;
+
+    if (!is_almost_zero(forcescale12)) {
+      const Potential &potential = getPotential(type1, type2);
       Real3D force(0.0);
       if (potential._computeForce(force, p1, p2)) {
         p1.force() += forcescale12 * force;
@@ -145,7 +156,6 @@ VerletListHybridInteractionTemplate<_Potential>::
 computeEnergy() {
   LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up potential energies");
 
-  real e = 0.0;
   real es = 0.0;
   for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
     Particle &p1 = *it->first;
@@ -157,15 +167,18 @@ computeEnergy() {
     if (cgPotential) {
       forcescale12 = (1 - w12);
     }
-    if (forcescale12 > 0.0) {
+
+    forcescale12 *= scaleFactor_;
+
+    if (!is_almost_zero(forcescale12)) {
       const Potential &potential = getPotential(type1, type2);
       es += forcescale12*potential._computeEnergy(p1, p2);
-      LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
+      LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << es);
     }
   }
 
   // reduce over all CPUs
-  real esum;
+  real esum = 0.0;
   boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
   return esum;
 }
@@ -174,18 +187,14 @@ template<typename _Potential>
 inline real
 VerletListHybridInteractionTemplate<_Potential>::
 computeEnergyAA() {
-  if (!cgPotential)
-    return computeEnergy();
-  return 0.0;
+  return computeEnergy();
 }
 
 template<typename _Potential>
 inline real
 VerletListHybridInteractionTemplate<_Potential>::
 computeEnergyCG() {
-  if (cgPotential)
-    return computeEnergy();
-  return 0.0;
+  return computeEnergy();
 }
 
 template<typename _Potential>
@@ -213,7 +222,10 @@ computeVirial() {
     if (cgPotential) {
       forcescale12 = (1 - w12);
     }
-    if (forcescale12 > 0.0) {
+
+    forcescale12 *= scaleFactor_;
+
+    if (!is_almost_zero(forcescale12)) {
       const Potential &potential = getPotential(type1, type2);
       // shared_ptr<Potential> potential = getPotential(type1, type2);
 
@@ -250,7 +262,10 @@ computeVirialTensor(Tensor &w) {
     if (cgPotential) {
       forcescale12 = (1 - w12);
     }
-    if (forcescale12 > 0.0) {
+
+    forcescale12 *= scaleFactor_;
+
+    if (!is_almost_zero(forcescale12)) {
       const Potential &potential = getPotential(type1, type2);
       // shared_ptr<Potential> potential = getPotential(type1, type2);
 
@@ -315,7 +330,10 @@ computeVirialTensor(Tensor &w, real z) {
       if (cgPotential) {
         forcescale12 = (1 - w12);
       }
-      if (forcescale12 > 0.0) {
+
+      forcescale12 *= scaleFactor_;
+
+      if (!is_almost_zero(forcescale12)) {
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
@@ -362,7 +380,9 @@ computeVirialTensor(Tensor *w, int n) {
       forcescale12 = (1 - w12);
     }
 
-    if (forcescale12 > 0.0) {
+    forcescale12 *= scaleFactor_;
+
+    if (!is_almost_zero(forcescale12)) {
       const Potential &potential = getPotential(type1, type2);
 
       Real3D force(0.0, 0.0, 0.0);
@@ -426,7 +446,6 @@ getMaxCutoff() {
   for (int i = 0; i < ntypes; i++) {
     for (int j = 0; j < ntypes; j++) {
       cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
-      // cutoff = std::max(cutoff, getPotential(i, j)->getCutoff());
     }
   }
   return cutoff;

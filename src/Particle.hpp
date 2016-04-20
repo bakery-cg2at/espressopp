@@ -182,7 +182,8 @@ namespace espressopp {
     void serialize(Archive &ar, const unsigned int version) {
       for (int ii = 0; ii < 3; ++ii)
         ar & i[ii];
-      ar & ghost & vp;
+      ar & ghost;
+      ar & vp;
     }
   };
 
@@ -361,6 +362,9 @@ namespace espressopp {
       ghost() = 1;
       l.vp = src.getVP();
       lambda() = src.lambda();
+      mass() = src.mass();
+      m.v = src.velocity();
+      q() = src.q();
     }
 
     bool operator<(Particle other) const {
@@ -377,10 +381,16 @@ namespace espressopp {
 
     friend std::ostream& operator<<(std::ostream &output, const Particle &p) {
       output << "P.id=" << p.id() << " type=" << p.type()
-          << " pos=" << p.position() << " v=" << p.velocity()
-          << " f=" << p.force() << " ghost=" << p.ghost()
-          << " lmb=" << p.lambda() << " state=" << p.state()
-          << " resid=" << p.res_id();
+          << " pos=" << p.position()
+          << " v=" << p.velocity()
+          << " f=" << p.force()
+          << " mass=" << p.mass()
+          << " img=" << p.image()
+          << " ghost=" << p.ghost()
+          << " lmb=" << p.lambda()
+          << " state=" << p.state()
+          << " resid=" << p.res_id()
+          << " vp=" << p.vp();
       return output;
     }
 

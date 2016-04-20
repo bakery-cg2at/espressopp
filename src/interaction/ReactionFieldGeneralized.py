@@ -150,7 +150,8 @@ from _espressopp import interaction_ReactionFieldGeneralized, \
                       interaction_VerletListReactionFieldGeneralized, \
                       interaction_VerletListAdressReactionFieldGeneralized, \
                       interaction_VerletListHadressReactionFieldGeneralized, \
-                      interaction_CellListReactionFieldGeneralized
+                      interaction_CellListReactionFieldGeneralized, \
+                      interaction_VerletListHybridReactionFieldGeneralized
                       #interaction_FixedPairListReactionFieldGeneralized
 
 class ReactionFieldGeneralizedLocal(PotentialLocal, interaction_ReactionFieldGeneralized):
@@ -177,7 +178,21 @@ class VerletListReactionFieldGeneralizedLocal(InteractionLocal, interaction_Verl
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
-    
+
+class VerletListHybridReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListHybridReactionFieldGeneralized):
+
+    def __init__(self, vl, is_cg=False):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHybridReactionFieldGeneralized, vl, is_cg)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
 class VerletListAdressReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListAdressReactionFieldGeneralized):
 
     def __init__(self, vl, fixedtupleList):
@@ -233,7 +248,7 @@ if pmi.isController:
         'The ReactionFieldGeneralized potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.ReactionFieldGeneralizedLocal',
-            pmiproperty = ['prefactor']#['qq']
+            pmiproperty = ['prefactor']
             )
         
     class VerletListReactionFieldGeneralized(Interaction):
@@ -242,7 +257,15 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListReactionFieldGeneralizedLocal',
             pmicall = ['setPotential','getPotential']
             )
-        
+
+    class VerletListHybridReactionFieldGeneralized(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListHybridReactionFieldGeneralizedLocal',
+            pmicall = ['setPotential','getPotential'],
+            pmiproperty = ['scale_factor']
+        )
+
     class VerletListAdressReactionFieldGeneralized(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(

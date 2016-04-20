@@ -97,6 +97,8 @@ namespace espressopp {
         // timeResort += timeIntegrate.getElapsedTime();
       }
 
+//      checkConsistence(999);
+
       bool recalcForces = true;  // TODO: more intelligent
 
       if (recalcForces) {
@@ -181,11 +183,8 @@ namespace espressopp {
       timeRun = timeIntegrate.getElapsedTime();
       timeLost = timeRun - (timeComm1 + timeComm2 + timeInt1 + timeInt2 + timeResort);
       // Substract the timeForceComp.
-      for (int i =0; i < timeForceComp.size(); i++)
+      for (int i = 0; i < timeForceComp.size(); i++)
         timeLost -= timeForceComp[i];
-      timeRun = timeIntegrate.getElapsedTime();
-      timeLost = timeRun - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] +
-                 timeComm1 + timeComm2 + timeInt1 + timeInt2 + timeResort);
 
       LOG4ESPP_INFO(theLogger, "finished run");
     }
@@ -365,6 +364,68 @@ namespace espressopp {
         timeForceComp[i] += timeIntegrate.getElapsedTime() - time;
       }
     }
+
+  void VelocityVerlet::checkConsistence(int postfix) {
+    System &system = getSystemRef();
+    storage::Storage &storage = *system.storage;
+
+    std::vector<real> localVector;
+    real localRank = system.comm->rank();
+
+    CellList cells;
+    cells = system.storage->getLocalCells();
+
+    for(CellListIterator vp(cells); !vp.isDone(); ++vp) {
+        Real3D &p = vp->position();
+        Int3D &img = vp->image();
+        localVector.push_back(localRank);
+        localVector.push_back(vp->id());
+        localVector.push_back(p[0]);
+        localVector.push_back(p[1]);
+        localVector.push_back(p[2]);
+        localVector.push_back(img[0]);
+        localVector.push_back(img[1]);
+        localVector.push_back(img[2]);
+        localVector.push_back(vp->ghost());
+
+    }
+
+    if (system.comm->rank() == 0) {
+      std::vector<std::vector<real> > globalVector;
+      mpi::gather(*system.comm, localVector, globalVector, 0);
+
+      std::vector<std::vector<real> >::const_iterator it = globalVector.begin();
+      std::vector<real>::const_iterator lit;
+      std::cout << "globalVector.size=" << globalVector.size() << std::endl;
+      int cpu = 0;
+
+      std::stringstream ss;
+      ss << "particle_list_" << step << "_" << postfix << ".txt";
+
+      FILE *fp;
+      fp = fopen(ss.str().c_str(), "w");
+
+      for (; it != globalVector.end(); ++it) {
+        lit = it->begin();
+        while (lit != it->end()) {
+          int lr = *(lit++);
+          longint pid = *(lit++);
+          real x = *(lit++);
+          real y = *(lit++);
+          real z = *(lit++);
+          int ix = *(lit++);
+          int iy = *(lit++);
+          int iz = *(lit++);
+          longint isGhost = *(lit++);
+          fprintf(fp, "%4d %4d % 03.8f % 03.8f % 03.8f %d %d %d %1d\n", lr, pid, x, y, z, ix, iy, iz, isGhost);
+        }
+        cpu++;
+      }
+      fclose(fp);
+    } else {
+      mpi::gather(*system.comm, localVector,  0);
+    }
+  }
 
     void VelocityVerlet::updateForces()
     {

@@ -136,6 +136,9 @@ namespace espressopp {
 
       readAll<bool>(p.vp());
       readAll<real>(p.lambda());
+      readAll<real>(p.mass());
+      readAll<Real3D>(p.velocity());
+      readAll<real>(p.q());
 
       if (extradata & DATA_PROPERTIES) {
         readAll<ParticleProperties>(p.p);
@@ -261,6 +264,9 @@ namespace espressopp {
 
       writeAll<bool>(p.vp());
       writeAll<real>(p.lambda());
+      writeAll<real>(p.mass());
+      writeAll<Real3D>(p.velocity());
+      writeAll<real>(p.q());
 
       if (extradata & DATA_PROPERTIES) {
         writeAll<ParticleProperties>(p.p);

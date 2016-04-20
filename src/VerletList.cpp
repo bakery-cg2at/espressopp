@@ -206,6 +206,7 @@ void DynamicExcludeList::registerPython() {
   
   void VerletList::rebuild()
   {
+    LOG4ESPP_DEBUG(theLogger, "VerletList::rebuild");
     //real cutVerlet = cut + getSystem() -> getSkin();
     cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
@@ -217,7 +218,13 @@ void DynamicExcludeList::registerPython() {
     LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
     for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
       checkPair(*it->first, *it->second);
-      LOG4ESPP_DEBUG(theLogger, "checking particles " << it->first->id() << " and " << it->second->id());
+      LOG4ESPP_DEBUG(
+          theLogger,
+          "checking particles "
+              << *(it->first)
+              << " and " <<
+              *(it->second)
+      );
     }
     
     builds++;

@@ -86,6 +86,8 @@ namespace espressopp {
           .def("getVerletList", &VerletListHybridLennardJones::getVerletList)
           .def("setPotential", &VerletListHybridLennardJones::setPotential)
           .def("getPotential", &VerletListHybridLennardJones::getPotentialPtr)
+          .add_property("scale_factor", &VerletListHybridLennardJones::scaleFactor,
+                                        &VerletListHybridLennardJones::setScaleFactor)
           ;
 
       class_< VerletListAdressLennardJones, bases< Interaction > >
