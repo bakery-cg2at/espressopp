@@ -71,9 +71,9 @@ namespace espressopp {
           short type = cit->type();
           myParticleIDToTypeMap[id] = type;
         }
-        if (myParticleIDToTypeMap.size() ==0 )
-          throw std::runtime_error("Dumper: No particles found in the system - make sure particles are added first before Dumper is initialized");
-        //std::cout << "my rank: " << system->comm->rank() << ", number of particles: " << myParticleIDToTypeMap.size() << std::endl;
+        if (myParticleIDToTypeMap.size() == 0) {
+          std::cout << "On rank: " << system->comm->rank() << " there is no particles: " << myParticleIDToTypeMap.size() << std::endl;
+        }
 
         //gather all particle ID maps
         std::vector< std::map<long, short> > allParticleIDMaps;
