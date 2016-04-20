@@ -311,12 +311,14 @@ void VelocityVerletHybrid::loadTimers(std::vector<real> &return_vector, std::vec
   }
 
   // signal timers.
-  return_vector.push_back(
-      timeRunInitS + timeRecalc1S + timeRecalc2S + timeBefIntPS +
-          timeAftIntPS + timeAftCalcFS + timeBefIntVS + timeAftIntVS
-  );
-  return_labels.push_back("signals");
-
+  return_vector.push_back(timeRunInitS);
+  return_vector.push_back(timeRecalc1S);
+  return_vector.push_back(timeRecalc2S);
+  return_vector.push_back(timeBefIntPS);
+  return_vector.push_back(timeAftIntPS);
+  return_vector.push_back(timeAftCalcFS);
+  return_vector.push_back(timeBefIntVS);
+  return_vector.push_back(timeAftIntVS);
 
   return_vector.push_back(timeVS);
   return_vector.push_back(timeVSdistrF);
@@ -326,6 +328,15 @@ void VelocityVerletHybrid::loadTimers(std::vector<real> &return_vector, std::vec
   return_vector.push_back(timeInt1);
   return_vector.push_back(timeInt2);
   return_vector.push_back(timeResort);
+
+  return_labels.push_back("timeRunInitS");
+  return_labels.push_back("timeRecalc1S");
+  return_labels.push_back("timeRecalc2S");
+  return_labels.push_back("timeBefIntPS");
+  return_labels.push_back("timeAftIntPS");
+  return_labels.push_back("timeAftCalcFS");
+  return_labels.push_back("timeBefIntVS");
+  return_labels.push_back("timeAftIntVS");
   return_labels.push_back("timeVS");
   return_labels.push_back("timeVSdistrF");
   return_labels.push_back("timeVSvel");
