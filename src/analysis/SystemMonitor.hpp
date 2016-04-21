@@ -89,6 +89,8 @@ class SystemMonitor : public ParticleAccess {
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
     }
+
+    current_time_ = 0.0;
   }
 
   ~SystemMonitor() {
@@ -104,6 +106,7 @@ class SystemMonitor : public ParticleAccess {
   void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
 
   int current_step_;
+  real current_time_;
   bool header_written_;
   bool header_shown_;
   shared_ptr<std::vector<real> > values_;

@@ -19,20 +19,21 @@
 */
 
 #include "python.hpp"
+#include "SystemMonitor.hpp"
+#include "integrator/MDIntegrator.hpp"
 #include <string>
 #include <utility>
 #include <vector>
-#include "SystemMonitor.hpp"
-#include "integrator/MDIntegrator.hpp"
 
 namespace espressopp {
 namespace analysis {
 
 void SystemMonitor::perform_action() {
   current_step_ = integrator_->getStep();
+  current_time_ += current_step_ * integrator_->getTimeStep();
   values_->clear();
   values_->push_back(current_step_);
-  values_->push_back(current_step_ * integrator_->getTimeStep());
+  values_->push_back(current_time_);
 
   computeObservables();
   if (system_->comm->rank() == 0) {
