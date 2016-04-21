@@ -30,15 +30,18 @@ namespace analysis {
 
 void SystemMonitor::perform_action() {
   current_step_ = integrator_->getStep();
-  current_time_ += current_step_ * integrator_->getTimeStep();
+  real t = last_time_ + (current_step_ - last_step_)*integrator_->getTimeStep();
   values_->clear();
   values_->push_back(current_step_);
-  values_->push_back(current_time_);
+  values_->push_back(t);
 
   computeObservables();
   if (system_->comm->rank() == 0) {
     output_->write();
   }
+  
+  last_time_ = t;
+  last_step_ = current_step_;
 }
 
 void SystemMonitor::computeObservables() {

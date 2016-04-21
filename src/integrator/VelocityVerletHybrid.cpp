@@ -347,17 +347,6 @@ void VelocityVerletHybrid::loadTimers(std::vector<real> &return_vector, std::vec
   return_labels.push_back("timeResort");
 }
 
-static boost::python::object wrapGetTimers(class VelocityVerletHybrid* obj) {
-  std::vector<real> timers;
-  std::vector<std::string> labels;
-  obj->loadTimers(timers, labels);
-
-  boost::python::list return_list;
-  for (int i = 0; i < timers.size(); i++) {
-    return_list.append(boost::python::make_tuple(labels[i], timers[i]));
-  }
-  return return_list;
-}
 
 
 real VelocityVerletHybrid::integrate1() {
@@ -632,6 +621,18 @@ void VelocityVerletHybrid::distributeVSforces() {
   real time = timeIntegrate.getElapsedTime();
   storage.collectGhostForces();
   timeComm2 += timeIntegrate.getElapsedTime() - time;
+}
+
+static boost::python::object wrapGetTimers(class VelocityVerletHybrid* obj) {
+  std::vector<real> timers;
+  std::vector<std::string> labels;
+  obj->loadTimers(timers, labels);
+
+  boost::python::list return_list;
+  for (int i = 0; i < timers.size(); i++) {
+    return_list.append(boost::python::make_tuple(labels[i], timers[i]));
+  }
+  return return_list;
 }
 
 /****************************************************

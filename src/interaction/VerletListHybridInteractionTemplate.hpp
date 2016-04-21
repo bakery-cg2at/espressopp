@@ -88,7 +88,6 @@ class VerletListHybridInteractionTemplate: public Interaction {
       scaleFactor_ = 1.0;
     else if (scaleFactor_ <= 0.0)
       scaleFactor_ = 0.0;
-    std::cout << "set scale factor to=" << scaleFactor_ << std::endl;
   }
 
   real scaleFactor() { return scaleFactor_; }
