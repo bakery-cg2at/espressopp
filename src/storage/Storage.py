@@ -386,6 +386,7 @@ class StorageLocal(object):
                   elif property.lower() == "lambda_adrd" : particle.lambda_adrd = value
                   elif property.lower() == "state" : particle.state = value
                   elif property.lower() == "res_id" : particle.res_id = value
+                  elif property.lower() == "vp": particle.isVP = value
                   else: raise SyntaxError( 'unknown particle property: %s' % property) # UnknownParticleProperty exception is not implemented
               #except ParticleDoesNotExistHere:
                # self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))
