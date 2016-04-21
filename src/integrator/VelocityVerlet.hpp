@@ -71,7 +71,7 @@ namespace espressopp {
         void run(int nsteps);
         
         /** Load timings in array to export to Python as a tuple. */
-        void loadTimers(std::vector<real> &return_vector);
+        void loadTimers(std::vector<real> &return_vector, std::vector<std::string> &labels);
 
         /** Clean up all timers.*/
         void resetTimers();
