@@ -132,16 +132,9 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::addForces() {
     }
 
     if (!is_almost_zero(forcescale12)) {
-      try {
-        if (potential->_computeForce(force, dist)) {
-          p1.force() += forcescale12 * force;
-          p2.force() -= forcescale12 * force;
-        }
-      } catch (const std::exception &ex) {
-        LOG4ESPP_ERROR(_Potential::theLogger,
-                       "p1 " << p1 << " p2 " << p2 << " cgPotential=" << cgPotential
-                       << " w12=" << w12);
-        throw ex;
+      if (potential->_computeForce(force, dist)) {
+        p1.force() += forcescale12 * force;
+        p2.force() -= forcescale12 * force;
       }
     }
   }
@@ -164,14 +157,7 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeEnergy
     if (!is_almost_zero(energyscale12)) {
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
-      try {
-        e_local += energyscale12 * potential->_computeEnergy(r21);
-      } catch (const std::exception &ex) {
-        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
-            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
-
-        throw ex;
-      }
+      e_local += energyscale12 * potential->_computeEnergy(r21);
     }
   }
   real esum = 0.0;
@@ -222,15 +208,8 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
       Real3D force;
-      try {
-        if (potential->_computeForce(force, r21)) {
-          w_virial += r21 * forcescale * force;
-        }
-      } catch (const std::exception &ex) {
-        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
-            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
-
-        throw ex;
+      if (potential->_computeForce(force, r21)) {
+        w_virial += r21 * forcescale * force;
       }
     }
   }
@@ -259,15 +238,8 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
       Real3D force;
-      try {
-        if (potential->_computeForce(force, r21)) {
-          w_wlocal += Tensor(r21, forcescale * force);
-        }
-      } catch (const std::exception &ex) {
-        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
-            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
-
-        throw ex;
+      if (potential->_computeForce(force, r21)) {
+        w_wlocal += Tensor(r21, forcescale * force);
       }
     }
   }
@@ -306,15 +278,8 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
         Real3D r21;
         bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
         Real3D force;
-        try {
-          if (potential->_computeForce(force, r21)) {
-            wlocal += Tensor(r21, forcescale * force);
-          }
-        } catch (const std::exception &ex) {
-          LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
-              << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
-
-          throw ex;
+        if (potential->_computeForce(force, r21)) {
+          wlocal += Tensor(r21, forcescale * force);
         }
       }
     }
@@ -361,15 +326,8 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
       bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
       Real3D force;
       Tensor ww;
-      try {
-        if (potential->_computeForce(force, r21)) {
-          ww = Tensor(r21, forcescale * force);
-        }
-      }  catch (const std::exception &ex) {
-        LOG4ESPP_ERROR(_Potential::theLogger, "p1.id=" << p1.id() << " p1.pos=" << p1.position()
-            << " p2.id=" << p2.id() << " p2.pos=" << p2.position());
-
-        throw ex;
+      if (potential->_computeForce(force, r21)) {
+        ww = Tensor(r21, forcescale * force);
       }
 
       int i = minpos + 1;

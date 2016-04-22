@@ -91,9 +91,9 @@ real VelocityVerletHybrid::updateVS() {
           LOG4ESPP_DEBUG(theLogger, "vp-" << vp->id() << " atp:" << atp->id() << " " << atp->position());
           Real3D vec12;
           bc.getMinimumImageVectorBox(vec12, pos, vp->position());
-          cmp[0] += m * vec12[0]; // (pos[0] + img[0]*box[0]);
-          cmp[1] += m * vec12[1]; // (pos[1] + img[1]*box[1]);
-          cmp[2] += m * vec12[2]; // (pos[2] + img[2]*box[2]);
+          cmp[0] += m * vec12[0];
+          cmp[1] += m * vec12[1];
+          cmp[2] += m * vec12[2];
 
           cmv += m * atp->velocity();
         } else {
@@ -107,16 +107,9 @@ real VelocityVerletHybrid::updateVS() {
       cmv /= vp->mass();
       LOG4ESPP_DEBUG(theLogger, "vp-" << vp->id() << " cmp=" << cmp);
       Real3D old_p = vp->position();
-
-//      Int3D cmp_imageBox(0, 0, 0);
-//      vp->position() = cmp;
-//      bc.foldPosition(vp->position(), cmp_imageBox);
-//      vp->image() = cmp_imageBox;
-
       vp->position() += cmp;
-
       vp->velocity() = cmv;
-      // Check how fare we move new cg position
+      // Check how fare we move new cg position.
       Real3D d_p = old_p - vp->position();
       maxSqDist = std::max(maxSqDist, d_p.sqr());
     }
@@ -186,8 +179,6 @@ void VelocityVerletHybrid::run(int nsteps) {
   runInit();
   timeRunInitS += timeIntegrate.getElapsedTime() - time;
 
-//  checkConsistence(0);
-
   // Before start make sure that particles are on the right processor
   if (resortFlag) {
     LOG4ESPP_INFO(theLogger, "resort particles");
@@ -195,8 +186,6 @@ void VelocityVerletHybrid::run(int nsteps) {
     maxDist = 0.0;
     resortFlag = false;
   }
-
-//  checkConsistence(1);
 
   bool recalcForces = true;  // TODO: more intelligent
 
@@ -466,6 +455,17 @@ void VelocityVerletHybrid::checkConsistence(int postfix) {
       localVector.push_back(img[2]);
       localVector.push_back(vp->ghost());
 
+      bool wrong = false;
+      if (is_almost_zero(vp->velocity().abs())) {
+        wrong = true;
+      }
+      if (is_almost_zero(vp->mass())) {
+        wrong = true;
+      }
+
+      if (wrong)
+        std::cout << *vp << std::endl;
+
       for (FixedVSList::tuple::iterator itp = it->second.begin(); itp != it->second.end(); ++itp) {
         Particle *atp = storage.lookupLocalParticle(*itp);
         if (atp) {
@@ -482,6 +482,14 @@ void VelocityVerletHybrid::checkConsistence(int postfix) {
           localVector.push_back(img[1]);
           localVector.push_back(img[2]);
           localVector.push_back(atp->ghost());
+          if (is_almost_zero(atp->velocity().abs()))
+            wrong = true;
+          if (is_almost_zero(atp->mass()))
+            wrong = true;
+          if (is_almost_zero(atp->q()))
+            wrong = true;
+          if (wrong)
+            std::cout << *atp << std::endl;
         } else {
           std::cout << " AT particle (" << *itp << ") of VP " << vp->id() << "-"
               << vp->ghost() << " not found in tuples ";
@@ -498,14 +506,13 @@ void VelocityVerletHybrid::checkConsistence(int postfix) {
 
     std::vector<std::vector<real> >::const_iterator it = globalVector.begin();
     std::vector<real>::const_iterator lit;
-    std::cout << "globalVector.size=" << globalVector.size() << std::endl;
     int cpu = 0;
 
     std::stringstream ss;
     ss << "particle_list_" << step << "_" << postfix << ".txt";
 
-    FILE *fp;
-    fp = fopen(ss.str().c_str(), "w");
+    //FILE *fp;
+    //fp = fopen(ss.str().c_str(), "w");
 
     for (; it != globalVector.end(); ++it) {
       lit = it->begin();
@@ -519,11 +526,11 @@ void VelocityVerletHybrid::checkConsistence(int postfix) {
         int iy = *(lit++);
         int iz = *(lit++);
         longint isGhost = *(lit++);
-        fprintf(fp, "%4d %4d % 03.8f % 03.8f % 03.8f %d %d %d %1d\n", lr, pid, x, y, z, ix, iy, iz, isGhost);
+        //fprintf(fp, "%4d %4d % 03.8f % 03.8f % 03.8f %d %d %d %1d\n", lr, pid, x, y, z, ix, iy, iz, isGhost);
       }
       cpu++;
     }
-    fclose(fp);
+    //fclose(fp);
   } else {
     mpi::gather(*system.comm, localVector,  0);
   }
@@ -535,7 +542,6 @@ void VelocityVerletHybrid::updateForces() {
   storage::Storage &storage = *getSystemRef().storage;
 
   // Make sure that positions and velocity of VS sites is correct with respect to the atoms.
-//  checkConsistence(2);
   timeIntegrate.startMeasure();
   real maxDist = updateVS();
   timeVS += timeIntegrate.stopMeasure();
@@ -550,8 +556,6 @@ void VelocityVerletHybrid::updateForces() {
     storage.updateGhosts();
     timeComm1 += timeIntegrate.getElapsedTime() - time;
   }
-
-//  checkConsistence(3);
 
   time = timeIntegrate.getElapsedTime();
   calcForces();

@@ -62,6 +62,7 @@ namespace espressopp {
       lambdaDeriv = 0.0;
       state = 0;
       res_id = 0;
+      vp = false;
     }
 
   private:
@@ -78,6 +79,7 @@ namespace espressopp {
       ar & lambdaDeriv;
       ar & state;
       ar & res_id;
+      ar & vp;
     }
   };
 
@@ -172,7 +174,6 @@ namespace espressopp {
     // the image of the particle
     Int3D i;
     bool ghost;
-    bool vp;
     bool dummy1;
     bool dummy2;
     bool dummy3;
@@ -183,7 +184,6 @@ namespace espressopp {
       for (int ii = 0; ii < 3; ++ii)
         ar & i[ii];
       ar & ghost;
-      ar & vp;
     }
   };
 
@@ -220,7 +220,7 @@ namespace espressopp {
       r.extVar       = 0.0;      
       p.state        = 0;
       p.res_id       = 0;
-      l.vp           = false;
+      p.vp           = false;
     }
 
     // getter and setter used for export in Python
@@ -340,10 +340,10 @@ namespace espressopp {
     void setResId(const int& _res_id) { p.res_id = _res_id; }
 
     // virtual-particle
-    bool& vp() { return l.vp; }
-    const bool& vp() const { return l.vp; }
-    bool getVP() const { return l.vp; }
-    void setVP(const bool &_vp) { l.vp = _vp; }
+    bool& vp() { return p.vp; }
+    const bool& vp() const { return p.vp; }
+    bool getVP() const { return p.vp; }
+    void setVP(const bool &_vp) { p.vp = _vp; }
 
     static void registerPython();
   
@@ -360,11 +360,8 @@ namespace espressopp {
         l = src.l;
       }
       ghost() = 1;
-      l.vp = src.getVP();
       lambda() = src.lambda();
-      mass() = src.mass();
       m.v = src.velocity();
-      q() = src.q();
     }
 
     bool operator<(Particle other) const {
