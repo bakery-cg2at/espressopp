@@ -91,6 +91,7 @@ class SystemMonitor : public ParticleAccess {
     }
 
     last_time_ = 0.0;
+    last_step_ = 0;
   }
 
   ~SystemMonitor() {

@@ -20,7 +20,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include "DomainDecompositionHybrid.hpp"
+//#include "DomainDecompositionHybrid.hpp"
 #include "DomainDecompositionNonBlocking.hpp"
 #include "DomainDecompositionAdress.hpp"
 #include "DomainDecomposition.hpp"
@@ -34,7 +34,7 @@ namespace espressopp {
       DomainDecomposition::registerPython();
       DomainDecompositionNonBlocking::registerPython();
       DomainDecompositionAdress::registerPython();
-      DomainDecompositionHybrid::registerPython();
+      //DomainDecompositionHybrid::registerPython();
     }
   }
 }
