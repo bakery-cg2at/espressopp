@@ -441,6 +441,7 @@ namespace espressopp {
                       // TODO: error handling
                       LOG4ESPP_ERROR(logger, "particle " << part.id() <<
                               " has moved to outer space (one or more coordinates are nan)");
+		      exit(1);
                     } else {
                       // particle stays where it is, and will be sorted in the next round
                       finished = false;

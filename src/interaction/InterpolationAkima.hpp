@@ -89,16 +89,9 @@ namespace espressopp {
             std::stringstream ss;
             ss << "InterpolationAkima.hpp:99 ";
             if (index < 0) {
-              ss << "Distance " << r << " out of range " << inner << " - " << inner + (N-1) * delta;
-              ss << " index(" << index << ") < 0 ";
-              LOG4ESPP_ERROR(theLogger, ss.str());
               index = 0;
             }
             if (index >= N) {
-              ss << "Distance " << r << " out of range " << inner << " - "
-                 << inner + (N-1)*delta;
-              ss << " index(" << index << ") >= N(" << N << ") ";
-              LOG4ESPP_ERROR(theLogger, ss.str());
               index = N;
             }
             

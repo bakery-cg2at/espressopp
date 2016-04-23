@@ -83,7 +83,7 @@ class FixedPairListAdressInteractionTemplate: public Interaction, SystemAccess {
     return potential;
   }
 
-  void setScaleFactor(real s) { scaleFactor_ = s; std::cout << "set scale_factor=" << s << std::endl; }
+  void setScaleFactor(real s) { scaleFactor_ = s; }
   real scaleFactor() { return scaleFactor_; }
 
   virtual void addForces();
