@@ -58,6 +58,7 @@ class FixedPairListAdressInteractionTemplate: public Interaction, SystemAccess {
     if (!potential) {
       LOG4ESPP_ERROR(theLogger, "NULL potential");
     }
+    scaleFactor_ = 1.0;
   }
 
   virtual ~FixedPairListAdressInteractionTemplate() {}
@@ -82,6 +83,9 @@ class FixedPairListAdressInteractionTemplate: public Interaction, SystemAccess {
     return potential;
   }
 
+  void setScaleFactor(real s) { scaleFactor_ = s; }
+  real scaleFactor() { return scaleFactor_; }
+
   virtual void addForces();
   virtual real computeEnergy();
   virtual real computeEnergyAA();
@@ -99,6 +103,7 @@ class FixedPairListAdressInteractionTemplate: public Interaction, SystemAccess {
   shared_ptr < FixedPairList > fixedpairList;
   shared_ptr < Potential > potential;
   bool cgPotential;
+  real scaleFactor_;
 };
 
 //////////////////////////////////////////////////
@@ -131,6 +136,8 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::addForces() {
       forcescale12 = (1-w12);
     }
 
+    forcescale12 *= scaleFactor_;
+
     if (!is_almost_zero(forcescale12)) {
       if (potential->_computeForce(force, dist)) {
         p1.force() += forcescale12 * force;
@@ -153,6 +160,8 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeEnergy
     real energyscale12 = w12;
     if (cgPotential)
       energyscale12 = 1.0-w12;
+
+    energyscale12 *= scaleFactor_;
 
     if (!is_almost_zero(energyscale12)) {
       Real3D r21;
@@ -204,6 +213,9 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
     if (cgPotential) {
       forcescale = (1.0-w12);
     }
+
+    forcescale *= scaleFactor_;
+
     if (!is_almost_zero(forcescale)) {
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
@@ -234,6 +246,9 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
     if (cgPotential) {
       forcescale = (1.0-w12);
     }
+
+    forcescale *= scaleFactor_;
+
     if (!is_almost_zero(forcescale)) {
       Real3D r21;
       bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
@@ -269,6 +284,9 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
     if (cgPotential) {
       forcescale = (1.0-w12);
     }
+
+    forcescale *= scaleFactor_;
+
     if (!is_almost_zero(forcescale)) {
       Real3D p1pos = p1.position();
       Real3D p2pos = p2.position();
@@ -312,6 +330,9 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
     if (cgPotential) {
       forcescale = (1.0-w12);
     }
+
+    forcescale *= scaleFactor_;
+
     if (!is_almost_zero(forcescale)) {
       Real3D p1pos = p1.position();
       Real3D p2pos = p2.position();

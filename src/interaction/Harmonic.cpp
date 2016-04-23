@@ -82,7 +82,9 @@ namespace espressopp {
       .def("setPotential", &FixedPairListAdressHarmonic::setPotential)
       .def("getPotential", &FixedPairListAdressHarmonic::getPotential)
       .def("setFixedPairList", &FixedPairListAdressHarmonic::setFixedPairList)
-      .def("getFixedPairList", &FixedPairListAdressHarmonic::getFixedPairList);
+      .def("getFixedPairList", &FixedPairListAdressHarmonic::getFixedPairList)
+      .add_property("scale_factor", &FixedPairListAdressHarmonic::scaleFactor,
+                    &FixedPairListAdressHarmonic::setScaleFactor);
 
     class_< VerletListHarmonic, bases< Interaction > >("interaction_VerletListHarmonic",
         init< shared_ptr<VerletList> >())

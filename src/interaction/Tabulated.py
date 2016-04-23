@@ -286,7 +286,6 @@ class FixedPairListAdressTabulatedLocal(InteractionLocal, interaction_FixedPairL
             self.cxxclass.setPotential(self, potential)
 
 
-
 if pmi.isController:
     class Tabulated(Potential):
         'The Tabulated potential.'

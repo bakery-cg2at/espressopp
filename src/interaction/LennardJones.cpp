@@ -149,10 +149,12 @@ namespace espressopp {
         ("interaction_FixedPairListAdressLennardJones",
           init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJones>, bool >())
           .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJones>, bool >())
-          .def("setPotential", &FixedPairListLennardJones::setPotential)
-          .def("getPotential", &FixedPairListLennardJones::getPotential)
-          .def("setFixedPairList", &FixedPairListLennardJones::setFixedPairList)
-          .def("getFixedPairList", &FixedPairListLennardJones::getFixedPairList)
+          .def("setPotential", &FixedPairListAdressLennardJones::setPotential)
+          .def("getPotential", &FixedPairListAdressLennardJones::getPotential)
+          .def("setFixedPairList", &FixedPairListAdressLennardJones::setFixedPairList)
+          .def("getFixedPairList", &FixedPairListAdressLennardJones::getFixedPairList)
+          .add_property("scale_factor", &FixedPairListAdressLennardJones::scaleFactor,
+                        &FixedPairListAdressLennardJones::setScaleFactor);
       ;
     }
     

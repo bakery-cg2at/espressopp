@@ -486,5 +486,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListAdressLennardJonesLocal',
-            pmicall = ['getPotential', 'setPotential', 'setFixedPairList','getFixedPairList' ]
+            pmicall = ['getPotential', 'setPotential', 'setFixedPairList','getFixedPairList' ],
+            pmiproperty = ['scale_factor']
         )

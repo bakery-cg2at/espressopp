@@ -225,7 +225,8 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListAdressHarmonicLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
+            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList'],
+            pmiproperty = ['scale_factor']
             )
     class VerletListHarmonic(Interaction):
         __metaclass__ = pmi.Proxy

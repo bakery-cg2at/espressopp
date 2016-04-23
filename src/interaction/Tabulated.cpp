@@ -91,6 +91,8 @@ namespace espressopp {
           ("interaction_VerletListHybridTabulated", init <shared_ptr<VerletList>, bool >())
           .def("setPotential", &VerletListHybridTabulated::setPotential)
           .def("getPotential", &VerletListHybridTabulated::getPotentialPtr)
+          .add_property("scale_factor", &VerletListHybridTabulated::scaleFactor,
+                        &VerletListHybridTabulated::setScaleFactor)
           ;
       class_ <VerletListAdressTabulated, bases <Interaction> >
         ("interaction_VerletListAdressTabulated",
@@ -150,7 +152,9 @@ namespace espressopp {
                  >())
         .def("setPotential", &FixedPairListAdressTabulated::setPotential)
         .def("setFixedPairList", &FixedPairListAdressTabulated::setFixedPairList)
-        .def("getFixedPairList", &FixedPairListAdressTabulated::getFixedPairList);
+        .def("getFixedPairList", &FixedPairListAdressTabulated::getFixedPairList)
+        .add_property("scale_factor", &FixedPairListAdressTabulated::scaleFactor,
+                      &FixedPairListAdressTabulated::setScaleFactor);
         ;
 
     }
