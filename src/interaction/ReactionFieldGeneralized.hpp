@@ -132,7 +132,8 @@ namespace espressopp {
                 real _computeEnergy(const Particle& p1, const Particle& p2) const {
                     Real3D dist = p1.position() - p2.position();
                     real distSqr = dist.sqr();
-                    if (distSqr>rc2) return 0.0;
+                    if (distSqr>rc2)
+                      return 0.0;
                     real qq = p1.q()*p2.q();
                     /* Note: this implementation counts minus integral of the force as energy
                          which is not the same as the full electrostatic energy
@@ -151,7 +152,8 @@ namespace espressopp {
                          const Particle &p2) const {
                     Real3D dist = p1.position() - p2.position();
                     real r2 = dist.sqr();
-                    if (r2>rc2) return true;
+                    if (r2>rc2)
+                      return false;
 
                     real r = sqrt(r2);
                     real qq = p1.q()*p2.q();
