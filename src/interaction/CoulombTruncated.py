@@ -94,7 +94,8 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_CoulombTruncated, \
                       interaction_VerletListCoulombTruncated, \
                       interaction_FixedPairListTypesCoulombTruncated, \
-                      interaction_VerletListAdressCoulombTruncated
+                      interaction_VerletListAdressCoulombTruncated, \
+                      interaction_VerletListHybridCoulombTruncated
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
     def __init__(self, prefactor=1.0, cutoff=infinity):
@@ -112,6 +113,20 @@ class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCo
 
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+class VerletListHybridCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCoulombTruncated):
+    'The (local) CoulombTruncated interaction using Verlet lists.'
+    def __init__(self, vl, cg_potential=False):
+        if pmi.workerIsActive():
+            cxxinit(self, interaction_VerletListHybridCoulombTruncated, vl, cg_potential)
+
+    def setPotential(self, type1, type2, potential):
+        if pmi.workerIsActive():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if pmi.workerIsActive():
             return self.cxxclass.getPotential(self, type1, type2)
 
 class FixedPairListTypesCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListTypesCoulombTruncated):
@@ -151,6 +166,15 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListCoulombTruncatedLocal',
             pmicall = ['setPotential','getPotential']
             )
+
+    class VerletListHybridCoulombTruncated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListHybridCoulombTruncatedLocal',
+            pmicall = ['setPotential', 'getPotential', 'getVerletList'],
+            pmiproperty = ['scale_factor']
+        )
+
     class FixedPairListTypesCoulombTruncated(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(

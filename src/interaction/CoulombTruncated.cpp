@@ -25,6 +25,7 @@
 #include "VerletListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListHybridInteractionTemplate.hpp"
 #include "Tabulated.hpp"
 
 //For a Coulombic FixedPairList interaction, it's necessary to use FixedPairListTypesInteractionTemplate.hpp instead of FixedPairListInteractionTemplate.hpp
@@ -37,6 +38,9 @@ namespace espressopp {
     VerletListCoulombTruncated;
     typedef class FixedPairListTypesInteractionTemplate< CoulombTruncated >
     FixedPairListTypesCoulombTruncated;
+
+    typedef class VerletListHybridInteractionTemplate<CoulombTruncated>
+      VerletListHybridCoulombTruncated;
 
     typedef class VerletListAdressInteractionTemplate<CoulombTruncated, Tabulated>
         VerletListAdressCoulombTruncated;
@@ -58,6 +62,15 @@ namespace espressopp {
         .def("setPotential", &VerletListCoulombTruncated::setPotential)
         .def("getPotential", &VerletListCoulombTruncated::getPotentialPtr)
         ;
+
+      class_<VerletListHybridCoulombTruncated, bases<Interaction> >
+          ("interaction_VerletListHybridCoulombTruncated", init<shared_ptr<VerletList>, bool>())
+          .def("getVerletList", &VerletListHybridCoulombTruncated::getVerletList)
+          .def("setPotential", &VerletListHybridCoulombTruncated::setPotential)
+          .def("getPotential", &VerletListHybridCoulombTruncated::getPotentialPtr)
+          .add_property("scale_factor", &VerletListHybridCoulombTruncated::scaleFactor,
+                        &VerletListHybridCoulombTruncated::setScaleFactor)
+          ;
 
       class_<VerletListAdressCoulombTruncated, bases<Interaction> >
           ("interaction_VerletListAdressCoulombTruncated",
