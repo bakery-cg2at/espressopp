@@ -1,7 +1,5 @@
-#  Copyright (C) 2012,2013
-#      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
-#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2016
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  
 #  This file is part of ESPResSo++.
 #  
@@ -25,10 +23,12 @@ r"""
 ***************************************************
 
 
-.. function:: espressopp.integrator.LangevinThermostatOnGroup(system)
+.. function:: espressopp.integrator.LangevinThermostatOnGroup(system, particle_group)
 
 		:param system: 
-		:type system: 
+		:type system:
+		:param particle_group:
+		:type particle_group: espressopp.ParticleGroup
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

@@ -1,8 +1,9 @@
+# Copyright (c) 2015,2016
+#     Jakub Krajniak (jkrajniak at gmail.com)
+#
 # Copyright (c) 2015
 #     Pierre de Buyl
 #
-# Copyright (c) 2015-2016
-#     Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
 #
@@ -89,7 +90,10 @@ from espressopp import pmi
 from _espressopp import io_DumpH5MD
 from mpi4py import MPI
 import numpy as np
-import pyh5md
+try:
+    import pyh5md
+except ImportError:
+    print 'missing pyh5md'
 
 
 class DumpH5MDLocal(io_DumpH5MD):
