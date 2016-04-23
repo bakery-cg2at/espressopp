@@ -91,19 +91,15 @@ namespace espressopp {
             if (index < 0) {
               ss << "Distance " << r << " out of range " << inner << " - " << inner + (N-1) * delta;
               ss << " index(" << index << ") < 0 ";
-              ss << " Nothing to do, exit(1)";
               LOG4ESPP_ERROR(theLogger, ss.str());
               index = 0;
-              throw std::runtime_error(ss.str());
             }
             if (index >= N) {
               ss << "Distance " << r << " out of range " << inner << " - "
                  << inner + (N-1)*delta;
               ss << " index(" << index << ") >= N(" << N << ") ";
-              ss << " Nothing to do, exit(1)";
               LOG4ESPP_ERROR(theLogger, ss.str());
               index = N;
-              throw std::runtime_error(ss.str());
             }
             
             real z = r - radius[index];
