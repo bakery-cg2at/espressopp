@@ -141,9 +141,17 @@ class SystemLocal(_espressopp.System):
             return ret_val
 
     def removeInteraction(self, number):
-
         if pmi.workerIsActive():
             self.cxxclass.removeInteraction(self, number)
+            self._interaction2id = {
+                k: v if v < number else v - 1
+                for k, v in self._interaction2id.iteritems()
+                if v != number
+                }
+            if self._interaction2id:
+                self._interaction_pid = max(self._interaction2id.values()) + 1
+            else:
+                self._interaction_pid = 0
 
     def removeInteractionByName(self, name):
         if pmi.workerIsActive():
@@ -151,11 +159,6 @@ class SystemLocal(_espressopp.System):
                 raise RuntimeError('Interaction {} not found'.format(name))
             interaction_id = self._interaction2id[name]
             self.cxxclass.removeInteraction(self, interaction_id)
-            self._interaction2id = {
-                k: v if v < interaction_id else v - 1
-                for k, v in self._interaction2id.iteritems()
-                }
-            self._interaction_pid = max(self._interaction2id.values()) + 1
 
     def getAllInteractions(self):
         if pmi.workerIsActive():
@@ -166,6 +169,11 @@ class SystemLocal(_espressopp.System):
             for name, iid in self._interaction2id.items():
                 if iid == number:
                     return name
+    
+    def getInteractionNames2Ids(self):
+        if pmi.workerIsActive():
+            return self._interaction2id
+
 
     def getNumberOfInteractions(self):
 
@@ -227,6 +235,7 @@ if pmi.isController:
       pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
       pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
             'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
-            'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction']
+            'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction',
+                 'getInteractionNames2Ids']
     )
 
