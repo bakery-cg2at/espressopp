@@ -98,7 +98,7 @@ void DynamicResolution::updateWeights() {
   FixedVSList::GlobalTuples vs = vs_list->globalTuples;
   FixedVSList::GlobalTuples::iterator it = vs.begin();
   for (; it != vs.end(); ++it) {
-    Particle *vp = system.storage->lookupRealParticle(it->first);
+    Particle *vp = system.storage->lookupLocalParticle(it->first);
     if (vp) {
       vp->lambda() = resolution_;
 

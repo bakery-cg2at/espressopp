@@ -89,6 +89,10 @@ void SystemMonitor::addObservable(std::string name, shared_ptr<Observable> obs,
     visible_observables_.push_back(0);
 }
 
+void SystemMonitor::copyState(shared_ptr<SystemMonitor> sm) {
+  sm->updateState(last_step_, last_time_);
+}
+
 void SystemMonitor::registerPython() {
   using namespace espressopp::python;  // NOLINT
   class_<SystemMonitor, bases< ParticleAccess > >
@@ -99,6 +103,7 @@ void SystemMonitor::registerPython() {
           >())
       .def("add_observable", &SystemMonitor::addObservable)
       .def("info", &SystemMonitor::info)
+      .def("copy_state", &SystemMonitor::copyState)
       .def("dump", &SystemMonitor::perform_action);
 }
 

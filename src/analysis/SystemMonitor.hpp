@@ -99,6 +99,11 @@ class SystemMonitor : public ParticleAccess {
   void perform_action();
   void info();
 
+  void updateState(longint last_step, real last_time) {
+    last_step_ = last_step;
+    last_time_ = last_time;
+  }
+
   static void registerPython();
 
  private:
@@ -106,10 +111,11 @@ class SystemMonitor : public ParticleAccess {
 
   void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
 
+  void copyState(shared_ptr<SystemMonitor> sm);
+
   int current_step_;
   int last_step_;
   real last_time_;
-  bool header_written_;
   bool header_shown_;
   shared_ptr<std::vector<real> > values_;
   shared_ptr<std::vector<std::string> > header_;

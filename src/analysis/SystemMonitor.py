@@ -111,6 +111,10 @@ class SystemMonitorLocal(analysis_SystemMonitor):
         if pmi.workerIsActive():
             self.cxxclass.dump(self)
 
+    def copy_state(self, sm):
+        if pmi.workerIsActive():
+            self.cxxclass.copy_state(sm)
+
 if pmi.isController:
     class SystemMonitorOutputCSV:
         __metaclass__ = pmi.Proxy
@@ -120,5 +124,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.analysis.SystemMonitorLocal',
-            pmicall=['add_observable', 'info', 'dump']
+            pmicall=['add_observable', 'info', 'dump', 'copy_state']
             )
