@@ -395,6 +395,9 @@ namespace espressopp {
     ParticleList recvBufR;
     recvBufR.reserve(exchangeBufferSize);
 
+    System& system = getSystemRef();
+    esutil::Error err(system.comm);
+
     bool allFinished;
     do {
       bool finished = true;
@@ -439,9 +442,10 @@ namespace espressopp {
                     // isnan function is C99 only, x != x is only true if x == nan
                     if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
                       // TODO: error handling
-                      LOG4ESPP_ERROR(logger, "particle " << part.id() <<
-                              " has moved to outer space (one or more coordinates are nan)");
-		      exit(1);
+                      std::stringstream msg;
+                      msg << "particle " << part << " has moved to outer space (one or more coordinates are nan)";
+                      LOG4ESPP_ERROR(logger, msg.str());
+                      err.setException(msg.str());
                     } else {
                       // particle stays where it is, and will be sorted in the next round
                       finished = false;
@@ -504,11 +508,10 @@ namespace espressopp {
                             const Real3D& pos = part.position();
                             // isnan function is C99 only, x != x is only true if x == nan
                             if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
-                              std::stringstream ss;
-                              ss << "Particle " << part.id() << " has moved to outer "
-                                 << "space (one or more coordinates are nan)";
-                              LOG4ESPP_ERROR(logger, ss.str());
-                              exit(1);
+                              std::stringstream msg;
+                              msg << "particle " << part
+                                  << " has moved to outer space (one or more coordinates are nan)";
+                              err.setException(msg.str());
                             } else {
                                 // particle stays where it is, and will be sorted in the next round
                                 finished = false;
@@ -529,6 +532,8 @@ namespace espressopp {
       // Communicate wether particle exchange is finished
       mpi::all_reduce(*getSystem()->comm, finished, allFinished, std::logical_and<bool>());
     } while (!allFinished);
+
+    err.checkException();
 
     exchangeBufferSize = std::max(exchangeBufferSize,
                   std::max(sendBufL.capacity(),
