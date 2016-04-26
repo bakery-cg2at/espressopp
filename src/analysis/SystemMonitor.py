@@ -111,9 +111,9 @@ class SystemMonitorLocal(analysis_SystemMonitor):
         if pmi.workerIsActive():
             self.cxxclass.dump(self)
 
-    def copy_state(self, sm):
+    def copy_state(self, from_sm):
         if pmi.workerIsActive():
-            self.cxxclass.copy_state(sm)
+            self.cxxclass.copy_state(self, from_sm)
 
 if pmi.isController:
     class SystemMonitorOutputCSV:
