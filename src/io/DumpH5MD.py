@@ -90,10 +90,14 @@ from espressopp import pmi
 from _espressopp import io_DumpH5MD
 from mpi4py import MPI
 import numpy as np
+import sys
 try:
     import pyh5md
+    import h5py
 except ImportError:
     print 'missing pyh5md'
+
+import time as py_time
 
 
 class DumpH5MDLocal(io_DumpH5MD):
@@ -110,7 +114,8 @@ class DumpH5MDLocal(io_DumpH5MD):
                  is_adress=False,
                  author='xxx',
                  email='xxx',
-                 chunk_size=256):
+                 chunk_size=256,
+                 sorted=True):
         """
         Args:
             system: The system object.
@@ -130,11 +135,13 @@ class DumpH5MDLocal(io_DumpH5MD):
             author: The name of author of the file. (default: xxx)
             email: The e-mail to author of that file. (default: xxx)
             chunk_size: The size of data chunk. (default: 256)
+            sorted: If set to True then HDF5 will be sorted on close.
         """
         if not pmi.workerIsActive():
             return
         cxxinit(self, io_DumpH5MD, system, is_adress)
 
+        self.filename = filename
         self.group_name = group_name
         self.store_position = store_position
         self.store_species = store_species
@@ -146,6 +153,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.store_res_id = store_res_id
         self.static_box = static_box
         self.chunk_size = chunk_size
+        self.sorted = sorted
 
         self.system = system
         self.file = pyh5md.H5MD_File(filename, 'w', driver='mpio', comm=MPI.COMM_WORLD,
@@ -206,6 +214,10 @@ class DumpH5MDLocal(io_DumpH5MD):
 
         self._system_data()
 
+	self.commTimer = 0.0
+	self.updateTimer = 0.0
+	self.writeTimer = 0.0
+
     def _system_data(self):
         """Stores specific information about simulation."""
         # Creates /system group
@@ -218,60 +230,85 @@ class DumpH5MDLocal(io_DumpH5MD):
             parameters['dt'] = self.system.integrator.dt
         self.set_parameters(parameters)
 
+    def getTimers(self):
+        if pmi.workerIsActive():
+            return {'commTimer': self.commTimer,
+                    'updateTimer': self.updateTimer,
+                    'writeTimer': self.writeTimer
+                   }
+
     def set_parameters(self, paramters):
-        if 'parameters' not in self.file.f:
-            self.file.f.create_group('parameters')
-        g_params = self.file.f['parameters']
-        for k, v in paramters.iteritems():
-            g_params.attrs[k] = v
+        if pmi.workerIsActive():
+            if 'parameters' not in self.file.f:
+                self.file.f.create_group('parameters')
+            g_params = self.file.f['parameters']
+            for k, v in paramters.iteritems():
+                g_params.attrs[k] = v
 
     def get_file(self):
-        return self.file.f
+        if pmi.workerIsActive():
+            return self.file.f
 
     def update(self):
         if pmi.workerIsActive():
             self.cxxclass.update(self)
 
     def clear_buffers(self):
-        self.cxxclass.clear_buffers(self)
+        if pmi.workerIsActive():
+            self.cxxclass.clear_buffers(self)
 
     def getPosition(self):
-        return self.cxxclass.getPosition(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getPosition(self)
 
     def getImage(self):
-        return self.cxxclass.getImage(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getImage(self)
 
     def getVelocity(self):
-        return self.cxxclass.getVelocity(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getVelocity(self)
 
     def getForce(self):
-        return self.cxxclass.getForce(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getForce(self)
 
     def getId(self):
-        return self.cxxclass.getId(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getId(self)
 
     def getSpecies(self):
-        return self.cxxclass.getSpecies(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getSpecies(self)
 
     def getState(self):
-        return self.cxxclass.getState(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getState(self)
 
     def getCharge(self):
-        return self.cxxclass.getCharge(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getCharge(self)
 
     def getMass(self):
-        return self.cxxclass.getMass(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getMass(self)
 
     def getLambdaAdr(self):
-        return self.cxxclass.getLambda(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getLambda(self)
 
     def getResId(self):
-        return self.cxxclass.getResId(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getResId(self)
 
     def dump(self, step, time):
         if not pmi.workerIsActive():
             return
+        time0 = py_time.time()
         self.update()
+        self.updateTimer += (py_time.time() - time0)
+
+        time0 = py_time.time()
         NLocal = np.array(self.NLocal, 'i')
         NMaxLocal = np.array(0, 'i')
         MPI.COMM_WORLD.Allreduce(NLocal, NMaxLocal, op=MPI.MAX)
@@ -279,7 +316,9 @@ class DumpH5MDLocal(io_DumpH5MD):
         total_size = MPI.COMM_WORLD.size*cpu_size
         idx_0 = MPI.COMM_WORLD.rank*cpu_size
         idx_1 = idx_0+NLocal
+        self.commTimer += (py_time.time() - time0)
 
+        time0 = py_time.time()
         # Store ids. Always!
         id_ar = np.asarray(self.getId())
         if total_size > self.id_e.value.shape[1]:
@@ -354,6 +393,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             if total_size > self.res_id.value.shape[1]:
                 self.res_id.value.resize(total_size, axis=1)
             self.res_id.append(res_id, step, time, region=(idx_0, idx_1))
+        self.writeTimer += (py_time.time() - time0)
 
     def close(self):
         if pmi.workerIsActive():
@@ -365,12 +405,43 @@ class DumpH5MDLocal(io_DumpH5MD):
 
 
 if pmi.isController:
+    def sort_file(h5):
+        """Sort data file."""
+        atom_groups = [ag for ag in h5['/particles'] if 'id' in h5['/particles/{}/'.format(ag)]]
+        T = len(h5['/particles/{}/id/value'.format(atom_groups[0])])
+        # Iterate over time frames.
+        for t in xrange(T):
+            sys.stdout.write('Progress: {:.2f} %\r'.format(100.0*float(t)/T))
+            sys.stdout.flush()
+            for ag in atom_groups:
+                ids = h5['/particles/{}/id/value'.format(ag)]
+                idd = [
+                    x[1] for x in sorted(
+                        [(p_id, col_id) for col_id, p_id in enumerate(ids[t])],
+                        key=lambda y: (True, y[0]) if y[0] == -1 else (False, y[0]))
+                    ]
+                for k in h5['/particles/{}/'.format(ag)].keys():
+                    if 'value' in h5['/particles/{}/{}'.format(ag, k)].keys():
+                        path = '/particles/{}/{}/value'.format(ag, k)
+                        h5[path][t] = h5[path][t][idd]
+
     class DumpH5MD(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
             pmicall=['update', 'getPosition', 'getId', 'getSpecies', 'getState', 'getImage',
                      'getVelocity', 'getMass', 'getCharge', 'getResId',
-                     'dump', 'clear_buffers', 'flush', 'get_file', 'close', 'set_parameters'],
+                     'dump', 'clear_buffers', 'flush', 'get_file', 'set_parameters'],
+            pmiinvoke = ['getTimers'],
             pmiproperty=['store_position', 'store_species', 'store_state', 'store_velocity',
                          'store_charge', 'store_res_id', 'store_lambda'])
+
+        def close(self):
+            print('Closing file')
+            pmi.call(self.pmiobject, "close")
+            # Sort file if flag is set to true.
+            if self.pmiobject.sorted:
+                h5 = h5py.File(self.pmiobject.filename, 'r+')
+                sort_file(h5)
+                print('File sorted')
+                h5.close()
