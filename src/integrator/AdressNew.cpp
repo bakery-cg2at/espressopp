@@ -106,11 +106,6 @@ void AdressNew::updateWeights() {
         Particle *at = system.storage->lookupLocalParticle(*itp);
         if (at) {
           at->lambda() = w;
-        } else {
-          std::cout << " AT particle (" << *itp << ") of VP " << vp->id() << "-"
-              << vp->ghost() << " not found in tuples ";
-          std::cout << " (" << vp->position() << ")" << std::endl;
-          exit(1);
         }
       }
     }
