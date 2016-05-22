@@ -44,6 +44,7 @@ from espressopp.integrator.LangevinThermostatOnGroup import *
 from espressopp.integrator.LangevinThermostatHybrid import *
 from espressopp.integrator.LangevinThermostat1D import *
 from espressopp.integrator.GeneralizedLangevinThermostat import *
+from espressopp.integrator.LangevinThermostatOnGroup import *
 from espressopp.integrator.DPDThermostat import *
 from espressopp.integrator.LangevinBarostat import *
 from espressopp.integrator.FixPositions import *
