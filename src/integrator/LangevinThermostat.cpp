@@ -35,6 +35,7 @@ namespace espressopp {
 
     using namespace espressopp::iterator;
 
+    LOG4ESPP_LOGGER(LangevinThermostat::theLogger, "LangevinThermostat");
 
     LangevinThermostat::LangevinThermostat(shared_ptr<System> system)
     :Extension(system) {
