@@ -1,9 +1,7 @@
 /*
-  Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+  Copyright (C) 2016
+      Jakub Krajniak (c) (jkrjaniak at gmail.com)
+
   This file is part of ESPResSo++.
   
   ESPResSo++ is free software: you can redistribute it and/or modify
@@ -33,72 +31,66 @@
 #include "Extension.hpp"
 #include "VelocityVerlet.hpp"
 
-
 #include "boost/signals2.hpp"
 
 
 namespace espressopp {
-  namespace integrator {
+namespace integrator {
 
-    /** Langevin thermostat */
+/** Langevin thermostat on ParticleGroup */
+class LangevinThermostatOnGroup: public Extension {
+ public:
+  LangevinThermostatOnGroup(shared_ptr<System>, shared_ptr<ParticleGroup> pg);
+  virtual ~LangevinThermostatOnGroup();
 
-    class LangevinThermostatOnGroup : public Extension {
+  void setGamma(real gamma);
+  real getGamma();
 
-      public:
+  void setTemperature(real temperature);
+  real getTemperature();
 
-        LangevinThermostatOnGroup(shared_ptr<System>, shared_ptr<ParticleGroup> pg);
-        virtual ~LangevinThermostatOnGroup();
+  void initialize();
 
-        void setGamma(real gamma);
-        real getGamma();
+  /** update of forces to thermalize the system */
+  void thermalize();
 
-        void setTemperature(real temperature);
-        real getTemperature();
+  /** very nasty: if we recalculate force when leaving/reentering the integrator,
+      a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
+      numbers are drawn twice, resulting in a different variance of the random force.
+      This is corrected by additional heat when restarting the integrator here.
+      Currently only works for the Langevin thermostat, although probably also others
+      are affected.
+  */
+  void heatUp();
 
-        void initialize();
+  /** Opposite to heatUp */
+  void coolDown();
 
-        /** update of forces to thermalize the system */
-        void thermalize();
+  /** Register this class so it can be used from Python. */
+  static void registerPython();
 
-        /** very nasty: if we recalculate force when leaving/reentering the integrator,
-            a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
-            numbers are drawn twice, resulting in a different variance of the random force.
-            This is corrected by additional heat when restarting the integrator here.
-            Currently only works for the Langevin thermostat, although probably also others
-            are affected.
-        */
-        void heatUp();
+ private:
+  boost::signals2::connection _initialize, _heatUp, _coolDown, _thermalize;
+  boost::signals2::connection _initialize_onSetTimeStep;
 
-        /** Opposite to heatUp */
-        void coolDown();
+  void frictionThermo(class Particle &);
 
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
+  void connect();
+  void disconnect();
 
-      private:
+  real gamma;        //!< friction coefficient
+  real temperature;  //!< desired user temperature
 
-        boost::signals2::connection _initialize, _heatUp, _coolDown,
-                                       _thermalize, _thermalizeAdr;
+  real pref1;  //!< prefactor, reduces complexity of thermalize
+  real pref2;  //!< prefactor, reduces complexity of thermalize
 
-        void frictionThermo(class Particle&);
+  real pref2buffer; //!< temporary to save value between heatUp/coolDown
 
-        void connect();
-        void disconnect();
+  shared_ptr<esutil::RNG> rng;  //!< random number generator used for friction term
 
-        real gamma;        //!< friction coefficient
-        real temperature;  //!< desired user temperature
+  shared_ptr<ParticleGroup> particle_group;
 
-        real pref1;  //!< prefactor, reduces complexity of thermalize
-        real pref2;  //!< prefactor, reduces complexity of thermalize
-
-        real pref2buffer; //!< temporary to save value between heatUp/coolDown
-
-        shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
-
-        shared_ptr<ParticleGroup> particle_group;
-
-    };
-  }
-}
-
+};
+}  // end namespace integrator
+}  // end namespace espressopp
 #endif
