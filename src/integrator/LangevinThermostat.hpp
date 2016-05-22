@@ -103,6 +103,9 @@ namespace espressopp {
 
         shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
+        /** Logger */
+        static LOG4ESPP_DECL_LOGGER(theLogger);
+
     };
   }
 }
