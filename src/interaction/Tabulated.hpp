@@ -49,6 +49,8 @@ namespace espressopp {
             int interpolationType;
 
         public:
+            static LOG4ESPP_DECL_LOGGER(theLogger);
+      
             static void registerPython();
          
             Tabulated() {
@@ -113,7 +115,6 @@ namespace espressopp {
                 force = dist * ffactor;
                 return true;
             }
-
     };//class
 
     // provide pickle support

@@ -35,7 +35,6 @@
 #include "VerletList.hpp"
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
-
 #include "storage/Storage.hpp"
 
 namespace espressopp {

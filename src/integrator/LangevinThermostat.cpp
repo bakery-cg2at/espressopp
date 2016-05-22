@@ -93,6 +93,7 @@ namespace espressopp {
     void LangevinThermostat::disconnect() {
 
         _initialize.disconnect();
+        _initialize_onSetTimeStep.disconnect();
         _heatUp.disconnect();
         _coolDown.disconnect();
         _thermalize.disconnect();
@@ -104,6 +105,9 @@ namespace espressopp {
 
         // connect to initialization inside run()
         _initialize = integrator->runInit.connect(
+                boost::bind(&LangevinThermostat::initialize, this));
+
+        _initialize_onSetTimeStep = integrator->onSetTimeStep.connect(
                 boost::bind(&LangevinThermostat::initialize, this));
 
         _heatUp = integrator->recalc1.connect(

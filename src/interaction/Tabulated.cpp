@@ -68,7 +68,7 @@ namespace espressopp {
     typedef class FixedPairListInteractionTemplate <Tabulated> FixedPairListTabulated;
     typedef class FixedPairListTypesInteractionTemplate <Tabulated> FixedPairListTypesTabulated;
     typedef class FixedPairListAdressInteractionTemplate <Tabulated> FixedPairListAdressTabulated;
-
+    LOG4ESPP_LOGGER(Tabulated::theLogger, "Tabulated");
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////

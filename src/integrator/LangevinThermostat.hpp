@@ -81,7 +81,8 @@ namespace espressopp {
       private:
 
         boost::signals2::connection _initialize, _heatUp, _coolDown,
-                                       _thermalize, _thermalizeAdr;
+                                    _thermalize, _thermalizeAdr;
+        boost::signals2::connection _initialize_onSetTimeStep;
 
         void frictionThermo(class Particle&);
 
