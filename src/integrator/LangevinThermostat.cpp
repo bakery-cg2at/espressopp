@@ -195,12 +195,13 @@ namespace espressopp {
 
         real timestep = integrator->getTimeStep();
 
-      LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-		    ", gamma = " << gamma << 
-		    ", temperature = " << temperature);
-
       pref1 = -gamma;
       pref2 = sqrt(24.0 * temperature * gamma / timestep);
+
+
+      LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
+          ", gamma = " << gamma <<
+          ", temperature = " << temperature << " pref2=" << pref2);
 
     }
 
