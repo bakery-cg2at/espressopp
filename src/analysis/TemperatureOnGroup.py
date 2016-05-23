@@ -38,11 +38,9 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_TemperatureOnGroup
 
 class TemperatureOnGroupLocal(ObservableLocal, analysis_TemperatureOnGroup):
-
     def __init__(self, system, particle_group):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if pmi.workerIsActive():
             cxxinit(self, analysis_TemperatureOnGroup, system, particle_group)
-
 
 if pmi.isController :
     class TemperatureOnGroup(Observable):

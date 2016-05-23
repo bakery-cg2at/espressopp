@@ -26,17 +26,12 @@
 #include "Observable.hpp"
 #include "storage/Storage.hpp"
 #include "ParticleGroup.hpp"
-#include <boost/unordered_set.hpp>
 
 namespace espressopp {
 namespace analysis {
 
 /** Class to compute the Temperature in ParticleGroup. */
 class TemperatureOnGroup: public Observable {
- private:
-  boost::unordered_set <longint> valid_type_ids;
-  bool has_types;
-
  public:
   static void registerPython();
 
