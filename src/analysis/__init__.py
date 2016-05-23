@@ -25,6 +25,7 @@ pmiimport('espressopp.analysis')
 from espressopp.analysis.Observable import *
 from espressopp.analysis.AnalysisBase import *
 from espressopp.analysis.Temperature import *
+from espressopp.analysis.TemperatureOnGroup import *
 from espressopp.analysis.Pressure import *
 from espressopp.analysis.PressureTensor import *
 from espressopp.analysis.PressureTensorLayer import *

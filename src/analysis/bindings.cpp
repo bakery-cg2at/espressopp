@@ -24,6 +24,7 @@
 #include "Observable.hpp"
 #include "AnalysisBase.hpp"
 #include "Temperature.hpp"
+#include "TemperatureOnGroup.hpp"
 #include "Pressure.hpp"
 #include "PressureTensor.hpp"
 #include "PressureTensorLayer.hpp"
@@ -77,6 +78,7 @@ namespace espressopp {
       Observable::registerPython();
       AnalysisBase::registerPython();
       Temperature::registerPython();
+      TemperatureOnGroup::registerPython();
       Pressure::registerPython();
       PressureTensor::registerPython();
       PressureTensorLayer::registerPython();
