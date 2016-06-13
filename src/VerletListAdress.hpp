@@ -100,6 +100,8 @@ namespace espressopp {
     /** Add pairs to exclusion list */
     bool exclude(longint pid1, longint pid2);
 
+    void excludeFromList(boost::python::list &l);
+
     /** Get the number of times the Verlet list has been rebuilt */
     int getBuilds() const { return builds; }
 

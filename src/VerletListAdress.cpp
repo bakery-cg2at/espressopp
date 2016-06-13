@@ -262,6 +262,15 @@ namespace espressopp {
         return true;
     }
 
+    void VerletListAdress::excludeFromList(boost::python::list &l) {
+      boost::python::ssize_t n = boost::python::len(l);
+      for(boost::python::ssize_t i = 0; i < n; i = i+2) {
+        int pid1 = python::extract<int>(l[i]);
+        int pid2 = python::extract<int>(l[i+1]);
+        exList.insert(std::make_pair(pid1, pid2));
+      }
+    }
+
     void VerletListAdress::addAdrParticle(longint pid) {
           std::cout<<"Warning! Moving adres region only works with VerletListAdressInteractionTemplate.hpp"<<std::endl;
           std::cout<<"VerletListHadressInteractionTemplate.hpp would need to be modified too"<<std::endl;
@@ -331,6 +340,7 @@ namespace espressopp {
         .def("localSize", &VerletListAdress::localSize)
         .def("localAdrSize", &VerletListAdress::localAdrSize)
         .def("exclude", pyExclude)
+        .def("exclude_from_list", &VerletListAdress::excludeFromList)
         .def("getPair", &VerletListAdress::getPair)
         .def("getAdrPair", &VerletListAdress::getAdrPair)
         .def("addAdrParticle", pyAddAdrParticle)

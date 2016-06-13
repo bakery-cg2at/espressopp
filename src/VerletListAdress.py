@@ -127,9 +127,10 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
             # check for exclusions
             if (exclusionlist != []):
                 # add exclusions
-                for pair in exclusionlist:
-                    pid1, pid2 = pair
-                    self.cxxclass.exclude(self, pid1, pid2)
+                #for pair in exclusionlist:
+                #    pid1, pid2 = pair
+                #    self.cxxclass.exclude(self, pid1, pid2)
+                self.cxxclass.exclude_from_list(self, [x for p in exclusionlist for x in p])
             # add adress particles
             if (pids != []):
                 for pid in pids:
@@ -170,9 +171,10 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
         and adds it to its list.
         """
         if pmi.workerIsActive():
-            for pair in exclusionlist:
-                pid1, pid2 = pair
-                self.cxxclass.exclude(self, pid1, pid2)
+            #for pair in exclusionlist:
+            #    pid1, pid2 = pair
+            #    self.cxxclass.exclude(self, pid1, pid2)
+            self.cxxclass.exclude_from_list(self, [x for p in exclusionlist for x in p])
             # rebuild list with exclusions
             self.cxxclass.rebuild(self)
 
@@ -218,6 +220,6 @@ if pmi.isController:
             cls = 'espressopp.VerletListAdressLocal',
             pmiproperty = [ 'builds' ],
             pmicall = ['localSize', 'totalSize', 'localAdrSize', 'totalAdrSize',
-                       'exclude', 'addAdrParticles', 'rebuild' ],
+                       'exclude', 'addAdrParticles', 'rebuild', 'exclude_from_list' ],
             pmiinvoke = ['getAllPairs', 'getAllCGPairs', 'getAllAdrPairs']
             )
