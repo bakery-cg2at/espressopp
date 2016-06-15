@@ -79,7 +79,7 @@ real VelocityVerletHybrid::updateVS() {
       if (vp->id() != it->first)
         throw std::runtime_error("something is really wrong!");
       Real3D cmp(0.0, 0.0, 0.0);
-      Real3D cmv(0.0, 0.0, 0.0);
+      //Real3D cmv(0.0, 0.0, 0.0);
       for (FixedVSList::tuple::iterator itp = it->second.begin(); itp != it->second.end(); ++itp) {
         Particle *atp = storage.lookupLocalParticle(*itp);  // based on real or ghost position.
         if (atp) {
@@ -95,7 +95,7 @@ real VelocityVerletHybrid::updateVS() {
           cmp[1] += m * vec12[1];
           cmp[2] += m * vec12[2];
 
-          cmv += m * atp->velocity();
+          //cmv += m * atp->velocity();
         } else {
           std::cout << " AT particle (" << *itp << ") of VP " << vp->id() << "-"
                     << vp->ghost() << " not found in tuples ";
@@ -104,11 +104,11 @@ real VelocityVerletHybrid::updateVS() {
         }
       }
       cmp /= vp->mass();
-      cmv /= vp->mass();
+      //cmv /= vp->mass();
       LOG4ESPP_DEBUG(theLogger, "vp-" << vp->id() << " cmp=" << cmp);
       Real3D old_p = vp->position();
       vp->position() += cmp;
-      vp->velocity() = cmv;
+      //vp->velocity() = cmv;
       // Check how fare we move new cg position.
       Real3D d_p = old_p - vp->position();
       maxSqDist = std::max(maxSqDist, d_p.sqr());
@@ -402,7 +402,7 @@ void VelocityVerletHybrid::integrate2() {
 
   // Update velocity of VS based on the AT velocities.
   timeIntegrate.startMeasure();
-  updateVS_vel();
+  //updateVS_vel();
   timeVSvel += timeIntegrate.stopMeasure();
 
   step++;
