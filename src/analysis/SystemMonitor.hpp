@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015
+  Copyright (c) 2015-2016
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -40,6 +40,12 @@ namespace espressopp {
 namespace analysis {
 
 
+/**
+ * Output of SystemMonitor writen to CSV file.
+ *
+ * @param file_name The output file name.
+ * @param delimiter The separator of fields.
+ */
 class SystemMonitorOutputCSV {
   friend class SystemMonitor;
  public:
@@ -125,6 +131,9 @@ class SystemMonitor : public ParticleAccess {
 
   shared_ptr<SystemMonitorOutputCSV> output_;
   ObservableList observables_;
+
+  real total_energy_;
+  real potential_energy_;
 };
 
 }  // end namespace analysis
