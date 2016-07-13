@@ -28,15 +28,41 @@ The resolution is changed by
 
 .. math::
 
-  \lambda(t) = \lambda_0 + \alpha t
+   \lambda(t) = \lambda_0 + at
 
-where :math:`\lambda` is the current resolution of the particles, :math:`\alpha` is
+
+where :math:`\lambda` is the current resolution of the particles, :math:`a` is
 the rate by which the resolution is changed during the simulation and :math:`\lambda_0`
 is an initial resolution.
 
-.. function:: espressopp.integrator.DynamicResolution(system, vs_list, rate)
+.. class:: espressopp.integrator.DynamicResolution
 
+      The main class for DynamicResolution method.
 
+      .. data:: resolution
+
+         The initial resolution (:math:`\lambda_0`).
+
+      .. data:: rate
+
+         The rate of resolution update.
+
+      .. data:: active
+
+         If set to True then resolution change is active.
+
+      .. method:: DynamicResolution(system, vs_list, rate)
+
+         :param system: The system object.
+         :type system: espressopp.System
+         :param vs_list: The MD integrator.
+         :type vs_list: espressopp.FixedVSList
+         :param rate: The rate.
+         :type output: float
+
+      .. method:: update_weights
+
+         Manual update the resolutions of the particles.
 
 """
 
@@ -48,8 +74,6 @@ from _espressopp import integrator_DynamicResolution
 
 
 class DynamicResolutionLocal(ExtensionLocal, integrator_DynamicResolution):
-    'The (local) AdResS'
-
     def __init__(self, _system, _vs_list, _rate):
         'Local construction of a verlet list for AdResS'
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

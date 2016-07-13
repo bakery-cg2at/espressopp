@@ -10,6 +10,7 @@ integrator
    espressopp.integrator.BerendsenThermostat.rst
    espressopp.integrator.CapForce.rst
    espressopp.integrator.DPDThermostat.rst
+   espressopp.integrator.DynamicResolution.rst
    espressopp.integrator.ExtAnalyze.rst
    espressopp.integrator.ExtForce.rst
    espressopp.integrator.Extension.rst
