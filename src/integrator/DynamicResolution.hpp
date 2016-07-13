@@ -60,7 +60,7 @@ class DynamicResolution : public Extension {
  private:
   void updateWeights();
 
-  void ChangeResolution();
+  void changeResolution();
   real rate_;
   bool active_;
 

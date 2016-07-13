@@ -56,7 +56,7 @@ DynamicResolution::~DynamicResolution() {
 void DynamicResolution::connect() {
   LOG4ESPP_INFO(theLogger, "connect");
   _aftIntV = integrator->aftIntV.connect(
-      boost::bind(&DynamicResolution::ChangeResolution, this),
+      boost::bind(&DynamicResolution::changeResolution, this),
       boost::signals2::at_back);
   _runInit = integrator->runInit.connect(
       boost::bind(&DynamicResolution::updateWeights, this),
@@ -74,7 +74,7 @@ void DynamicResolution::set_active(bool active) {
   active_ = active;
 }
 
-void DynamicResolution::ChangeResolution() {
+void DynamicResolution::changeResolution() {
   if (!active_)
     return;
 
@@ -129,6 +129,7 @@ void DynamicResolution::registerPython() {
     .add_property("active", &DynamicResolution::active, &DynamicResolution::set_active)
     .add_property("resolution", &DynamicResolution::resolution, &DynamicResolution::set_resolution)
     .add_property("rate", &DynamicResolution::rate, &DynamicResolution::set_rate)
+    .def("update_weights", &DynamicResolution::updateWeights)
     .def("connect", &DynamicResolution::connect)
     .def("disconnect", &DynamicResolution::disconnect);
 }

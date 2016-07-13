@@ -1,9 +1,5 @@
-#  Copyright (c) 2014,2015
+#  Copyright (c) 2015-2016
 #      Jakub Krajniak (jkrajniak at gmail.com)
-#  Copyright (C) 2012,2013
-#      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
-#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #
 #  This file is part of ESPResSo++.
 #
@@ -20,12 +16,36 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+*******************************************
+**espressopp.integrator.DynamicResolution**
+*******************************************
+
+*DynamicResolution* extension allows changing the *lambda* parameter of particles, namely
+the so called resolution. The module can be used to perform backmapping.
+
+The resolution is changed by
+
+.. math::
+
+  \lambda(t) = \lambda_0 + \alpha t
+
+where :math:`\lambda` is the current resolution of the particles, :math:`\alpha` is
+the rate by which the resolution is changed during the simulation and :math:`\lambda_0`
+is an initial resolution.
+
+.. function:: espressopp.integrator.DynamicResolution(system, vs_list, rate)
+
+
+
+"""
 
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_DynamicResolution
+
 
 class DynamicResolutionLocal(ExtensionLocal, integrator_DynamicResolution):
     'The (local) AdResS'
@@ -35,6 +55,9 @@ class DynamicResolutionLocal(ExtensionLocal, integrator_DynamicResolution):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_DynamicResolution, _system, _vs_list, _rate)
 
+    def update_weights(self):
+        if pmi.workerIsActive():
+            self.cxxclass.update_weights(self)
 
 if pmi.isController:
     class DynamicResolution(Extension):
@@ -42,4 +65,5 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.integrator.DynamicResolutionLocal',
             pmiproperty = [ 'resolution', 'rate', 'active' ],
+            pmicall = ['update_weights']
             )
