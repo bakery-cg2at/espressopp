@@ -56,11 +56,13 @@ Example (not complete):
 .. function:: espressopp.System()
 
 
-.. function:: espressopp.System.addInteraction(interaction)
+.. function:: espressopp.System.addInteraction(interaction, name)
 
 		:param interaction: 
 		:type interaction: 
-		:rtype: 
+		:param name: The optional name of the interaction.
+		:type name: string
+		:rtype: bool
 
 .. function:: espressopp.System.getInteraction(number)
 
@@ -133,19 +135,21 @@ class SystemLocal(_espressopp.System):
 
         if pmi.workerIsActive():
             ret_val = self.cxxclass.addInteraction(self, interaction)
-            if name is not None:
-                if name in self._interaction2id:
-                    raise RuntimeError('Interaction with name {} already defined.'.format(name))
-                self._interaction2id[name] = self._interaction_pid
+            if name is None:
+                name = 'interaction_{}'.format(self._interaction_pid)
+            if name in self._interaction2id:
+                raise RuntimeError('Interaction with name {} already defined.'.format(name))
+            self._interaction2id[name] = self._interaction_pid
             self._interaction_pid += 1
             return ret_val
 
     def removeInteraction(self, number):
+
         if pmi.workerIsActive():
             self.cxxclass.removeInteraction(self, number)
             self._interaction2id = {
                 k: v if v < number else v - 1
-                for k, v in self._interaction2id.iteritems()
+                for k, v in self._interaction2id.items()
                 if v != number
                 }
             if self._interaction2id:
@@ -158,7 +162,7 @@ class SystemLocal(_espressopp.System):
             if name not in self._interaction2id:
                 raise RuntimeError('Interaction {} not found'.format(name))
             interaction_id = self._interaction2id[name]
-            self.cxxclass.removeInteraction(self, interaction_id)
+            self.removeInteraction(interaction_id)
 
     def getAllInteractions(self):
         if pmi.workerIsActive():
@@ -195,7 +199,7 @@ class SystemLocal(_espressopp.System):
     def getInteractionByName(self, name):
         if pmi.workerIsActive():
             return self.getInteraction(self._interaction2id[name])
-            
+
     def scaleVolume(self, *args):
 
         if pmi.workerIsActive():

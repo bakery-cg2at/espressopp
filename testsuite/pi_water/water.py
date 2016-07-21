@@ -182,7 +182,7 @@ for i in range(check):
 
 # print timings and neighbor list information
 end_time = time.clock()
-timers.show(integrator.getTimers(), precision=2)
+timers.show(integrator.getTimers(), system)
 espressopp.tools.analyse.final_info(system, integrator, verletlist, start_time, end_time)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

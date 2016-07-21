@@ -28,7 +28,7 @@ system.addInteraction(lj3, 'lj3')
 system.addInteraction(lj4)
 
 # Checks if all interactions are present.
-assert set(['lj1', 'lj2', 'lj3']) == set(system.getAllInteractions().keys())
+assert set(['lj1', 'lj2', 'lj3', 'interaction_3']) == set(system.getAllInteractions().keys())
 assert id(lj1) == id(system.getInteractionByName('lj1'))
 
 assert id(lj1) == id(system.getInteraction(0))

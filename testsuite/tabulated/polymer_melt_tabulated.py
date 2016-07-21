@@ -201,7 +201,7 @@ for tabulation in [True, False]:
     sys.stdout.write('\n')
         
     end_time = time.clock()
-    timers.show(integrator.getTimers(), precision=2)
+    timers.show(integrator.getTimers(), system)
 
 #os.system('rm '+tabfileLJ+' '+tabfileFENE+' '+tabfileCosine)
 print '\nDone.'

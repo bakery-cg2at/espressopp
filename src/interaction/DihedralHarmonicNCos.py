@@ -81,6 +81,7 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_DihedralHarmonicNCos
 from _espressopp import interaction_FixedQuadrupleListDihedralHarmonicNCos
 from _espressopp import interaction_FixedQuadrupleListAdressDihedralHarmonicNCos
+from _espressopp import interaction_FixedQuadrupleListTypesDihedralHarmonicNCos
 
 
 class DihedralHarmonicNCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicNCos):
@@ -128,8 +129,7 @@ class FixedQuadrupleListTypesDihedralHarmonicNCosLocal(InteractionLocal,
       return self.cxxclass.getPotential(self, type1, type2, type3, type4)
 
 class FixedQuadrupleListAdressDihedralHarmonicNCosLocal(
-    InteractionLocal, interaction_FixedQuadrupleListAdressDihedralHarmonicNCos
-):
+    InteractionLocal, interaction_FixedQuadrupleListAdressDihedralHarmonicNCos):
     'The (local) DihedralHarmonicNCos interaction using FixedQuadruple lists Adress.'
     def __init__(self, system, fql, potential, is_cg=False):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())

@@ -39,7 +39,6 @@
 #include "Isokinetic.hpp"
 #include "StochasticVelocityRescaling.hpp"
 #include "LangevinThermostat.hpp"
-#include "LangevinThermostatOnGroup.hpp"
 #include "LangevinThermostat1D.hpp"
 #include "LangevinThermostatHybrid.hpp"
 #include "GeneralizedLangevinThermostat.hpp"
@@ -88,7 +87,6 @@ namespace espressopp {
       FreeEnergyCompensation::registerPython();
       OnTheFlyFEC::registerPython();
       LangevinThermostat::registerPython();
-      LangevinThermostatOnGroup::registerPython();
       LangevinThermostat1D::registerPython();
       LangevinThermostatHybrid::registerPython();
       GeneralizedLangevinThermostat::registerPython();
