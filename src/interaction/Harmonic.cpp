@@ -39,8 +39,10 @@ namespace espressopp {
       class_< Harmonic, bases< Potential > >
     	("interaction_Harmonic", init< real, real, real >())
 	.def(init< real, real, real, real >())
+          .def("getParams", &Harmonic::getParams)
 	.add_property("K", &Harmonic::getK, &Harmonic::setK)
 	.add_property("r0", &Harmonic::getR0, &Harmonic::setR0)
+          .def_pickle(Harmonic_pickle())
     	;
 
       typedef class VerletListInteractionTemplate< Harmonic >

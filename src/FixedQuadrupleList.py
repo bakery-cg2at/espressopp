@@ -95,7 +95,15 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
 
         if pmi.workerIsActive():
           quadruple = self.cxxclass.getQuadruples(self)
-          return quadruple 
+          return quadruple
+
+    def getAllQuadruples(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllQuadruples(self)
+
+    def getList(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllQuadruples(self)
 
 if pmi.isController:
     class FixedQuadrupleList(object):
@@ -103,6 +111,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedQuadrupleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addQuadruples" ],
+            pmicall = [ "addQuadruples", "getAllQuadruples", "getList"],
             pmiinvoke = ["getQuadruples", "size"]
             )

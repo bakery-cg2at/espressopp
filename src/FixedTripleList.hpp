@@ -60,6 +60,7 @@ namespace espressopp {
 		virtual void onParticlesChanged();
 
 		python::list getTriples();
+		python::list getAllTriples();
 
 	    /** Get the number of triples in the GlobalTriples list */
 	    int size() {

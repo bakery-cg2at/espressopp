@@ -68,6 +68,7 @@ namespace espressopp {
       class_< LennardJones, bases< Potential > >
     	("interaction_LennardJones", init< real, real, real >())
 	    .def(init< real, real, real, real >())
+        .def("getParams", &LennardJones::getParams)
     	.add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
     	.add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
         .def_pickle(LennardJones_pickle())
@@ -78,6 +79,7 @@ namespace espressopp {
         ("interaction_VerletListLennardJones", init< shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJones::getVerletList)
         .def("setPotential", &VerletListLennardJones::setPotential)
+        .def("getInteractionMatrix", &VerletListLennardJones::getInteractionMatrix)
         .def("getPotential", &VerletListLennardJones::getPotentialPtr)
       ;
 
@@ -86,6 +88,7 @@ namespace espressopp {
           .def("getVerletList", &VerletListHybridLennardJones::getVerletList)
           .def("setPotential", &VerletListHybridLennardJones::setPotential)
           .def("getPotential", &VerletListHybridLennardJones::getPotentialPtr)
+          .def("getInteractionMatrix", &VerletListHybridLennardJones::getInteractionMatrix)
           .add_property("scale_factor", &VerletListHybridLennardJones::scaleFactor,
                                         &VerletListHybridLennardJones::setScaleFactor)
           ;
@@ -94,6 +97,7 @@ namespace espressopp {
         ("interaction_VerletListAdressLennardJones",
            init< shared_ptr<VerletListAdress>,
                   shared_ptr<FixedTupleListAdress> >())
+        .def("getInteractionMatrix", &VerletListAdressLennardJones::getInteractionMatrix)
         .def("setPotentialAT", &VerletListAdressLennardJones::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLennardJones::setPotentialCG);
       ;
@@ -102,7 +106,8 @@ namespace espressopp {
         ("interaction_VerletListAdressLennardJones2",
            init< shared_ptr<VerletListAdress>,
                   shared_ptr<FixedTupleListAdress> >())
-        .def("setPotentialAT", &VerletListAdressLennardJones2::setPotentialAT)
+          .def("getInteractionMatrix", &VerletListAdressLennardJones2::getInteractionMatrix)
+          .def("setPotentialAT", &VerletListAdressLennardJones2::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLennardJones2::setPotentialCG);
       ;
 
@@ -110,6 +115,7 @@ namespace espressopp {
         ("interaction_VerletListHadressLennardJones",
            init< shared_ptr<VerletListHadress>,
                   shared_ptr<FixedTupleListAdress> >())
+          .def("getInteractionMatrix", &VerletListHadressLennardJones::getInteractionMatrix)
         .def("setPotentialAT", &VerletListHadressLennardJones::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones::setPotentialCG);
       ;
@@ -118,6 +124,7 @@ namespace espressopp {
         ("interaction_VerletListHadressLennardJones2",
            init< shared_ptr<VerletListHadress>,
                   shared_ptr<FixedTupleListAdress> >())
+          .def("getInteractionMatrix", &VerletListHadressLennardJones2::getInteractionMatrix)
         .def("setPotentialAT", &VerletListHadressLennardJones2::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones2::setPotentialCG);
       ;

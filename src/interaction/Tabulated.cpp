@@ -77,6 +77,7 @@ namespace espressopp {
      
       class_ <Tabulated, bases <Potential> >
         ("interaction_Tabulated", init <int, const char*, real>())
+            .def("getParams", &Tabulated::getParams)
             .add_property("filename", &Tabulated::getFilename, &Tabulated::setFilename)
             .def_pickle(Tabulated_pickle())
         ;
@@ -85,12 +86,14 @@ namespace espressopp {
         ("interaction_VerletListTabulated", init <shared_ptr<VerletList> >())
             .def("setPotential", &VerletListTabulated::setPotential)
             .def("getPotential", &VerletListTabulated::getPotentialPtr)
+          .def("getInteractionMatrix", &VerletListTabulated::getInteractionMatrix)
         ;
 
       class_ <VerletListHybridTabulated, bases <Interaction> >
           ("interaction_VerletListHybridTabulated", init <shared_ptr<VerletList>, bool >())
           .def("setPotential", &VerletListHybridTabulated::setPotential)
           .def("getPotential", &VerletListHybridTabulated::getPotentialPtr)
+          .def("getInteractionMatrix", &VerletListHybridTabulated::getInteractionMatrix)
           .add_property("scale_factor", &VerletListHybridTabulated::scaleFactor,
                         &VerletListHybridTabulated::setScaleFactor)
           ;
@@ -100,7 +103,8 @@ namespace espressopp {
                  shared_ptr<FixedTupleListAdress> >()
                 )
             .def("setPotentialAT", &VerletListAdressTabulated::setPotentialAT)
-            .def("setPotentialCG", &VerletListAdressTabulated::setPotentialCG);
+            .def("setPotentialCG", &VerletListAdressTabulated::setPotentialCG)
+            .def("getInteractionMatrix", &VerletListAdressTabulated::getInteractionMatrix);
         ;
         
       class_ <VerletListHadressTabulated, bases <Interaction> >
@@ -109,7 +113,8 @@ namespace espressopp {
                  shared_ptr<FixedTupleListAdress> >()
                 )
             .def("setPotentialAT", &VerletListHadressTabulated::setPotentialAT)
-            .def("setPotentialCG", &VerletListHadressTabulated::setPotentialCG);
+            .def("setPotentialCG", &VerletListHadressTabulated::setPotentialCG)
+            .def("getInteractionMatrix", &VerletListHadressTabulated::getInteractionMatrix)
         ;
      
       class_ <CellListTabulated, bases <Interaction> > 
@@ -125,6 +130,7 @@ namespace espressopp {
         )
         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Tabulated> >())
         .def("setPotential", &FixedPairListTabulated::setPotential)
+          .def("getPotential", &FixedPairListTabulated::getPotential)
         .def("setFixedPairList", &FixedPairListTabulated::setFixedPairList)
         .def("getFixedPairList", &FixedPairListTabulated::getFixedPairList);
 
@@ -151,6 +157,7 @@ namespace espressopp {
                    bool
                  >())
         .def("setPotential", &FixedPairListAdressTabulated::setPotential)
+          .def("getPotential", &FixedPairListAdressTabulated::getPotential)
         .def("setFixedPairList", &FixedPairListAdressTabulated::setFixedPairList)
         .def("getFixedPairList", &FixedPairListAdressTabulated::getFixedPairList)
         .add_property("scale_factor", &FixedPairListAdressTabulated::scaleFactor,

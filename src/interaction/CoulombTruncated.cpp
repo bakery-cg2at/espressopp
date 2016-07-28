@@ -60,6 +60,7 @@ namespace espressopp {
       class_< VerletListCoulombTruncated, bases< Interaction > >
         ("interaction_VerletListCoulombTruncated", init< shared_ptr<VerletList> >())
         .def("setPotential", &VerletListCoulombTruncated::setPotential)
+          .def("getInteractionMatrix", &VerletListCoulombTruncated::getInteractionMatrix)
         .def("getPotential", &VerletListCoulombTruncated::getPotentialPtr)
         ;
 
@@ -68,6 +69,7 @@ namespace espressopp {
           .def("getVerletList", &VerletListHybridCoulombTruncated::getVerletList)
           .def("setPotential", &VerletListHybridCoulombTruncated::setPotential)
           .def("getPotential", &VerletListHybridCoulombTruncated::getPotentialPtr)
+          .def("getInteractionMatrix", &VerletListHybridCoulombTruncated::getInteractionMatrix)
           .add_property("scale_factor", &VerletListHybridCoulombTruncated::scaleFactor,
                         &VerletListHybridCoulombTruncated::setScaleFactor)
           ;
@@ -76,6 +78,7 @@ namespace espressopp {
           ("interaction_VerletListAdressCoulombTruncated",
                   init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
           .def("setPotentialAT", &VerletListAdressCoulombTruncated::setPotentialAT)
+          .def("getInteractionMatrix", &VerletListAdressCoulombTruncated::getInteractionMatrix)
           .def("setPotentialCG", &VerletListAdressCoulombTruncated::setPotentialCG);
       ;
 
@@ -84,6 +87,7 @@ namespace espressopp {
           init< shared_ptr<System>, shared_ptr<FixedPairList> >())
         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
         .def("setPotential", &FixedPairListTypesCoulombTruncated::setPotential)
+          .def("getPotential", &FixedPairListTypesCoulombTruncated::getPotentialPtr)
         ;
     }
 

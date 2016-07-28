@@ -31,7 +31,8 @@ void DihedralRB::registerPython() {
   using namespace espressopp::python;  //NOLINT
 
   class_<DihedralRB, bases<DihedralPotential> >(
-      "interaction_DihedralRB", init< real, real, real, real, real, real >());
+      "interaction_DihedralRB", init< real, real, real, real, real, real >())
+      .def("getParams", &DihedralRB::getParams);
 
   typedef class FixedQuadrupleListInteractionTemplate<DihedralRB> FixedQuadrupleListDihedralRB;
   class_ <FixedQuadrupleListDihedralRB, bases <Interaction> >
@@ -40,6 +41,7 @@ void DihedralRB::registerPython() {
       .def(init<shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
                 shared_ptr<DihedralRB> >())
       .def("setPotential", &FixedQuadrupleListDihedralRB::setPotential)
+      .def("getPotential", &FixedQuadrupleListDihedralRB::getPotential)
       .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralRB::getFixedQuadrupleList);
 
   typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralRB>
@@ -60,7 +62,9 @@ void DihedralRB::registerPython() {
 	        shared_ptr<DihedralRB>, bool >())
   .def(init< shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
       shared_ptr<DihedralRB>, bool>())
-  .def("setPotential", &FixedQuadrupleListAdressDihedralRB::setPotential);
+  .def("setPotential", &FixedQuadrupleListAdressDihedralRB::setPotential)
+      .def("getPotential", &FixedQuadrupleListAdressDihedralRB::getPotential)
+      .def("getFixedQuadrupleList", &FixedQuadrupleListAdressDihedralRB::getFixedQuadrupleList);
 
 
 }

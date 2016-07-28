@@ -82,5 +82,5 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListAdressLocal',
             localcall = [ "add" ],
-            pmicall = [ "addTriples" ]
+            pmicall = [ "addTriples", "getAllTriples", "getList" ]
             )

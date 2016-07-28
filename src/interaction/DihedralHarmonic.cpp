@@ -50,6 +50,7 @@ namespace espressopp {
                         shared_ptr<FixedQuadrupleList>,
                         shared_ptr<DihedralHarmonic> >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonic::setPotential)
+        .def("getPotential", &FixedQuadrupleListDihedralHarmonic::getPotential)
         .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonic::getFixedQuadrupleList)
         ;
       typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralHarmonic>

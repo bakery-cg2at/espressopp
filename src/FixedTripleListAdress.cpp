@@ -248,6 +248,7 @@ FixedTripleListAdress::~FixedTripleListAdress() {
               init <shared_ptr<storage::Storage>,
                      shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
+      .def("getAllTriples", &FixedTripleListAdress::getAllTriples)
       ;
   }
 

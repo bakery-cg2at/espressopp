@@ -229,6 +229,7 @@ void FixedQuadrupleListAdress::registerPython() {
     .def("add", pyAdd)
     .def("size", &FixedQuadrupleListAdress::size)
     .def("getQuadruples",  &FixedQuadrupleListAdress::getQuadruples)
+    .def("getAllQuadruples", &FixedQuadrupleListAdress::getAllQuadruples)
    ;
 }
 }  // end namespace espressopp

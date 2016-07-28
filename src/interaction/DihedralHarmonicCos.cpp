@@ -51,6 +51,7 @@ namespace espressopp {
                    shared_ptr<DihedralHarmonicCos>
                  >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonicCos::setPotential)
+        .def("getPotential", &FixedQuadrupleListDihedralHarmonicCos::getPotential)
         .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonicCos::getFixedQuadrupleList)
         ;
     }

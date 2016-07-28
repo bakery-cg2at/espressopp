@@ -113,6 +113,10 @@ class FixedPairListLocal(_espressopp.FixedPairList):
     def getAllBonds(self):
         if pmi.workerIsActive():
             return self.cxxclass.getAllBonds(self)
+
+    def getList(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllBonds(self)
       
     def resetLongtimeMaxBond(self):
 
@@ -131,8 +135,8 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListLocal',
             #localcall = [ 'add' ],
-            pmicall = [ 'add', 'addBonds', 'resetLongtimeMaxBond', 'totalSize' ],
-            pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal', 'getAllBonds' ]
+            pmicall = [ 'add', 'addBonds', 'resetLongtimeMaxBond', 'totalSize', 'getAllBonds', 'getList' ],
+            pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal']
         )
         
         def getLongtimeMaxBond(self):

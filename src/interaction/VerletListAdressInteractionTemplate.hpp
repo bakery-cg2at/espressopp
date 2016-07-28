@@ -121,6 +121,7 @@ namespace espressopp {
       virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
+      virtual python::list getInteractionMatrix();
 
     protected:
       int ntypes;
@@ -663,6 +664,21 @@ namespace espressopp {
       }
       return cutoff;
     }
+
+  template < typename _PotentialAT, typename _PotentialCG >
+  inline boost::python::list
+  VerletListAdressInteractionTemplate< _PotentialAT, _PotentialCG >::getInteractionMatrix() {
+    python::list params;
+
+    for (int i = 0; i < ntypes; i++) {
+      for (int j = 0; j < ntypes; j++) {
+        params.append(python::make_tuple(i, j, getPotentialAT(i, j).getParams(), "AT"));
+        params.append(python::make_tuple(i, j, getPotentialCG(i, j).getParams(), "CG"));
+      }
+    }
+    return params;
+  }
+
   }
 }
 #endif

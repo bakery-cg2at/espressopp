@@ -36,6 +36,7 @@ namespace espressopp {
 
       class_< AngularHarmonic, bases< AngularPotential > >
     	("interaction_AngularHarmonic", init< real, real >())
+          .def("getParams", &AngularHarmonic::getParams)
 	.add_property("K", &AngularHarmonic::getK, &AngularHarmonic::setK)
 	.add_property("theta0", &AngularHarmonic::getTheta0, &AngularHarmonic::setTheta0)
     	;
@@ -53,6 +54,7 @@ namespace espressopp {
                 shared_ptr<AngularHarmonic> >())
         .def(init< shared_ptr<System>, shared_ptr<FixedTripleListAdress>, shared_ptr<AngularHarmonic> >())
         .def("setPotential", &FixedTripleListAngularHarmonic::setPotential)
+        .def("getPotential", &FixedTripleListAngularHarmonic::getPotential)
         .def("getFixedTripleList", &FixedTripleListAngularHarmonic::getFixedTripleList);
       ;
 
@@ -64,6 +66,7 @@ namespace espressopp {
                 bool >())
         .def(init< shared_ptr<System>, shared_ptr<FixedTripleListAdress>, shared_ptr<AngularHarmonic>, bool >())
         .def("setPotential", &FixedTripleListAdressAngularHarmonic::setPotential)
+        .def("getPotential", &FixedTripleListAdressAngularHarmonic::getPotential)
         .def("getFixedTripleList", &FixedTripleListAdressAngularHarmonic::getFixedTripleList);
       ;
 

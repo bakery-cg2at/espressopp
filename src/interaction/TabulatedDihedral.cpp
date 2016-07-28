@@ -72,6 +72,7 @@ namespace espressopp {
             
             class_ <TabulatedDihedral, bases <DihedralPotential> >
                 ("interaction_TabulatedDihedral", init <int, const char*>())
+                    .def("getParams", &TabulatedDihedral::getParams)
                 .add_property("filename", &TabulatedDihedral::getFilename, &TabulatedDihedral::setFilename)
                 .def_pickle(TabulatedDihedral_pickle())
                 ;

@@ -230,6 +230,7 @@ namespace espressopp {
                      shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
       .def("getBonds",  &FixedPairListAdress::getBonds)
+      .def("getAllBonds", &FixedPairListAdress::getAllBonds)
       ;
   }
 

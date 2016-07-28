@@ -124,7 +124,16 @@ namespace espressopp {
         return -2.0 * K * (acos(cos_theta) - theta0) / sin_theta;
         
       }
-      
+
+      boost::python::list getParams() {
+        python::list params;
+
+        params.append(python::make_tuple("K", K));
+        params.append(python::make_tuple("theta0", theta0));
+
+        return params;
+      }
+
     };
   }
 }

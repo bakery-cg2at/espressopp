@@ -56,6 +56,10 @@ namespace espressopp {
       virtual real getMaxCutoff() = 0;
       virtual int bondType() = 0;
 
+      virtual python::list getInteractionMatrix() {
+        return python::list();
+      }
+
       static void registerPython();
 
     protected:

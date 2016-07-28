@@ -166,6 +166,35 @@ namespace espressopp {
 	return triples;
   }
 
+  python::list FixedTripleList::getAllTriples() {
+    std::vector<longint> local_triples;
+    std::vector<std::vector<longint> > global_triples;
+    python::list triples;
+
+    for (GlobalTriples::const_iterator it=globalTriples.begin(); it != globalTriples.end(); it++) {
+      local_triples.push_back(it->second.first);
+      local_triples.push_back(it->first);
+      local_triples.push_back(it->second.second);
+    }
+    System& system = storage->getSystemRef();
+    if (system.comm->rank() == 0) {
+      mpi::gather(*system.comm, local_triples, global_triples, 0);
+
+      for (std::vector<std::vector<longint> >::iterator it = global_triples.begin();
+           it != global_triples.end(); ++it) {
+        for (std::vector<longint>::iterator iit = it->begin(); iit != it->end();) {
+          longint pid1 = *(iit++);
+          longint pid2 = *(iit++);
+          longint pid3 = *(iit++);
+          triples.append(python::make_tuple(pid1, pid2, pid3));
+        }
+      }
+    } else {
+      mpi::gather(*system.comm, local_triples, global_triples, 0);
+    }
+    return triples;
+  }
+
   void FixedTripleList::
   beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     std::vector< longint > toSend;
@@ -300,6 +329,7 @@ namespace espressopp {
       .def("add", pyAdd)
       .def("size", &FixedTripleList::size)
       .def("getTriples",  &FixedTripleList::getTriples)
+      .def("getAllTriples", &FixedTripleList::getAllTriples)
      ;
   }
 }

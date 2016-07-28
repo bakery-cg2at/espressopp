@@ -103,6 +103,7 @@ class VerletListHybridInteractionTemplate: public Interaction {
   virtual void computeVirialTensor(Tensor *w, int n);
   virtual real getMaxCutoff();
   virtual int bondType() { return Nonbonded; }
+  virtual python::list getInteractionMatrix();
 
  protected:
   int ntypes;
@@ -449,6 +450,21 @@ getMaxCutoff() {
   }
   return cutoff;
 }
+
+template<typename _Potential>
+inline boost::python::list
+VerletListHybridInteractionTemplate<_Potential>::getInteractionMatrix() {
+  python::list params;
+
+  for (int i = 0; i < ntypes; i++) {
+    for (int j = 0; j < ntypes; j++) {
+      params.append(python::make_tuple(i, j, getPotential(i, j).getParams()));
+    }
+  }
+
+  return params;
+}
+
 }
 }
 #endif

@@ -204,7 +204,7 @@ if pmi.isController:
         'The Harmonic potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.HarmonicLocal',
-            pmiproperty = ['K', 'r0']
+            pmiproperty = ['K', 'r0'],
             )
 
     class FixedPairListHarmonic(Interaction):

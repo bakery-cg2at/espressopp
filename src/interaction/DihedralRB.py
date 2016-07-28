@@ -119,6 +119,7 @@ class FixedQuadrupleListDihedralRBLocal(InteractionLocal, interaction_FixedQuadr
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             return self.cxxclass.getFixedQuadrupleList(self)
 
+
 class FixedQuadrupleListTypesDihedralRBLocal(InteractionLocal, interaction_FixedQuadrupleListTypesDihedralRB):
     def __init__(self, system, fql):
         if pmi.workerIsActive():
@@ -149,6 +150,10 @@ class FixedQuadrupleListAdressDihedralRBLocal(InteractionLocal, interaction_Fixe
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
+    def getFixedQuadrupleList(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getFixedQuadrupleList(self)
 
 
 if pmi.isController:
@@ -181,5 +186,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedQuadrupleListAdressDihedralRBLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'getFixedList', 'getFixedQuadrupleList']
             )

@@ -138,6 +138,10 @@ class FixedPairListTypesCoulombTruncatedLocal(InteractionLocal, interaction_Fixe
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
+    def getPotential(self, type1, type2):
+        if pmi.workerIsActive():
+            return self.cxxclass.getPotential(self, type1, type2)
+
 class VerletListAdressCoulombTruncatedLocal(InteractionLocal, interaction_VerletListAdressCoulombTruncated):
     'The (local) CoulombTruncated interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
@@ -179,7 +183,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedPairListTypesCoulombTruncatedLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'getPotential']
             )
 
     class VerletListAdressCoulombTruncated(Interaction):

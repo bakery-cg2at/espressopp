@@ -173,6 +173,18 @@ namespace espressopp {
                         exit(0);
                         return false;
                 }
+
+          boost::python::list getParams() {
+            python::list params;
+            params.append(python::make_tuple("prefactor", getPrefactor()));
+            params.append(python::make_tuple("kappa", getKappa()));
+            params.append(python::make_tuple("epsilon1", getEpsilon1()));
+            params.append(python::make_tuple("epsilon2", getEpsilon2()));
+            params.append(python::make_tuple("cutoff", getCutoff()));
+            params.append(python::make_tuple("shift", getShift()));
+
+            return params;
+          }
         };
 
         // provide pickle support

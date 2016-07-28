@@ -85,7 +85,40 @@ namespace espressopp {
         force = dist * ffactor;
         return true;
       }
+
+      boost::python::list getParams() {
+        python::list params;
+
+        params.append(python::make_tuple("class", "Harmonic"));
+        params.append(python::make_tuple("K", K));
+        params.append(python::make_tuple("r0", r0));
+        params.append(python::make_tuple("cutoff", getCutoff()));
+        params.append(python::make_tuple("shift", getShift()));
+
+        return params;
+      }
     };
+
+    // provide pickle support
+    struct Harmonic_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(Harmonic const& pot)
+      {
+        real K;
+        real r0;
+        real rc;
+        real sh;
+        K = pot.getK();
+        r0 = pot.getR0();
+        rc = pot.getCutoff();
+        sh = pot.getShift();
+        return boost::python::make_tuple(K, r0, rc, sh);
+      }
+      static LOG4ESPP_DECL_LOGGER(theLogger);
+    };
+
   }
 }
 

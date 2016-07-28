@@ -162,6 +162,22 @@ class DihedralRB : public DihedralPotentialTemplate< DihedralRB > {
       - 5.0*K5*cos_phi*cos_phi*cos_phi*cos_phi;
     return -1.0*coef1;
   }
+
+  boost::python::list getParams() {
+    python::list params;
+//K0=0.0, K1=0.0, K2=0.0, K3=0.0, K4=0.0, K5=0.0, iupac=True
+    params.append(python::make_tuple("K0", K0));
+    params.append(python::make_tuple("K1", K1));
+    params.append(python::make_tuple("K2", K2));
+    params.append(python::make_tuple("K3", K3));
+    params.append(python::make_tuple("K4", K4));
+    params.append(python::make_tuple("K5", K5));
+    // if true then parameters are multiply by -1 on the python level, better to pass them as they are from C++>python
+    params.append(python::make_tuple("iupac", false));
+
+    return params;
+  }
+
 };
 
 }  // end namespace interaction

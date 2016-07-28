@@ -61,6 +61,7 @@ namespace espressopp {
     virtual void onParticlesChanged();
 
     python::list getQuadruples();
+    python::list getAllQuadruples();
 
     /** Get the number of quadruples in the GlobalQuadruples list */
     int size() {
@@ -71,6 +72,7 @@ namespace espressopp {
 
   private:
     static LOG4ESPP_DECL_LOGGER(theLogger);
+
   };
 }
 

@@ -47,6 +47,7 @@ namespace espressopp {
                 shared_ptr<FixedTripleList>,
                 shared_ptr<Cosine> >())
         .def("setPotential", &FixedTripleListCosine::setPotential)
+        .def("getPotential", &FixedTripleListCosine::getPotential)
         .def("getFixedTripleList", &FixedTripleListCosine::getFixedTripleList);
       ;
     }

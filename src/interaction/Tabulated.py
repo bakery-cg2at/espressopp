@@ -253,6 +253,10 @@ class FixedPairListTabulatedLocal(InteractionLocal, interaction_FixedPairListTab
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
+    def getPotential(self, potential):
+        if pmi.workerIsActive():
+            self.cxxclass.getPotential(self)
+
 
 class FixedPairListTypesTabulatedLocal(InteractionLocal, interaction_FixedPairListTypesTabulated):
     def __init__(self, system, vl):
@@ -284,6 +288,7 @@ class FixedPairListAdressTabulatedLocal(InteractionLocal, interaction_FixedPairL
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
 
 
 if pmi.isController:

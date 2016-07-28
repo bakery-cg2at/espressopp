@@ -83,6 +83,10 @@ class PotentialLocal(object):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.shift.fget(self)
 
+    def getParams(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getParams(self)
+
     shift = property(_getShift, _setShift)
 
 if pmi.isController:
@@ -90,7 +94,8 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
-            pmiproperty = ['cutoff', 'shift']
+            pmiproperty = ['cutoff', 'shift'],
+            pmicall=('getParams',)
             )
         
 

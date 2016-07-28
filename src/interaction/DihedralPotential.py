@@ -70,10 +70,15 @@ class DihedralPotentialLocal(object):
                    return self.cxxclass.computeForce(self, arg0)
             return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
+    def getParams(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getParams(self)
+
 if pmi.isController:
     class DihedralPotential(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             localcall = [ 'computeForce', 'computeEnergy' ],
-            pmiproperty = [ 'cutoff' ]
+            pmiproperty = [ 'cutoff' ],
+            pmicall=('getParams',)
             )

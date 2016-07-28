@@ -79,14 +79,46 @@ class InteractionLocal(object):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeVirial(self)
 
+    def getPotential(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getPotential(self)
+
     def bondType(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return int(self.cxxclass.bondType(self))
+
+    def getFixedList(self):
+        if pmi.workerIsActive():
+            b_type = self.bondType()
+            if b_type == Pair:
+                return self.cxxclass.getFixedPairList(self)
+            elif b_type == Angular:
+                return self.cxxclass.getFixedTripleList(self)
+            elif b_type == Dihedral:
+                return self.cxxclass.getFixedQuadrupleList(self)
+            else:
+                return None
+
+    def getParams(self):
+        if pmi.workerIsActive():
+            b_type = self.bondType()
+            if b_type in (Pair, Angular, Dihedral):
+                return self.cxxclass.getPotential(self).getParams()
+            elif b_type == Nonbonded:
+                return self.cxxclass.getInteractionMatrix(self)
+            else:
+                return None
+
+
 
 if pmi.isController :
     class Interaction(object):
 
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "computeEnergy", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]
-            )
+            pmicall = [
+                "computeEnergy", "computeEnergyAA",
+                "computeEnergyCG", "computeVirial",
+                "bondType", "getFixedList",
+                "getParams", "getInteractionMatrix",
+                "getPotential"])

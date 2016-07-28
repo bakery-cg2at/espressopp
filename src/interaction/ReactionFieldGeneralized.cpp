@@ -61,12 +61,14 @@ namespace espressopp {
                 ("interaction_ReactionFieldGeneralized", init< real, real, real, real, real>())
                 .def(init< real, real, real, real, real, real>())
                 .def_pickle(ReactionFieldGeneralized_pickle())
+                .def("getParams", &ReactionFieldGeneralized::getParams)
                 .add_property("prefactor", &ReactionFieldGeneralized::getPrefactor, &ReactionFieldGeneralized::setPrefactor)
             ;
 
             class_<VerletListReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListReactionFieldGeneralized", init< shared_ptr<VerletList> >())
                 .def("setPotential", &VerletListReactionFieldGeneralized::setPotential)
+                .def("getInteractionMatrix", &VerletListReactionFieldGeneralized::getInteractionMatrix)
                 .def("getPotential", &VerletListReactionFieldGeneralized::getPotentialPtr)
             ;
 
@@ -74,6 +76,7 @@ namespace espressopp {
                 ("interaction_VerletListHybridReactionFieldGeneralized", init< shared_ptr<VerletList>, bool >())
                 .def("setPotential", &VerletListHybridReactionFieldGeneralized::setPotential)
                 .def("getPotential", &VerletListHybridReactionFieldGeneralized::getPotentialPtr)
+                .def("getInteractionMatrix", &VerletListHybridReactionFieldGeneralized::getInteractionMatrix)
                 .add_property("scale_factor", &VerletListHybridReactionFieldGeneralized::scaleFactor,
                               &VerletListHybridReactionFieldGeneralized::setScaleFactor)
                 ;
@@ -82,12 +85,14 @@ namespace espressopp {
                 ("interaction_VerletListAdressReactionFieldGeneralized",
                         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
                 .def("setPotentialAT", &VerletListAdressReactionFieldGeneralized::setPotentialAT)
+                .def("getInteractionMatrix", &VerletListAdressReactionFieldGeneralized::getInteractionMatrix)
                 .def("setPotentialCG", &VerletListAdressReactionFieldGeneralized::setPotentialCG);
             ;
 
             class_<VerletListHadressReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListHadressReactionFieldGeneralized",
                         init< shared_ptr<VerletListHadress>, shared_ptr<FixedTupleListAdress> >())
+                .def("getInteractionMatrix", &VerletListHadressReactionFieldGeneralized::getInteractionMatrix)
                 .def("setPotentialAT", &VerletListHadressReactionFieldGeneralized::setPotentialAT)
                 .def("setPotentialCG", &VerletListHadressReactionFieldGeneralized::setPotentialCG);
             ;

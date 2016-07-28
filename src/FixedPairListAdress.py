@@ -86,6 +86,14 @@ class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
           bonds=self.cxxclass.getBonds(self)
           return bonds
 
+    def getAllBonds(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllBonds(self)
+
+    def getList(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllBonds(self)
+
     def addBonds(self, bondlist):
         """
         Each processor takes the broadcasted bondlist and
@@ -104,6 +112,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListAdressLocal',
             localcall = [ "add" ],
-            pmicall = [ "addBonds" ],
+            pmicall = [ "addBonds", 'getList', 'getAllBonds'],
 			pmiinvoke = ['getBonds']
             )

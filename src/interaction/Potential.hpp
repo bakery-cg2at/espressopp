@@ -49,6 +49,11 @@ namespace espressopp {
       virtual real getShift() const = 0;
       virtual real setAutoShift() = 0;
 
+      virtual python::list getParams() {
+        python::list params;
+        return params;
+      }
+
       static void registerPython();
 
       static LOG4ESPP_DECL_LOGGER(theLogger);

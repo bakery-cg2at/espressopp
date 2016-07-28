@@ -212,6 +212,16 @@ namespace espressopp {
         return -1.0*(1.0/sin(phi))*K * multiplicity * sin(phi0 - multiplicity*phi);
       }
 
+      boost::python::list getParams() {
+        python::list params;
+
+        params.append(python::make_tuple("K", K));
+        params.append(python::make_tuple("phi0", phi0));
+        params.append(python::make_tuple("multiplicity", multiplicity));
+
+        return params;
+      }
+
     }; // class
   }
 }

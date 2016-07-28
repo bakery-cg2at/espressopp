@@ -69,6 +69,7 @@ namespace espressopp {
             
             class_ <TabulatedAngular, bases <AngularPotential> >
                 ("interaction_TabulatedAngular", init <int, const char*>())
+                    .def("getParams", &TabulatedAngular::getParams)
                 .add_property("filename", &TabulatedAngular::getFilename, &TabulatedAngular::setFilename)
                 .def_pickle(TabulatedAngular_pickle());
             

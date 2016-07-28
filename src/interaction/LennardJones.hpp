@@ -118,6 +118,18 @@ namespace espressopp {
         force = dist * ffactor;
         return true;
       }
+
+      boost::python::list getParams() {
+        python::list params;
+
+        params.append(python::make_tuple("epsilon", epsilon));
+        params.append(python::make_tuple("sigma", sigma));
+        params.append(python::make_tuple("cutoff", getCutoff()));
+        params.append(python::make_tuple("shift", getShift()));
+
+        return params;
+      }
+
       static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 

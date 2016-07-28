@@ -39,6 +39,7 @@ namespace espressopp {
 
       class_ <DihedralHarmonicNCos, bases <DihedralPotential> >
       ("interaction_DihedralHarmonicNCos", init< real, real, int >())
+          .def("getParams", &DihedralHarmonicNCos::getParams)
         .add_property("K", &DihedralHarmonicNCos::getK, &DihedralHarmonicNCos::setK)
         .add_property("phi0", &DihedralHarmonicNCos::getPhi0, &DihedralHarmonicNCos::setPhi0)
         .add_property("multiplicity", &DihedralHarmonicNCos::getMultiplicity, &DihedralHarmonicNCos::setMultiplicity)
@@ -57,6 +58,7 @@ namespace espressopp {
                    shared_ptr<DihedralHarmonicNCos>
                 >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonicNCos::setPotential)
+        .def("getPotential", &FixedQuadrupleListDihedralHarmonicNCos::getPotential)
         .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonicNCos::getFixedQuadrupleList)
         ;
 
@@ -79,6 +81,7 @@ namespace espressopp {
         .def(init< shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
             shared_ptr<DihedralHarmonicNCos>, bool>())
         .def("setPotential", &FixedQuadrupleListAdressDihedralHarmonicNCos::setPotential)
+          .def("getPotential", &FixedQuadrupleListAdressDihedralHarmonicNCos::getPotential)
         .def("getFixedQuadrupleList",
             &FixedQuadrupleListAdressDihedralHarmonicNCos::getFixedQuadrupleList);
     }

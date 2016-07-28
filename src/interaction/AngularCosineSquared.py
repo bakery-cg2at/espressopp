@@ -82,15 +82,23 @@ class AngularCosineSquaredLocal(AngularPotentialLocal, interaction_AngularCosine
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularCosineSquared, K, theta0)
 
+    def getParams(self):
+        if pmi.workerIsActive():
+            return {'K': self.cxxclass.K, 'theta0': self.cxxclass.theta0}
+
 class FixedTripleListAngularCosineSquaredLocal(InteractionLocal, interaction_FixedTripleListAngularCosineSquared):
 
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedTripleListAngularCosineSquared, system, vl, potential)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, potential)
+
+    def getPotential(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getPotential(self)
 
     def getFixedTripleList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -101,12 +109,13 @@ if pmi.isController:
         'The AngularCosineSquared potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.AngularCosineSquaredLocal',
-            pmiproperty = ['K', 'theta0']
+            pmiproperty = ['K', 'theta0'],
+            pmicall = ('getParams',)
             )
 
     class FixedTripleListAngularCosineSquared(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListAngularCosineSquaredLocal',
-            pmicall = ['setPotential','getFixedTripleList']
+            pmicall = ['setPotential', 'getPotential', 'getFixedTripleList']
         )

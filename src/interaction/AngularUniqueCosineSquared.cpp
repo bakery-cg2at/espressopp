@@ -46,6 +46,7 @@ namespace espressopp {
                       shared_ptr<FixedTripleAngleList>,
                       shared_ptr<AngularUniqueCosineSquared> >())
           .def("setPotential", &FixedTripleAngleListAngularUniqueCosineSquared::setPotential)
+          .def("getPotential", &FixedTripleAngleListAngularUniqueCosineSquared::getPotential)
           .def("getFixedTripleList", &FixedTripleAngleListAngularUniqueCosineSquared::getFixedTripleList)
         ;
     }

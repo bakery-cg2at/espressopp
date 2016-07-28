@@ -115,6 +115,16 @@ namespace espressopp {
                 force = dist * ffactor;
                 return true;
             }
+
+      boost::python::list getParams() {
+        python::list params;
+
+        params.append(python::make_tuple("itype", interpolationType));
+        params.append(python::make_tuple("filename", filename));
+        params.append(python::make_tuple("cutoff", getCutoff()));
+
+        return params;
+      }
     };//class
 
     // provide pickle support

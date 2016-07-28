@@ -108,6 +108,18 @@ namespace espressopp {
         return true;
       }
 
+      boost::python::list getParams() {
+        python::list params;
+
+        params.append(python::make_tuple("K", K));
+        params.append(python::make_tuple("r0", r0));
+        params.append(python::make_tuple("rMax", rMax));
+        params.append(python::make_tuple("cutoff", getCutoff()));
+        params.append(python::make_tuple("shift", getShift()));
+
+        return params;
+      }
+
       static LOG4ESPP_DECL_LOGGER(theLogger);
     };
   }
