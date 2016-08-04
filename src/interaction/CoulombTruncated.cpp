@@ -24,6 +24,7 @@
 #include "CoulombTruncated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
+#include "FixedPairListAdressTypesInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "VerletListHybridInteractionTemplate.hpp"
 #include "Tabulated.hpp"
@@ -38,6 +39,9 @@ namespace espressopp {
     VerletListCoulombTruncated;
     typedef class FixedPairListTypesInteractionTemplate< CoulombTruncated >
     FixedPairListTypesCoulombTruncated;
+
+    typedef class FixedPairListAdressTypesInteractionTemplate<CoulombTruncated>
+      FixedPairListAdressTypesCoulombTruncated;
 
     typedef class VerletListHybridInteractionTemplate<CoulombTruncated>
       VerletListHybridCoulombTruncated;
@@ -89,6 +93,16 @@ namespace espressopp {
         .def("setPotential", &FixedPairListTypesCoulombTruncated::setPotential)
           .def("getPotential", &FixedPairListTypesCoulombTruncated::getPotentialPtr)
         ;
+
+      class_< FixedPairListAdressTypesCoulombTruncated, bases< Interaction > >
+          ("interaction_FixedPairListAdressTypesCoulombTruncated",
+           init< shared_ptr<System>, shared_ptr<FixedPairList>, bool >())
+          .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, bool >())
+          .def("setPotential", &FixedPairListAdressTypesCoulombTruncated::setPotential)
+          .def("getPotential", &FixedPairListAdressTypesCoulombTruncated::getPotentialPtr)
+          .def("setFixedPairList", &FixedPairListAdressTypesCoulombTruncated::setFixedPairList)
+          .def("getFixedPairList", &FixedPairListAdressTypesCoulombTruncated::getFixedPairList)
+          ;
     }
 
   }

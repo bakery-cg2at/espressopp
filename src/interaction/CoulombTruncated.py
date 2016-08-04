@@ -96,6 +96,7 @@ from _espressopp import interaction_CoulombTruncated, \
                       interaction_FixedPairListTypesCoulombTruncated, \
                       interaction_VerletListAdressCoulombTruncated, \
                       interaction_VerletListHybridCoulombTruncated
+from _espressopp import interaction_FixedPairListAdressTypesCoulombTruncated
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
     def __init__(self, prefactor=1.0, cutoff=infinity):
@@ -141,6 +142,27 @@ class FixedPairListTypesCoulombTruncatedLocal(InteractionLocal, interaction_Fixe
     def getPotential(self, type1, type2):
         if pmi.workerIsActive():
             return self.cxxclass.getPotential(self, type1, type2)
+
+class FixedPairListAdressTypesCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListAdressTypesCoulombTruncated):
+    def __init__(self, system, vl, is_cg=False):
+        if pmi.workerIsActive():
+            cxxinit(self, interaction_FixedPairListAdressTypesCoulombTruncated, system, vl, is_cg)
+
+    def setPotential(self, type1, type2, potential):
+        if pmi.workerIsActive():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if pmi.workerIsActive():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+    def setFixedPairList(self, fixedpairlist):
+        if pmi.workerIsActive():
+            self.cxxclass.setFixedPairList(self, fixedpairlist)
+
+    def getFixedPairList(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getFixedPairList(self)
 
 class VerletListAdressCoulombTruncatedLocal(InteractionLocal, interaction_VerletListAdressCoulombTruncated):
     'The (local) CoulombTruncated interaction using Verlet lists.'
@@ -193,4 +215,10 @@ if pmi.isController:
             pmicall = ['setPotentialAT','setPotentialCG']
             )
 
+    class FixedPairListAdressTypesCoulombTruncated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListAdressTypesCoulombTruncatedLocal',
+            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
+        )
 
