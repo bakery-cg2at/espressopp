@@ -130,7 +130,12 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::addForces() {
     // Scaling for the Adress extension. If this potential works between CG beads
     // then the Force is scalded by (1-w12) otherwise it works across the beads,
     // with scaling w12.
-    real w12 = p1.lambda() * p2.lambda();
+    real p1lambda = p1.lambda();
+    real p2lambda = p2.lambda();
+    if (p1lambda < 0.0 || p2lambda < 0.0)
+      continue;
+
+    real w12 = p1lambda * p2lambda;
     real forcescale12 = w12;
     if (cgPotential) {
       forcescale12 = (1-w12);
@@ -156,7 +161,13 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeEnergy
   for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
     const Particle &p1 = *it->first;
     const Particle &p2 = *it->second;
-    real w12 = p1.lambda() * p2.lambda();
+
+    real p1lambda = p1.lambda();
+    real p2lambda = p2.lambda();
+    if (p1lambda < 0.0 || p2lambda < 0.0)
+      continue;
+
+    real w12 = p1lambda * p2lambda;
     real energyscale12 = w12;
     if (cgPotential)
       energyscale12 = 1.0-w12;
@@ -208,7 +219,12 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
     const Particle &p1 = *it->first;
     const Particle &p2 = *it->second;
 
-    real w12 = p1.lambda() * p2.lambda();
+    real p1lambda = p1.lambda();
+    real p2lambda = p2.lambda();
+    if (p1lambda < 0.0 || p2lambda < 0.0)
+      continue;
+
+    real w12 = p1lambda * p2lambda;
     real forcescale = w12;
     if (cgPotential) {
       forcescale = (1.0-w12);
@@ -241,7 +257,13 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
        it.isValid(); ++it) {
     const Particle &p1 = *it->first;
     const Particle &p2 = *it->second;
-    real w12 = p1.lambda() * p2.lambda();
+
+    real p1lambda = p1.lambda();
+    real p2lambda = p2.lambda();
+    if (p1lambda < 0.0 || p2lambda < 0.0)
+      continue;
+
+    real w12 = p1lambda * p2lambda;
     real forcescale = w12;
     if (cgPotential) {
       forcescale = (1.0-w12);
@@ -270,107 +292,15 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
 template < typename _Potential >
 inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirialTensor(
     Tensor& w, real z) {
-  LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+  LOG4ESPP_ERROR(theLogger, "compute the virial tensor for the FixedPair List Adress not implemented");
 
-  Tensor wlocal(0.0);
-  const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-  for (FixedPairList::PairList::Iterator it(*fixedpairList);
-       it.isValid(); ++it) {
-    const Particle &p1 = *it->first;
-    const Particle &p2 = *it->second;
-
-    real w12 = p1.lambda() * p2.lambda();
-    real forcescale = w12;
-    if (cgPotential) {
-      forcescale = (1.0-w12);
-    }
-
-    forcescale *= scaleFactor_;
-
-    if (!is_almost_zero(forcescale)) {
-      Real3D p1pos = p1.position();
-      Real3D p2pos = p2.position();
-
-      if ((p1pos[2] >= z && p2pos[2] <= z) ||
-        (p1pos[2] <= z && p2pos[2] >= z)) {
-        Real3D r21;
-        bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
-        Real3D force;
-        if (potential->_computeForce(force, r21)) {
-          wlocal += Tensor(r21, forcescale * force);
-        }
-      }
-    }
-  }
-
-  // reduce over all CPUs
-  Tensor wsum(0.0);
-  boost::mpi::all_reduce(
-      *mpiWorld, reinterpret_cast<double*>(&wlocal),
-      6, reinterpret_cast<double*>(&wsum), std::plus<double>());
-  w += wsum;
 }
 
 template < typename _Potential >
 inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirialTensor(
     Tensor *w, int n) {
-  LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+  LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List Adress not implemented");
 
-  const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-  Real3D Li = bc.getBoxL();
-  Tensor *wlocal = new Tensor[n];
-  for (int i = 0; i < n; i++) wlocal[i] = Tensor(0.0);
-  for (FixedPairList::PairList::Iterator it(*fixedpairList);
-       it.isValid(); ++it) {
-    const Particle &p1 = *it->first;
-    const Particle &p2 = *it->second;
-
-    real w12 = p1.lambda() * p2.lambda();
-    real forcescale = w12;
-    if (cgPotential) {
-      forcescale = (1.0-w12);
-    }
-
-    forcescale *= scaleFactor_;
-
-    if (!is_almost_zero(forcescale)) {
-      Real3D p1pos = p1.position();
-      Real3D p2pos = p2.position();
-
-      int position1 = static_cast<int>(n * p1pos[2] / Li[2]);
-      int position2 = static_cast<int>(n * p1pos[2] / Li[2]);
-
-      int maxpos = std::max(position1, position2);
-      int minpos = std::min(position1, position2);
-
-      Real3D r21;
-      bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
-      Real3D force;
-      Tensor ww;
-      if (potential->_computeForce(force, r21)) {
-        ww = Tensor(r21, forcescale * force);
-      }
-
-      int i = minpos + 1;
-      while (i <= maxpos) {
-        wlocal[i] += ww;
-        i++;
-      }
-    }
-  }
-
-  Tensor *wsum = new Tensor[n];
-  boost::mpi::all_reduce(
-      *mpiWorld, reinterpret_cast<double*>(&wlocal),
-      n, reinterpret_cast<double*>(&wsum),
-      std::plus<double>());
-
-  for (int j = 0; j < n; j++) {
-    w[j] += wsum[j];
-  }
-
-  delete [] wsum;
-  delete [] wlocal;
 }
 
 template < typename _Potential >

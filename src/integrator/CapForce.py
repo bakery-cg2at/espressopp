@@ -73,5 +73,5 @@ if pmi.isController :
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.CapForceLocal',
             pmicall = ['setCapForce', 'setAbsCapForce', 'getCapForce', 'getAbsCapForce'],
-            pmiproperty = [ 'particleGroup', 'adress' ]
+            pmiproperty = [ 'particleGroup', 'adress', 'ramp']
             )

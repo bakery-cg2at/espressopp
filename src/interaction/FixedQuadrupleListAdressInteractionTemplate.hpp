@@ -112,7 +112,14 @@ inline void FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     Particle &p3 = *it->third;
     Particle &p4 = *it->fourth;
 
-    real w1234 = pow(p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda(), 0.5);
+    real p1lambda = p1.lambda();
+    real p2lambda = p2.lambda();
+    real p3lambda = p3.lambda();
+    real p4lambda = p4.lambda();
+    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0)
+      continue;
+
+    real w1234 = pow(p1lambda * p2lambda * p3lambda * p4lambda, 0.5);
     real forcescale1234 = w1234;
     if (cgPotential) {
       forcescale1234 = (1.0-w1234);
@@ -148,7 +155,15 @@ inline real FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     const Particle &p2 = *it->second;
     const Particle &p3 = *it->third;
     const Particle &p4 = *it->fourth;
-    real w1234 = pow(p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda(), 0.5);
+
+    real p1lambda = p1.lambda();
+    real p2lambda = p2.lambda();
+    real p3lambda = p3.lambda();
+    real p4lambda = p4.lambda();
+    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0)
+      continue;
+
+    real w1234 = pow(p1lambda * p2lambda * p3lambda * p4lambda, 0.5);
     real forcescale1234 = w1234;
     if (cgPotential) {
       forcescale1234 = (1.0-w1234);
@@ -205,7 +220,14 @@ inline real FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     const Particle &p3 = *it->third;
     const Particle &p4 = *it->fourth;
 
-    real w1234 = pow(p1.lambda() * p2.lambda() * p3.lambda() * p4.lambda(), 0.5);
+    real p1lambda = p1.lambda();
+    real p2lambda = p2.lambda();
+    real p3lambda = p3.lambda();
+    real p4lambda = p4.lambda();
+    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0)
+      continue;
+
+    real w1234 = pow(p1lambda * p2lambda * p3lambda * p4lambda, 0.5);
     real forcescale1234 = w1234;
     if (cgPotential) {
       forcescale1234 = (1.0-w1234);

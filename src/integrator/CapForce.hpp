@@ -66,19 +66,27 @@ namespace espressopp {
         void applyForceCappingToGroup();
         void applyForceCappingToAll();
 
+        real getRamp() { return ramp_; }
+        void setRamp(real v) { ramp_ = v; }
+
         virtual ~CapForce() {};
 
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       private:
-        boost::signals2::connection _aftCalcF;
+        boost::signals2::connection _aftCalcF, _aftIntV;
         shared_ptr< ParticleGroup > particleGroup;
         bool allParticles;
         bool absCapping;
         bool adress;
         Real3D capForce;
         real absCapForce;
+
+        real ramp_;
+
+        void changeMaxForce();
+
         void connect();
         void disconnect();
 

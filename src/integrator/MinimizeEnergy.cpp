@@ -33,12 +33,14 @@ LOG4ESPP_LOGGER(MinimizeEnergy::theLogger, "MinimizeEnergy");
 MinimizeEnergy::MinimizeEnergy(shared_ptr<System> system,
                                real gamma,
                                real ftol,
-                               real max_displacement)
+                               real max_displacement,
+                               bool variable_step_flag)
     : SystemAccess(system), gamma_(gamma), ftol_sqr_(ftol),
-      max_displacement_(max_displacement) {
+      max_displacement_(max_displacement), variable_step_flag_(variable_step_flag) {
   LOG4ESPP_INFO(theLogger, "construct MinimizeEnergy");
   resort_flag_ = false;
   nstep_ = 0;
+  dp_MAX = 0.0;
 }
 
 MinimizeEnergy::~MinimizeEnergy() {
@@ -76,9 +78,12 @@ bool MinimizeEnergy::run(int max_steps, bool verbose) {
   for (; iters < max_steps && f_max_sqr_ > ftol_sqr_; iters++) {
     steepestDescentStep();
 
-    resort_flag_ = sqrt(dp_sqr_max_) > skin_half;
+    dp_MAX += sqrt(dp_sqr_max_);
+
+    resort_flag_ = dp_MAX > skin_half;
 
     if (resort_flag_) {
+      dp_MAX = 0.0;
       storage.decompose();
       resort_flag_ = false;
     }
@@ -152,25 +157,35 @@ void MinimizeEnergy::steepestDescentStep() {
   System& system = getSystemRef();
 
   real f_sqr, dp, dp_sqr;
-  real f_max = std::numeric_limits<real>::min();
+  real f_max = sqrt(f_max_sqr_);
   real dp_sqr_max = std::numeric_limits<real>::min();
 
   // Iterate over only real particles.
   CellList realCells = system.storage->getRealCells();
   for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-    // Magnitiude of the force.
-    f_sqr = cit->force().sqr();
-    for (int i = 0; i < 3; i++) {   // Perhaps it can be done better.
-      dp = gamma_ * cit->force()[i];
-      if (fabs(dp) > max_displacement_)
-        dp = sgn<real>(dp)*max_displacement_;
-      dp_sqr += dp*dp;
 
-      // Update position component by dp.
-      cit->position()[i] += dp;
+    if (variable_step_flag_) {
+      dp_sqr = 0.;
+      for (int i = 0; i < 3; i++) {   // Perhaps it can be done better.
+        dp = max_displacement_ * cit->force()[i]/f_max;
+        dp_sqr += dp*dp;
+
+        cit->position()[i] += dp;
+      }
+      dp_sqr_max = std::max(dp_sqr_max, dp_sqr);
+    } else {
+      // Magnitiude of the force.
+      for (int i = 0; i < 3; i++) {   // Perhaps it can be done better.
+        dp = gamma_ * cit->force()[i];
+        if (fabs(dp) > max_displacement_)
+          dp = sgn<real>(dp) * max_displacement_;
+        dp_sqr += dp * dp;
+
+        // Update position component by dp.
+        cit->position()[i] += dp;
+      }
+      dp_sqr_max = std::max(dp_sqr_max, dp_sqr);
     }
-    f_max = std::max(f_max, f_sqr);
-    dp_sqr_max = std::max(dp_sqr_max, dp_sqr);
   }
 
   mpi::all_reduce(*system.comm, dp_sqr_max, dp_sqr_max_, boost::mpi::maximum<real>());
@@ -181,7 +196,7 @@ void MinimizeEnergy::registerPython() {
 
   // Note: use noncopyable and no_init for abstract classes
   class_<MinimizeEnergy, boost::noncopyable>
-    ("integrator_MinimizeEnergy", init<shared_ptr<System>, real, real, real>())
+    ("integrator_MinimizeEnergy", init<shared_ptr<System>, real, real, real, bool>())
       .add_property("f_max", &MinimizeEnergy::getFMax)
       .add_property("displacement", &MinimizeEnergy::getDpMax)
       .add_property("step", make_getter(&MinimizeEnergy::nstep_), make_setter(&MinimizeEnergy::nstep_))

@@ -83,9 +83,6 @@ void DynamicResolution::changeResolution() {
   if (resolution_ > 1.0) {
     resolution_ = 1.0;
     active_ = false;
-  } else if (resolution_ < 0.0) {
-    resolution_ = 0.0;
-    active_ = false;
   }
   updateWeights();
 }

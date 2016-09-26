@@ -37,7 +37,7 @@ namespace espressopp {
     LOG4ESPP_LOGGER(CapForce::theLogger, "CapForce");
 
     CapForce::CapForce(shared_ptr<System> system, const Real3D& _capForce)
-    : Extension(system), capForce(_capForce)
+    : Extension(system), capForce(_capForce), ramp_(0.0)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for all particles constructed");
       allParticles = true;
@@ -46,7 +46,7 @@ namespace espressopp {
     }
 
     CapForce::CapForce(shared_ptr<System> system, real _absCapForce)
-    : Extension(system), absCapForce(_absCapForce)
+    : Extension(system), absCapForce(_absCapForce), ramp_(0.0)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for all particles constructed");
       allParticles = true;
@@ -55,7 +55,7 @@ namespace espressopp {
     }
 
     CapForce::CapForce(shared_ptr<System> system, const Real3D& _capForce, shared_ptr< ParticleGroup > _particleGroup)
-    : Extension(system), capForce(_capForce), particleGroup(_particleGroup)
+    : Extension(system), capForce(_capForce), particleGroup(_particleGroup), ramp_(0.0)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
       allParticles = false;
@@ -64,7 +64,7 @@ namespace espressopp {
     }
 
     CapForce::CapForce(shared_ptr<System> system, real _absCapForce, shared_ptr< ParticleGroup > _particleGroup)
-    : Extension(system), absCapForce(_absCapForce), particleGroup(_particleGroup)
+    : Extension(system), absCapForce(_absCapForce), particleGroup(_particleGroup), ramp_(0.0)
     {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
       allParticles = false;
@@ -74,6 +74,7 @@ namespace espressopp {
 
     void CapForce::disconnect(){
       _aftCalcF.disconnect();
+      _aftIntV.disconnect();
     }
 
     void CapForce::connect(){
@@ -82,6 +83,15 @@ namespace espressopp {
         _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToGroup, this), boost::signals2::at_back);
       } else {
     	_aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToAll, this), boost::signals2::at_back);
+      }
+      _aftIntV = integrator->aftIntV.connect(boost::bind(&CapForce::changeMaxForce, this), boost::signals2::at_back);
+    }
+
+    void CapForce::changeMaxForce() {
+      if (absCapping) {
+        absCapForce += ramp_;
+      } else {
+        capForce += ramp_;
       }
     }
 
@@ -222,6 +232,7 @@ namespace espressopp {
         .def("getAbsCapForce", &CapForce::getAbsCapForce)
         .def("setCapForce", &CapForce::setCapForce )
         .def("setAbsCapForce", &CapForce::setAbsCapForce )
+        .add_property("ramp", &CapForce::getRamp, &CapForce::setRamp)
         .def("connect", &CapForce::connect)
         .def("disconnect", &CapForce::disconnect)
         ;
