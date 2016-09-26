@@ -117,10 +117,12 @@ FixedTripleListAdressInteractionTemplate <_AngularPotential>::addForces() {
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
     real p3lambda = p3.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0))
       continue;
 
     real w123 = pow(p1lambda * p2lambda * p3lambda, 2.0/3.0);
+    if (w123 < 0.0)
+      w123 = 0.0;
     real forcescale123 = w123;
     if (cgPotential) {
       forcescale123 = (1.0-w123);
@@ -156,10 +158,12 @@ FixedTripleListAdressInteractionTemplate < _AngularPotential >::computeEnergy() 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
     real p3lambda = p3.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0))
       continue;
 
     real w123 = pow(p1lambda * p2lambda * p3lambda, 2.0/3.0);
+    if (w123 < 0.0)
+      w123 = 0.0;
     real energyscale123 = w123;
     if (cgPotential) {
       energyscale123 = (1.0-w123);
@@ -217,10 +221,12 @@ computeVirial() {
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
     real p3lambda = p3.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0))
       continue;
 
     real w123 = pow(p1lambda * p2lambda * p3lambda, 2.0/3.0);
+    if (w123 < 0.0)
+      w123 = 0.0;
     real forcescale123 = w123;
     if (cgPotential) {
       forcescale123 = (1.0-w123);
@@ -255,10 +261,12 @@ computeVirialTensor(Tensor& w) {
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
     real p3lambda = p3.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0))
       continue;
 
     real w123 = pow(p1lambda * p2lambda * p3lambda, 2.0/3.0);
+    if (w123 < 0.0)
+      w123 = 0.0;
     real forcescale123 = w123;
     if (cgPotential) {
       forcescale123 = (1.0-w123);

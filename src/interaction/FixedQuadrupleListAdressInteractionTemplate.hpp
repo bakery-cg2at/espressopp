@@ -116,10 +116,12 @@ inline void FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     real p2lambda = p2.lambda();
     real p3lambda = p3.lambda();
     real p4lambda = p4.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0))
       continue;
 
     real w1234 = pow(p1lambda * p2lambda * p3lambda * p4lambda, 0.5);
+    if (w1234 < 0.0)
+      w1234 = 0.0;
     real forcescale1234 = w1234;
     if (cgPotential) {
       forcescale1234 = (1.0-w1234);
@@ -160,10 +162,12 @@ inline real FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     real p2lambda = p2.lambda();
     real p3lambda = p3.lambda();
     real p4lambda = p4.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0))
       continue;
 
     real w1234 = pow(p1lambda * p2lambda * p3lambda * p4lambda, 0.5);
+    if (w1234 < 0.0)
+      w1234 = 0.0;
     real forcescale1234 = w1234;
     if (cgPotential) {
       forcescale1234 = (1.0-w1234);
@@ -224,10 +228,12 @@ inline real FixedQuadrupleListAdressInteractionTemplate < _DihedralPotential >::
     real p2lambda = p2.lambda();
     real p3lambda = p3.lambda();
     real p4lambda = p4.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0 || p3lambda < 0.0 || p4lambda < 0.0))
       continue;
 
     real w1234 = pow(p1lambda * p2lambda * p3lambda * p4lambda, 0.5);
+    if (w1234 < 0.0)
+      w1234 = 0.0;
     real forcescale1234 = w1234;
     if (cgPotential) {
       forcescale1234 = (1.0-w1234);

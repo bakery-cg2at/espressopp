@@ -132,10 +132,12 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::addForces() {
     // with scaling w12.
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
     real forcescale12 = w12;
     if (cgPotential) {
       forcescale12 = (1-w12);
@@ -164,10 +166,12 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeEnergy
 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
     real energyscale12 = w12;
     if (cgPotential)
       energyscale12 = 1.0-w12;
@@ -221,10 +225,12 @@ inline real FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
     real forcescale = w12;
     if (cgPotential) {
       forcescale = (1.0-w12);
@@ -260,10 +266,12 @@ inline void FixedPairListAdressInteractionTemplate < _Potential >::computeVirial
 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
     real forcescale = w12;
     if (cgPotential) {
       forcescale = (1.0-w12);

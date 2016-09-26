@@ -122,7 +122,14 @@ namespace espressopp {
         // Scaling for the Adress extension. If this potential works between CG beads
         // then the Force is scalded by (1-w12) otherwise it works across the beads,
         // with scaling w12.
-        real w12 = p1.lambda() * p2.lambda();
+        real p1lambda = p1.lambda();
+        real p2lambda = p2.lambda();
+        if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
+          continue;
+
+        real w12 = p1lambda * p2lambda;
+        if (w12 < 0.0)
+          w12 = 0.0;
         real forcescale12 = w12;
         if (cgPotential)
           forcescale12 = 1.0 - w12;
@@ -157,7 +164,14 @@ namespace espressopp {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
 
-        real w12 = p1.lambda() * p2.lambda();
+        real p1lambda = p1.lambda();
+        real p2lambda = p2.lambda();
+        if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
+          continue;
+
+        real w12 = p1lambda * p2lambda;
+        if (w12 < 0.0)
+          w12 = 0.0;
         real energyscale12 = w12;
         if (cgPotential)
           energyscale12 = 1.0 - w12;
@@ -218,7 +232,14 @@ namespace espressopp {
         // Scaling for the Adress extension. If this potential works between CG beads
         // then the Force is scalded by (1-w12) otherwise it works across the beads,
         // with scaling w12.
-        real w12 = p1.lambda() * p2.lambda();
+        real p1lambda = p1.lambda();
+        real p2lambda = p2.lambda();
+        if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
+          continue;
+
+        real w12 = p1lambda * p2lambda;
+        if (w12 < 0.0)
+          w12 = 0.0;
         real forcescale12 = w12;
         if (cgPotential)
           forcescale12 = 1.0 - w12;

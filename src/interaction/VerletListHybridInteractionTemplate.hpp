@@ -132,10 +132,12 @@ addForces() {
 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
     real forcescale12 = w12;
     if (cgPotential) {
       forcescale12 = (1 - w12);
@@ -170,10 +172,14 @@ computeEnergy() {
 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
+
     real forcescale12 = w12;
     if (cgPotential) {
       forcescale12 = (1 - w12);
@@ -231,10 +237,12 @@ computeVirial() {
 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
     real forcescale12 = w12;
     if (cgPotential) {
       forcescale12 = (1 - w12);
@@ -277,10 +285,12 @@ computeVirialTensor(Tensor &w) {
 
     real p1lambda = p1.lambda();
     real p2lambda = p2.lambda();
-    if (p1lambda < 0.0 || p2lambda < 0.0)
+    if (!cgPotential && (p1lambda < 0.0 || p2lambda < 0.0))
       continue;
 
     real w12 = p1lambda * p2lambda;
+    if (w12 < 0.0)
+      w12 = 0.0;
     real forcescale12 = w12;
     if (cgPotential) {
       forcescale12 = (1 - w12);
