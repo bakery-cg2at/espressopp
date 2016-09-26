@@ -20,23 +20,40 @@
 
 #include "python.hpp"
 #include "Resolution.hpp"
-#include "storage/DomainDecomposition.hpp"
-#include "integrator/DynamicResolution.hpp"
+
 
 using namespace espressopp;  //NOLINT
+using namespace iterator;  // NOLINT
 
 namespace espressopp {
 namespace analysis {
 
 real Resolution::compute_real() const {
-  return res_->resolution();
+  System &system = getSystemRef();
+  CellList realCells = system.storage->getRealCells();
+
+  real res = 0.0;
+  longint NPart = 0;
+
+  for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    const Particle& p = *cit;
+    res += p.lambda();
+    NPart++;
+  }
+
+  longint systemN = 0;
+  real sumRes = 0.0;
+
+  mpi::all_reduce(*getSystem()->comm, res, sumRes, std::plus<real>());
+  mpi::all_reduce(*getSystem()->comm, NPart, systemN, std::plus<longint>());
+
+  return sumRes/systemN;
 }
 
 void Resolution::registerPython() {
   using namespace espressopp::python;  //NOLINT
   class_<Resolution, bases<Observable> >
-    ("analysis_Resolution", init< shared_ptr<System>,
-                            shared_ptr<integrator::DynamicResolution> >())
+    ("analysis_Resolution", init< shared_ptr<System> >())
     .add_property("value", &Resolution::compute_real);
 }
 }  // end namespace analysis

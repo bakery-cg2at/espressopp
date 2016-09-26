@@ -24,23 +24,21 @@
 
 #include "types.hpp"
 #include "Observable.hpp"
-#include "integrator/DynamicResolution.hpp"
+#include "iterator/CellListIterator.hpp"
+#include "storage/DomainDecomposition.hpp"
 
 namespace espressopp{
 namespace analysis {
 
 class Resolution : public Observable {
  public:
-  Resolution(shared_ptr<System> system, shared_ptr<integrator::DynamicResolution> res)
-      : Observable(system), res_(res) {
+  Resolution(shared_ptr<System> system) : Observable(system) {
     result_type = real_scalar;
   }
   virtual ~Resolution() {}
   virtual real compute_real() const;
 
   static void registerPython();
- private:
-  shared_ptr<integrator::DynamicResolution> res_;
 };
 }  // end namespace analysis
 }  // end namespace espresso

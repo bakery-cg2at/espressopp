@@ -1,7 +1,5 @@
-#  Copyright (C) 2012,2013
-#      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
-#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2016
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
 #
@@ -20,9 +18,9 @@
 
 
 """
-***************************
+**********************************
 **espressopp.analysis.Resolution**
-***************************
+**********************************
 
 """
 from espressopp.esutil import cxxinit
@@ -33,9 +31,9 @@ from _espressopp import analysis_Resolution
 
 class ResolutionLocal(ObservableLocal, analysis_Resolution):
     'The (local) compute of the number of particles of the system.'
-    def __init__(self, system, ext_dynamic_resolution):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, analysis_Resolution, system, ext_dynamic_resolution)
+    def __init__(self, system):
+        if pmi.workerIsActive():
+            cxxinit(self, analysis_Resolution, system)
 
 if pmi.isController :
     class Resolution(Observable):
