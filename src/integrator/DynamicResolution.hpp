@@ -19,8 +19,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _DYNAMICRESOLUTION_HPP
-#define _DYNAMICRESOLUTION_HPP
+#ifndef _INTEGRATOR_DYNAMICRESOLUTION_HPP
+#define _INTEGRATOR_DYNAMICRESOLUTION_HPP
 
 #include "log4espp.hpp"
 #include "types.hpp"
@@ -43,10 +43,6 @@ class DynamicResolution : public Extension {
   DynamicResolution(shared_ptr<System> _system, shared_ptr<FixedVSList> _vslist, real _rate);
 
   ~DynamicResolution();
-  real resolution() { return resolution_; }
-  void set_resolution(real resolution) {
-    resolution_ = resolution;
-  }
 
   real rate() { return rate_; }
   void set_rate(real rate) { rate_ = rate; }
@@ -60,11 +56,9 @@ class DynamicResolution : public Extension {
  private:
   void updateWeights();
 
-  void changeResolution();
   real rate_;
   bool active_;
 
-  real resolution_;  /// Current value of resolution, between 0.0 - 1.0
   void connect();
   void disconnect();
 

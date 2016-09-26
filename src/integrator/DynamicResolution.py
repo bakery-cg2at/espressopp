@@ -88,6 +88,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espressopp.integrator.DynamicResolutionLocal',
-            pmiproperty = [ 'resolution', 'rate', 'active' ],
+            pmiproperty = ['rate', 'active'],
             pmicall = ['update_weights']
             )

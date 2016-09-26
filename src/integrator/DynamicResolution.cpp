@@ -42,9 +42,7 @@ LOG4ESPP_LOGGER(DynamicResolution::theLogger, "DynamicResolution");
 DynamicResolution::DynamicResolution(shared_ptr<System> _system, shared_ptr<FixedVSList> _vslist, real _rate)
     : Extension(_system), vs_list(_vslist), rate_(_rate) {
     LOG4ESPP_INFO(theLogger, "construct DynamicResolution");
-
     type = Extension::Adress;
-    resolution_ = 0.0;
 }
 
 
@@ -56,39 +54,24 @@ DynamicResolution::~DynamicResolution() {
 void DynamicResolution::connect() {
   LOG4ESPP_INFO(theLogger, "connect");
   _aftIntV = integrator->aftIntV.connect(
-      boost::bind(&DynamicResolution::changeResolution, this),
-      boost::signals2::at_back);
-  _runInit = integrator->runInit.connect(
       boost::bind(&DynamicResolution::updateWeights, this),
-      boost::signals2::at_back
-  );
+      boost::signals2::at_back);
 }
 
 void DynamicResolution::disconnect() {
   LOG4ESPP_INFO(theLogger, "disconnect");
   _aftIntV.disconnect();
-  _runInit.disconnect();
 }
 
 void DynamicResolution::set_active(bool active) {
   active_ = active;
 }
 
-void DynamicResolution::changeResolution() {
+void DynamicResolution::updateWeights() {
+  LOG4ESPP_INFO(theLogger, "updateWeights");
   if (!active_)
     return;
 
-  // Increase the resolution lineary with the time.
-  resolution_ += rate_;
-  if (resolution_ > 1.0) {
-    resolution_ = 1.0;
-    active_ = false;
-  }
-  updateWeights();
-}
-
-void DynamicResolution::updateWeights() {
-  LOG4ESPP_INFO(theLogger, "updateWeights");
   System &system = getSystemRef();
 
   // Update weights of the particles.
@@ -97,13 +80,14 @@ void DynamicResolution::updateWeights() {
   for (; it != vs.end(); ++it) {
     Particle *vp = system.storage->lookupLocalParticle(it->first);
     if (vp) {
-      vp->lambda() = resolution_;
+      real res = vp->lambda() + rate_;
+      vp->lambda() = res;
 
       // Update weights for all underlying particles.
       for (FixedVSList::tuple::iterator itp = it->second.begin(); itp != it->second.end(); ++itp) {
         Particle *at = system.storage->lookupLocalParticle(*itp);
         if (at) {
-          at->lambda() = resolution_;
+          at->lambda() = res;
         } else {
           std::cout << " AT particle (" << *itp << ") of VP " << vp->id() << "-"
               << vp->ghost() << " not found in tuples ";
@@ -124,7 +108,6 @@ void DynamicResolution::registerPython() {
   class_<DynamicResolution, shared_ptr<DynamicResolution>, bases<Extension> >
     ("integrator_DynamicResolution", init<shared_ptr<System>, shared_ptr<FixedVSList>, real >())
     .add_property("active", &DynamicResolution::active, &DynamicResolution::set_active)
-    .add_property("resolution", &DynamicResolution::resolution, &DynamicResolution::set_resolution)
     .add_property("rate", &DynamicResolution::rate, &DynamicResolution::set_rate)
     .def("update_weights", &DynamicResolution::updateWeights)
     .def("connect", &DynamicResolution::connect)
