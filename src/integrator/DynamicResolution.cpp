@@ -81,6 +81,10 @@ void DynamicResolution::updateWeights() {
     Particle *vp = system.storage->lookupLocalParticle(it->first);
     if (vp) {
       real res = vp->lambda() + rate_;
+      if (res > (1.0 + rate_))
+        continue;
+      if (res > 1.0)
+        res = 1.0;
       vp->lambda() = res;
 
       // Update weights for all underlying particles.
