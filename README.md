@@ -1,3 +1,8 @@
+This is a modified version of ESPResSo++ to work with reverse mapping method that can be found here:
+https://github.com/MrTheodor/bakery
+
+
+
 ESPResSo++
 ==========
 
