@@ -109,6 +109,7 @@ namespace espressopp {
       XDensity::registerPython();
       XTemperature::registerPython();
       XPressure::registerPython();
+      AdressDensity::registerPython();
       Test::registerPython();
       ParticleRadiusDistribution::registerPython();
       
