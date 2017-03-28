@@ -1,3 +1,5 @@
+#  Copyright (C) 2016
+#      Max Planck Institute for Polymer Research & JGU Mainz
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -20,9 +22,9 @@
 
 
 r"""
-***********************
-**espressopp.Particle**
-***********************
+*******************
+espressopp.Particle
+*******************
 
 
 .. function:: espressopp.Particle(pid, storage)
@@ -33,7 +35,7 @@ r"""
 		:type storage: 
 """
 import _espressopp
-import esutil
+from espressopp.esutil import cxxinit
 import pmi
 from espressopp import toReal3DFromVector, toInt3DFromVector
 import mpi4py.MPI as MPI
@@ -226,6 +228,6 @@ if pmi.isController:
             return node
 
         def __getattr__(self, key):
-            value, node = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
+            value = pmi.reduce(pmi.MAX, self, 'getLocalData', key)
             return value
 
