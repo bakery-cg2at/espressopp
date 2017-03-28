@@ -20,9 +20,9 @@
 
 
 r"""
-***********************************
-**espressopp.integrator.Extension**
-***********************************
+*******************************
+espressopp.integrator.Extension
+*******************************
 
 
 
@@ -69,5 +69,6 @@ if pmi.isController :
             #cls =  'espressopp.integrator.Extension',
             pmiproperty = [ 'type'],
             #pmicall = ['addForce']
+            pmiinvoke = ['get_timers'],
             pmicall = [ 'connect', 'disconnect' ]
         )

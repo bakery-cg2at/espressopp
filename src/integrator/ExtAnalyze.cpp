@@ -33,11 +33,13 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ExtAnalyze::theLogger, "ExtAnalyze");
 
-    ExtAnalyze::ExtAnalyze(shared_ptr<ParticleAccess > particle_access, int interval):
-        Extension(particle_access->getSystem()), interval_(interval){
+    //ExtAnalyze::ExtAnalyze(shared_ptr< AnalysisBase > _analysis, int _interval) : Extension(_analysis->getSystem()), interval(_interval)
+    ExtAnalyze::ExtAnalyze(shared_ptr< ParticleAccess > _particle_access, int _interval) : Extension(_particle_access->getSystem()), interval(_interval){
       LOG4ESPP_INFO(theLogger, "Analyze observable in integrator");
-      particle_access_ = particle_access;
+      //analysis     = _analysis;
+      particle_access     = _particle_access;
       type = Extension::ExtAnalysis;
+      extensionOrder = Extension::withExtAnalyze;
     }
 
     void ExtAnalyze::disconnect(){
@@ -46,15 +48,17 @@ namespace espressopp {
 
     void ExtAnalyze::connect(){
       // connection to end of integrator
-      _aftIntV  = integrator->aftIntV.connect( boost::bind(&ExtAnalyze::perform_action, this), boost::signals2::at_front);
+      _aftIntV  = integrator->aftIntV.connect(extensionOrder, boost::bind(&ExtAnalyze::perform_action, this));
     }
 
     //void ExtAnalyze::performMeasurement() {
     void ExtAnalyze::perform_action() {
-      if ((integrator->getStep() % interval_) == 0) {
-          LOG4ESPP_INFO(theLogger, "performing measurement in integrator " << integrator->getStep() << " " << interval_ << " " << integrator->getStep() % interval_);
-          particle_access_->perform_action();
+      LOG4ESPP_INFO(theLogger, "performing measurement in integrator");
+      real time0 = wallTimer.getElapsedTime();
+      if (integrator->getStep() % interval == 0) {
+          particle_access->perform_action();
       }
+      timer_ += wallTimer.getElapsedTime() - time0;
     }
 
     /****************************************************
@@ -63,10 +67,9 @@ namespace espressopp {
     void ExtAnalyze::registerPython() {
       using namespace espressopp::python;
       class_<ExtAnalyze, shared_ptr<ExtAnalyze>, bases<Extension> >
-        ("integrator_ExtAnalyze", init< shared_ptr<ParticleAccess>, int >())
+        ("integrator_ExtAnalyze", init< shared_ptr< ParticleAccess > , int >())
         .def("connect", &ExtAnalyze::connect)
         .def("disconnect", &ExtAnalyze::disconnect)
-        .add_property("interval", &ExtAnalyze::interval, &ExtAnalyze::set_interval)
         ;
     }
   }

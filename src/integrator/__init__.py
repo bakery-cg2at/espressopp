@@ -54,11 +54,11 @@ from espressopp.integrator.LBInitConstForce import *
 from espressopp.integrator.LBInitPeriodicForce import *
 from espressopp.integrator.LBInitPopUniform import *
 from espressopp.integrator.LBInitPopWave import *
-from espressopp.integrator.LiquidGasLB import *
 from espressopp.integrator.ExtForce import *
 from espressopp.integrator.CapForce import *
 from espressopp.integrator.ExtAnalyze import *
 from espressopp.integrator.Settle import *
+from espressopp.integrator.Rattle import *
 from espressopp.integrator.VelocityVerletOnRadius import *
 from espressopp.integrator.AssociationReaction import *
 

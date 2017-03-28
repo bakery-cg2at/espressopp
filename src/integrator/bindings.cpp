@@ -53,12 +53,11 @@
 #include "LBInitPeriodicForce.hpp"
 #include "LBInitPopUniform.hpp"
 #include "LBInitPopWave.hpp"
-#include "LiquidGasLB.hpp"
-#include "LGLatticeSite.hpp"
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
 #include "Settle.hpp"
+#include "Rattle.hpp"
 #include "VelocityVerletOnRadius.hpp"
 #include "AssociationReaction.hpp"
 #include "FixDistances.hpp"
@@ -99,11 +98,11 @@ namespace espressopp {
       LBInitPeriodicForce::registerPython();
       LBInitPopUniform::registerPython();
       LBInitPopWave::registerPython();
-			LiquidGasLB::registerPython();
       ExtForce::registerPython();
       CapForce::registerPython();
       ExtAnalyze::registerPython();
       Settle::registerPython();
+      Rattle::registerPython();
       VelocityVerletOnRadius::registerPython();
       AssociationReaction::registerPython();
 

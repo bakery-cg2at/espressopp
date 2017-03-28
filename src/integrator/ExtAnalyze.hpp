@@ -28,6 +28,7 @@
 #include "logging.hpp"
 #include "Extension.hpp"
 #include "boost/signals2.hpp"
+#include "esutil/Timer.hpp"
 //#include "analysis/AnalysisBase.hpp"
 #include "ParticleAccess.hpp"
 
@@ -38,23 +39,36 @@ namespace espressopp {
     /** ExtAnalyze */
     class ExtAnalyze : public Extension {
       public:
-        ExtAnalyze(shared_ptr<ParticleAccess> particle_access, int interval);
+        //ExtAnalyze(shared_ptr< AnalysisBase > _analysis, int _interval);
+        ExtAnalyze(shared_ptr< ParticleAccess > _particle_access, int _interval);
         virtual ~ExtAnalyze() {};
-        
-        int interval() { return interval_; }
-        void set_interval(int interval) { interval_ = interval; }
-
         /** Register this class so it can be used from Python. */
         static void registerPython();
+
+      protected:
+          python::list getTimers() {
+              python::list ret;
+              ret.append(python::make_tuple("timePerformAction", timer_));
+              ret.append(python::make_tuple("timeAll", timer_));
+              return ret;
+
+          }
+          void resetTimers() {
+              wallTimer.reset();
+              timer_ = 0.0;
+          }
 
       private:
         boost::signals2::connection _aftIntV;
         void connect();
         void disconnect();
         void perform_action();
+        //void performMeasurement();
 
-        shared_ptr<ParticleAccess> particle_access_;
-        int interval_;
+        shared_ptr< ParticleAccess > particle_access;
+        int interval;
+
+        real timer_;
 
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);

@@ -24,6 +24,7 @@
 #ifndef _INTEGRATOR_EXTENSION_HPP
 #define _INTEGRATOR_EXTENSION_HPP
 
+#include <esutil/Timer.hpp>
 #include "log4espp.hpp"
 #include "types.hpp"
 #include "SystemAccess.hpp"
@@ -57,9 +58,22 @@ namespace espressopp {
             Reaction=8
         };
 
+        enum ExtensionOrder {
+          beforeAll=0,
+          beforeReaction=7,
+          withReaction=8,
+          afterReaction=9,
+          beforeExtAnalyze=10,
+          withExtAnalyze=11,
+          afterExtAnalyze=12,
+          atEnd=100
+        };
+
 
         //type of extension
         ExtensionType type;
+
+        ExtensionOrder extensionOrder;
 
         /** Register this class so it can be used from Python. */
         static void registerPython();
@@ -78,6 +92,9 @@ namespace espressopp {
         virtual void connect() = 0;
         virtual void disconnect() = 0;
 
+        esutil::WallTimer wallTimer;
+        virtual python::list getTimers() { return python::list(); }
+        virtual void resetTimers() { wallTimer.reset(); }
 
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);

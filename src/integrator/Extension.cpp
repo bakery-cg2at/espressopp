@@ -31,12 +31,13 @@ namespace espressopp {
     LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
 
     Extension::Extension(shared_ptr<System> system)
-      :SystemAccess(system){
+      :SystemAccess(system), extensionOrder(Extension::beforeAll) {
 
         if (!system->storage) {
            throw std::runtime_error("system has no storage");
         }
 
+        resetTimers();
         LOG4ESPP_INFO(theLogger, "construct Extension");
     }
 
@@ -61,6 +62,7 @@ namespace espressopp {
         ("integrator_Extension", no_init)
         .add_property("type",&Extension::getType, &Extension::setType)
         .def("setIntegrator", &Extension::setIntegrator)
+        .def("get_timers", &Extension::getTimers)
         .def("connect", &Extension::connect)
         .def("disconnect", &Extension::disconnect)
         ;

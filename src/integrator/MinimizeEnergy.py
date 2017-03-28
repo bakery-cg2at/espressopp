@@ -1,4 +1,6 @@
 #  Copyright (C) 2016
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2016
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
@@ -18,13 +20,12 @@
 
 
 r"""
-****************************************
-**espressopp.integrator.MinimizeEnergy**
-****************************************
+************************************
+espressopp.integrator.MinimizeEnergy
+************************************
 
 This is a very simple approach to perform energy minimization of the system. The module uses
-a `steepest descent method <https://en.wikipedia.org/wiki/Gradient_descent>`_. The position of particles is
-updated following the equation:
+a `steepest descent method <https://en.wikipedia.org/wiki/Gradient_descent>`_. The position of particles is updated following the equation:
 
 .. math::
 
@@ -33,21 +34,33 @@ updated following the equation:
 where :math:`p_{i+}` is a new position, :math:`p_i` is a position at current step with corresponding
 force :math:`F_i`. The parameters :math:`\gamma` and :math:`d_{max}` are set by user and control the relaxation
 of the energy and the maximum update of the coordinates per step.
-The routine runs until the maximum force is bigger than :math:`f_{max}` or for at most *n* steps.
+
+Additionaly, a variable :math:`\gamma` step is also implemented. In this case, the position of particles is updated following the equation:
+
+.. math::
+
+   p_{i+1} = p_i + d_{max}/f_{max} F_i
+
+where :math:`f_{max}` is a maximum force in a single step of steepest descent method. :math:`\gamma=d_{max}/f_{max}` is automatically adjusted to a force magnitude.
+
+In both cases, the routine runs until the maximum force is bigger than :math:`f_{max}` or for at most *n* steps.
 
 **Please note**
 This module does not support any integrator extensions.
 
 Example
-==========
 
 >>> em = espressopp.integrator.MinimizeEnergy(system, gamma=0.001, ftol=0.01, max_displacement=0.0001)
 >>> em.run(10000)
 
-API
-=======
+Example
 
-.. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement)
+>>> em = espressopp.integrator.MinimizeEnergy(system, gamma=0.01, ftol=0.01, max_displacement=0.01, variable_step_flag=True)
+>>> em.run(10000)
+
+**API**
+
+.. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement, variable_step_flag)
 
 		:param system: The espressopp system object.
 		:type system: espressopp.System
@@ -57,6 +70,8 @@ API
 		:type ftol: float
 		:param max_displacement: The maximum displacement.
 		:type max_displacement: float
+                :param variable_step_flag: The flag of adjusting gamma to the force strength.
+		:type variable_step_flag: bool
 
 .. function:: espressopp.integrator.MinimizeEnergy.run(max_steps, verbose)
 
