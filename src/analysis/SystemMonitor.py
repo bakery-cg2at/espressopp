@@ -1,4 +1,4 @@
-#  Copyright (c) 2015-2016
+#  Copyright (c) 2015-2017
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
@@ -18,9 +18,9 @@
 
 
 """
-*************************************
-**espressopp.analysis.SystemMonitor**
-*************************************
+*********************************
+espressopp.analysis.SystemMonitor
+*********************************
 
 SystemMonitor prints and logs to file values obtained from Observables like
 temperature, pressure or potential energy.
@@ -35,6 +35,7 @@ temperature, pressure or potential energy.
             :type output: espressopp.analysis.SystemMonitorOutputCSV
 
 .. function:: espressopp.analysis.SystemMonitor.add_observable(name, observable, is_visible)
+
             The function adds new observable to SystemMonitor.
 
             :param name: The name of observable
@@ -45,13 +46,10 @@ temperature, pressure or potential energy.
             :type is_visible: bool
 
 .. function:: espressopp.analysis.SystemMonitor.info()
+
             The method print out on console the values of observables.
 
-
-
-
-CSV Output
---------------
+**CSV Output**
 
 The output of SystemMonitor to CSV files.
 
@@ -64,7 +62,6 @@ The output of SystemMonitor to CSV files.
 
 
 Example
----------------------
 
 >>> interaction = espressopp.interaction.VerletListLennardJones(verletlist)
 >>> interaction.setPotential(type1=0, type2=0,
@@ -87,14 +84,12 @@ from _espressopp import analysis_SystemMonitorOutputCSV
 
 
 class SystemMonitorOutputCSVLocal(analysis_SystemMonitorOutputCSV):
-    """The (local) class to output values in CSV format."""
     def __init__(self, file_name, delimiter='\t'):
         if pmi.workerIsActive():
             cxxinit(self, analysis_SystemMonitorOutputCSV, file_name, delimiter)
 
 
 class SystemMonitorLocal(analysis_SystemMonitor):
-    """The (local) system monitor class."""
     def __init__(self, system, integrator, output):
         if pmi.workerIsActive():
             cxxinit(self, analysis_SystemMonitor, system, integrator, output)
@@ -111,10 +106,6 @@ class SystemMonitorLocal(analysis_SystemMonitor):
         if pmi.workerIsActive():
             self.cxxclass.dump(self)
 
-    def copy_state(self, from_sm):
-        if pmi.workerIsActive():
-            self.cxxclass.copy_state(self, from_sm)
-
 if pmi.isController:
     class SystemMonitorOutputCSV:
         __metaclass__ = pmi.Proxy
@@ -124,6 +115,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.analysis.SystemMonitorLocal',
-            pmicall=['add_observable', 'info', 'dump', 'copy_state'],
+            pmicall=['add_observable', 'info', 'dump'],
             pmiproperty=('total_energy', 'potential_energy')
             )

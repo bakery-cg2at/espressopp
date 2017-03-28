@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -39,7 +39,7 @@
 #include "NPart.hpp"
 #include "MaxPID.hpp"
 #include "AllParticlePos.hpp"
-#include "TotalVelocity.hpp"
+#include "CMVelocity.hpp"
 
 #include "ConfigsParticleDecomp.hpp"
 #include "VelocityAutocorrelation.hpp"
@@ -53,6 +53,7 @@
 #include "XDensity.hpp"
 #include "XTemperature.hpp"
 #include "XPressure.hpp"
+#include "AdressDensity.hpp"
 #include "Test.hpp"
 #include "ParticleRadiusDistribution.hpp"
 
@@ -96,7 +97,7 @@ namespace espressopp {
       IntraChainDistSq::registerPython();
       NeighborFluctuation::registerPython();
       OrderParameter::registerPython();
-      TotalVelocity::registerPython();
+      CMVelocity::registerPython();
 
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();

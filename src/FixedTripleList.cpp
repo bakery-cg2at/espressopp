@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -123,31 +123,28 @@ namespace espressopp {
 
     err.checkException();
     
-    if(returnVal){
-      // add the triple locally
-      this->add(p1, p2, p3);
-      //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
-
+    if (returnVal) {
       // ADD THE GLOBAL TRIPLET
       // see whether the particle already has triples
+      bool found = false;
       std::pair<GlobalTriples::const_iterator,
-                GlobalTriples::const_iterator> equalRange
-        = globalTriples.equal_range(pid2);
-      if (equalRange.first == globalTriples.end()) {
-        // if it hasn't, insert the new triple
-        globalTriples.insert(std::make_pair(pid2,
-                             std::pair<longint, longint>(pid1, pid3)));
-      }
-      else {
+                GlobalTriples::const_iterator> equalRange = globalTriples.equal_range(pid2);
+      if (equalRange.first != globalTriples.end()) {
         // otherwise test whether the triple already exists
-        for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
-          if (it->second == std::pair<longint, longint>(pid1, pid3)) {
-            // TODO: Triple already exists, generate error!
-  	      ;
+        for (GlobalTriples::const_iterator it = equalRange.first;
+             it != equalRange.second && !found; ++it) {
+          if (it->second == std::pair<longint, longint>(pid1, pid3) ||
+              it->second == std::pair<longint, longint>(pid3, pid1)) {
+            found = true;
           }
         }
-        // if not, insert the new triple
-        globalTriples.insert(equalRange.first, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      }
+      returnVal = !found;
+      if (!found) {
+        // add the triple locally
+        this->add(p1, p2, p3);
+        globalTriples.insert(equalRange.first,
+            std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
       }
       LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
     }
@@ -166,33 +163,44 @@ namespace espressopp {
 	return triples;
   }
 
+  std::vector<longint> FixedTripleList::getTripleList() {
+    std::vector<longint> ret;
+    for (GlobalTriples::const_iterator it=globalTriples.begin(); it != globalTriples.end(); it++) {
+      ret.push_back(it->second.first);
+      ret.push_back(it->first);
+      ret.push_back(it->second.second);
+    }
+    return ret;
+  }
+
   python::list FixedTripleList::getAllTriples() {
-    std::vector<longint> local_triples;
-    std::vector<std::vector<longint> > global_triples;
-    python::list triples;
+    std::vector<longint> local_triplets;
+    std::vector<std::vector<longint> > global_triplets;
+    python::list triplets;
 
     for (GlobalTriples::const_iterator it=globalTriples.begin(); it != globalTriples.end(); it++) {
-      local_triples.push_back(it->second.first);
-      local_triples.push_back(it->first);
-      local_triples.push_back(it->second.second);
+      local_triplets.push_back(it->second.first);
+      local_triplets.push_back(it->first);
+      local_triplets.push_back(it->second.second);
     }
+
     System& system = storage->getSystemRef();
     if (system.comm->rank() == 0) {
-      mpi::gather(*system.comm, local_triples, global_triples, 0);
+      mpi::gather(*system.comm, local_triplets, global_triplets, 0);
 
-      for (std::vector<std::vector<longint> >::iterator it = global_triples.begin();
-           it != global_triples.end(); ++it) {
+      for (std::vector<std::vector<longint> >::iterator it = global_triplets.begin();
+           it != global_triplets.end(); ++it) {
         for (std::vector<longint>::iterator iit = it->begin(); iit != it->end();) {
           longint pid1 = *(iit++);
           longint pid2 = *(iit++);
           longint pid3 = *(iit++);
-          triples.append(python::make_tuple(pid1, pid2, pid3));
+          triplets.append(python::make_tuple(pid1, pid2, pid3));
         }
       }
     } else {
-      mpi::gather(*system.comm, local_triples, global_triples, 0);
+      mpi::gather(*system.comm, local_triplets, global_triplets, 0);
     }
-    return triples;
+    return triplets;
   }
 
   void FixedTripleList::
@@ -324,10 +332,11 @@ namespace espressopp {
     //bool (FixedTripleList::*pyAdd)(pvec pids)
     //      = &FixedTripleList::add;
 
-    class_< FixedTripleList, shared_ptr< FixedTripleList > >
+    class_< FixedTripleList, shared_ptr< FixedTripleList >, boost::noncopyable  >
       ("FixedTripleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedTripleList::size)
+      .def("totalSize", &FixedTripleList::totalSize)
       .def("getTriples",  &FixedTripleList::getTriples)
       .def("getAllTriples", &FixedTripleList::getAllTriples)
      ;

@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -115,25 +117,33 @@ namespace espressopp {
     }
     err.checkException();
     
-    if(returnVal){
-      // add the quadruple locally
-      this->add(p1, p2, p3, p4);
+    if (returnVal) {
+
       // ADD THE GLOBAL QUADRUPLET
       // see whether the particle already has quadruples
-      std::pair<GlobalQuadruples::const_iterator,
-                GlobalQuadruples::const_iterator> equalRange
-        = globalQuadruples.equal_range(pid1);
-      if (equalRange.first == globalQuadruples.end()) {
-        // if it hasn't, insert the new quadruple
-        globalQuadruples.insert(std::make_pair(pid1,
-          Triple<longint, longint, longint>(pid2, pid3, pid4)));
-      }
-      else {
+      bool found = false;
+      std::pair<GlobalQuadruples::const_iterator, GlobalQuadruples::const_iterator> equalRange, equalRange_rev;
+      equalRange = globalQuadruples.equal_range(pid1);
+      if (equalRange.first != globalQuadruples.end()) {
         // otherwise test whether the quadruple already exists
-        for (GlobalQuadruples::const_iterator it = equalRange.first; it != equalRange.second; ++it)
-  	      if (it->second == Triple<longint, longint, longint>(pid2, pid3, pid4))
-  	        // TODO: Quadruple already exists, generate error!
-  	    	;
+        for (GlobalQuadruples::const_iterator it = equalRange.first; it != equalRange.second && !found; ++it)
+          found = found || (it->second == Triple<longint, longint, longint>(pid2, pid3, pid4));
+      }
+      // Check reverse order.
+      if (!found) {
+        equalRange_rev = globalQuadruples.equal_range(pid4);
+        if (equalRange_rev.first != globalQuadruples.end()) {
+          for (GlobalQuadruples::const_iterator it = equalRange_rev.first;
+               it != equalRange_rev.second && !found; ++it) {
+            found = found || (it->second == Triple<longint, longint, longint>(pid3, pid2, pid1));
+          }
+        }
+      }
+
+      returnVal = !found;
+      if (!found) {
+        // add the quadruple locally
+        this->add(p1, p2, p3, p4);
         // if not, insert the new quadruple
         globalQuadruples.insert(equalRange.first,
           std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
@@ -156,6 +166,17 @@ namespace espressopp {
 	return quadruples;
   }
 
+  std::vector<longint> FixedQuadrupleList::getQuadrupleList() {
+    std::vector<longint> ret;
+    for (GlobalQuadruples::const_iterator it=globalQuadruples.begin(); it != globalQuadruples.end(); it++) {
+      ret.push_back(it->first);
+      ret.push_back(it->second.first);
+      ret.push_back(it->second.second);
+      ret.push_back(it->second.third);
+    }
+    return ret;
+  }
+
   python::list FixedQuadrupleList::getAllQuadruples() {
     std::vector<longint> local_quadruples;
     std::vector<std::vector<longint> > global_quadruples;
@@ -170,7 +191,6 @@ namespace espressopp {
     System& system = storage->getSystemRef();
     if (system.comm->rank() == 0) {
       mpi::gather(*system.comm, local_quadruples, global_quadruples, 0);
-      python::tuple bond;
 
       for (std::vector<std::vector<longint> >::iterator it = global_quadruples.begin();
            it != global_quadruples.end(); ++it) {
@@ -309,6 +329,14 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
   }
 
+  int FixedQuadrupleList::totalSize() {
+    int local_size = globalQuadruples.size();
+    int global_size;
+    System& system = storage->getSystemRef();
+    mpi::all_reduce(*system.comm, local_size, global_size, std::plus<int>());
+    return global_size;
+  }
+
 
   /****************************************************
   ** REGISTRATION WITH PYTHON
@@ -327,6 +355,7 @@ namespace espressopp {
       ("FixedQuadrupleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedQuadrupleList::size)
+      .def("totalSize", &FixedQuadrupleList::totalSize)
       .def("getQuadruples",  &FixedQuadrupleList::getQuadruples)
       .def("getAllQuadruples", &FixedQuadrupleList::getAllQuadruples)
      ;

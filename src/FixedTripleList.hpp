@@ -56,16 +56,16 @@ namespace espressopp {
 		*/
 		virtual bool add(longint pid1, longint pid2, longint pid3);
 		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
-		void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
+		virtual void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
 		virtual void onParticlesChanged();
 
-		python::list getTriples();
-		python::list getAllTriples();
-
+		virtual std::vector<longint> getTripleList();
+		virtual python::list getTriples();
+		virtual python::list getAllTriples();
 	    /** Get the number of triples in the GlobalTriples list */
-	    int size() {
-	    	return globalTriples.size();
-	    }
+	    virtual int size() { return globalTriples.size(); }
+	    virtual int totalSize();
+
 
 		static void registerPython();
 	

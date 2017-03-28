@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015-2016
+  Copyright (c) 2015-2017
     Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -19,43 +19,49 @@
 */
 
 #include "python.hpp"
-#include "SystemMonitor.hpp"
-#include "integrator/MDIntegrator.hpp"
 #include <string>
 #include <utility>
 #include <vector>
+#include "SystemMonitor.hpp"
+#include "integrator/MDIntegrator.hpp"
+#include <iomanip>
+#include <boost/format.hpp>
 
 namespace espressopp {
 namespace analysis {
 
 void SystemMonitor::perform_action() {
   current_step_ = integrator_->getStep();
-  real t = last_time_ + (current_step_ - last_step_)*integrator_->getTimeStep();
   values_->clear();
   values_->push_back(current_step_);
-  values_->push_back(t);
+  values_->push_back(current_step_ * integrator_->getTimeStep());
 
   computeObservables();
   if (system_->comm->rank() == 0) {
     output_->write();
   }
-  
-  last_time_ = t;
-  last_step_ = current_step_;
 }
 
 void SystemMonitor::computeObservables() {
   total_energy_ = 0.0;
   potential_energy_ = 0.0;
   for (ObservableList::iterator it = observables_.begin(); it != observables_.end(); ++it) {
-    real val = it->second->compute_real();
-    Observable::ObservableTypes obs_type = it->second->getObservableType();
-    if (obs_type == Observable::POTENTIAL_ENERGY) {
-      potential_energy_ += val;
-    } else if (obs_type == Observable::KINETIC_ENERGY) {
-      total_energy_ += val;
+    int result_type = it->second->getResultType();
+    if (result_type == Observable::real_vector) {
+      std::vector<real> obs = it->second->compute_real_vector();
+      for (int n = 0; n < it->second->getResultVectorSize(); n++) {
+        values_->push_back(obs[n]);
+      }
+    } else if (result_type == Observable::real_scalar) {
+      real val = it->second->compute_real();
+      Observable::ObservableTypes obs_type = it->second->getObservableType();
+      if (obs_type == Observable::POTENTIAL_ENERGY) {
+        potential_energy_ += val;
+      } else if (obs_type == Observable::KINETIC_ENERGY) {
+        total_energy_ += val;
+      }
+      values_->push_back(val);
     }
-    values_->push_back(val);
   }
   total_energy_ += potential_energy_;
 }
@@ -64,6 +70,9 @@ void SystemMonitor::info() {
   if (system_->comm->rank() == 0) {
     int idx = 0;
     if (!header_shown_) {
+      if (elapsed_time_) {
+        std::cout << "elapsed\t";
+      }
       for (std::vector<std::string>::iterator it = header_->begin(); it != header_->end(); ++it) {
         if (visible_observables_[idx] == 1) {
           std::cout << *it;
@@ -74,9 +83,13 @@ void SystemMonitor::info() {
       }
       std::cout << std::endl;
       header_shown_ = true;
+
     }
     // Print data
     idx = 0;
+    if (elapsed_time_) {
+      std::cout << timer_.elapsed() << "\t";
+    }
     for (std::vector<real>::iterator it = values_->begin(); it != values_->end(); ++it) {
       if (visible_observables_[idx] == 1) {
         std::cout << *it;
@@ -91,15 +104,26 @@ void SystemMonitor::info() {
 
 void SystemMonitor::addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible) {
   observables_.push_back(std::make_pair(name, obs));
-  header_->push_back(name);
-  if (is_visible)
-    visible_observables_.push_back(1);
-  else
-    visible_observables_.push_back(0);
-}
-
-void SystemMonitor::copyState(shared_ptr<SystemMonitor> sm) {
-  sm->updateState(last_step_, last_time_);
+  if (obs->getResultType() == Observable::real_scalar || obs->getResultType() == Observable::old_format) {
+    header_->push_back(name);
+    if (is_visible) {
+      visible_observables_.push_back(1);
+    } else {
+      visible_observables_.push_back(0);
+    }
+  } else if (obs->getResultType() == Observable::real_vector || obs->getResultType() == Observable::int_vector) {
+    boost::format frmt("%s[%d]");
+    for (longint n = 0; n < obs->getResultVectorSize(); n++) {
+      frmt.clear();
+      frmt % name % n;
+      header_->push_back(frmt.str());
+      if (is_visible) {
+        visible_observables_.push_back(1);
+      } else {
+        visible_observables_.push_back(0);
+      }
+    }
+  }
 }
 
 void SystemMonitor::registerPython() {
@@ -114,7 +138,6 @@ void SystemMonitor::registerPython() {
       .add_property("potential_energy", make_getter(&SystemMonitor::potential_energy_))
       .def("add_observable", &SystemMonitor::addObservable)
       .def("info", &SystemMonitor::info)
-      .def("copy_state", &SystemMonitor::copyState)
       .def("dump", &SystemMonitor::perform_action);
 }
 

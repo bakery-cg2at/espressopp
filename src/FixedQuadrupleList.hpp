@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -60,19 +62,21 @@ namespace espressopp {
     void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
     virtual void onParticlesChanged();
 
-    python::list getQuadruples();
-    python::list getAllQuadruples();
+    virtual std::vector<longint> getQuadrupleList();
+    virtual python::list getQuadruples();
 
     /** Get the number of quadruples in the GlobalQuadruples list */
-    int size() {
+    virtual int size() {
     	return globalQuadruples.size();
     }
+
+    virtual int totalSize();
+    python::list getAllQuadruples();
 
     static void registerPython();
 
   private:
     static LOG4ESPP_DECL_LOGGER(theLogger);
-
   };
 }
 

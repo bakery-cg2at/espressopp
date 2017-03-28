@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015
+#  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -20,9 +20,9 @@
 
 
 r"""
-******************************
-**espressopp.FixedTripleList**
-******************************
+**************************
+espressopp.FixedTripleList
+**************************
 
 
 .. function:: espressopp.FixedTripleList(storage)
@@ -126,6 +126,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addTriples", "getList", "getAllTriples"],
+            pmicall = [ "addTriples", "totalSize", "getAllTriples"],
             pmiinvoke = ["getTriples", "size"]
         )
