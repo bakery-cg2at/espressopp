@@ -25,11 +25,11 @@
 #ifndef _IO_DUMPH5MD_HPP
 #define _IO_DUMPH5MD_HPP
 
-#include <Python.h>
-#include <object.h>
 #include "types.hpp"
 #include "SystemAccess.hpp"
 #include "FixedTupleListAdress.hpp"
+#include <Python.h>
+#include <object.h>
 
 namespace espressopp {
 namespace io {
@@ -62,6 +62,8 @@ class DumpH5MD : public SystemAccess {
   bool get_store_lambda() { return store_lambda; }
   void set_store_res_id(bool _s) { store_res_id = _s; }
   bool get_store_res_id() { return store_res_id; }
+  void set_store_mass(bool _s) { store_mass = _s; }
+  bool get_store_mass() { return store_mass; }
 
   void clear_buffers();
 

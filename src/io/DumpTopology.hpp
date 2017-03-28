@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015
+  Copyright (c) 2015-2016
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -31,7 +31,8 @@
 #include "integrator/MDIntegrator.hpp"
 #include "storage/Storage.hpp"
 #include "FixedPairList.hpp"
-
+#include "FixedTripleList.hpp"
+#include "FixedQuadrupleList.hpp"
 #include "esutil/Error.hpp"
 
 
@@ -40,29 +41,36 @@ namespace io {
 class DumpTopology: public ParticleAccess {
  public:
   DumpTopology(shared_ptr<System> system, shared_ptr<integrator::MDIntegrator> integrator)
-      : ParticleAccess(system), integrator_(integrator), fpl_idx_(0) { }
+      : ParticleAccess(system), integrator_(integrator) { }
   ~DumpTopology() {  }
 
-  void perform_action();
+  void perform_action() {
+    saveDataToBuffer();
+  }
 
-  void ObserveTuple(shared_ptr<FixedPairList> fpl);
+  void observeTuple(shared_ptr<FixedPairList> fpl);
+  void observeTriple(shared_ptr<FixedTripleList> ftl);
+  void observeQuadruple(shared_ptr<FixedQuadrupleList> fql);
 
-  python::list GetData();
+  python::list getData();
 
   static void registerPython();
 
  private:
   static LOG4ESPP_DECL_LOGGER(theLogger);
 
-  void ClearBuffer();
+  void clearBuffer();
 
   shared_ptr<integrator::MDIntegrator> integrator_;
+
   typedef std::deque<longint> FplBuffer;
   FplBuffer fpl_buffer_;
-  std::vector<shared_ptr<FixedPairList> > fpls_;
-  longint fpl_idx_;
 
-  void Dump();
+  std::vector<shared_ptr<FixedPairList> > fpls_;
+  std::vector<shared_ptr<FixedTripleList> > ftls_;
+  std::vector<shared_ptr<FixedQuadrupleList> > fqls_;
+
+  void saveDataToBuffer();
 };
 
 }  // end namespace io

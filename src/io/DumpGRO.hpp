@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -71,9 +73,9 @@ namespace espressopp {
           short type = cit->type();
           myParticleIDToTypeMap[id] = type;
         }
-        if (myParticleIDToTypeMap.size() == 0) {
-          std::cout << "On rank: " << system->comm->rank() << " there is no particles: " << myParticleIDToTypeMap.size() << std::endl;
-        }
+        if (myParticleIDToTypeMap.size() ==0 )
+          throw std::runtime_error("Dumper: No particles found in the system - make sure particles are added first before Dumper is initialized");
+        //std::cout << "my rank: " << system->comm->rank() << ", number of particles: " << myParticleIDToTypeMap.size() << std::endl;
 
         //gather all particle ID maps
         std::vector< std::map<long, short> > allParticleIDMaps;
@@ -95,7 +97,7 @@ namespace espressopp {
           FileBackup backup(file_name); //backup trajectory if it already exists
         }
       }
-      ~DumpGRO() {std::cout << "DumpGRO destructor" << std::endl;} // never called, right?
+      ~DumpGRO() { }
 
       void perform_action(){
         dump();
