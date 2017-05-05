@@ -22,9 +22,9 @@
 
 
 r"""
-**************************************
-**System** - Object
-**************************************
+*****************
+espressopp.System
+*****************
 
 The main purpose of this class is to store pointers to some
 important other classes and thus make them available to C++.
@@ -34,8 +34,7 @@ If you need to run more than one system at the same time you
 can combine several systems with the help of the Multisystem
 class.
 
-In detail the System class holds pointers to:
----------------------------------------------
+**In detail the System class holds pointers to:**
 
 * the `storage` (e.g. DomainDecomposition)
 * the boundary conditions `bc` for the system (e.g. OrthorhombicBC)
@@ -56,13 +55,11 @@ Example (not complete):
 .. function:: espressopp.System()
 
 
-.. function:: espressopp.System.addInteraction(interaction, name)
+.. function:: espressopp.System.addInteraction(interaction)
 
 		:param interaction: 
 		:type interaction: 
-		:param name: The optional name of the interaction.
-		:type name: string
-		:rtype: bool
+		:rtype: 
 
 .. function:: espressopp.System.getInteraction(number)
 
@@ -86,6 +83,7 @@ Example (not complete):
 		:type name: str
 
 .. function:: espressopp.System.getAllInteractions()
+
 		:rtype: The dictionary with name as a key and Interaction object.
 
 .. function:: espressopp.System.scaleVolume(\*args)
@@ -135,11 +133,10 @@ class SystemLocal(_espressopp.System):
 
         if pmi.workerIsActive():
             ret_val = self.cxxclass.addInteraction(self, interaction)
-            if name is None:
-                name = 'interaction_{}'.format(self._interaction_pid)
-            if name in self._interaction2id:
-                raise RuntimeError('Interaction with name {} already defined.'.format(name))
-            self._interaction2id[name] = self._interaction_pid
+            if name is not None:
+                if name in self._interaction2id:
+                    raise RuntimeError('Interaction with name {} already defined.'.format(name))
+                self._interaction2id[name] = self._interaction_pid
             self._interaction_pid += 1
             return ret_val
 
@@ -147,37 +144,22 @@ class SystemLocal(_espressopp.System):
 
         if pmi.workerIsActive():
             self.cxxclass.removeInteraction(self, number)
-            self._interaction2id = {
-                k: v if v < number else v - 1
-                for k, v in self._interaction2id.items()
-                if v != number
-                }
-            if self._interaction2id:
-                self._interaction_pid = max(self._interaction2id.values()) + 1
-            else:
-                self._interaction_pid = 0
 
     def removeInteractionByName(self, name):
         if pmi.workerIsActive():
             if name not in self._interaction2id:
                 raise RuntimeError('Interaction {} not found'.format(name))
             interaction_id = self._interaction2id[name]
-            self.removeInteraction(interaction_id)
+            self.cxxclass.removeInteraction(self, interaction_id)
+            self._interaction2id = {
+                k: v if v < interaction_id else v - 1
+                for k, v in self._interaction2id.iteritems()
+                }
+            self._interaction_pid = max(self._interaction2id.values()) + 1
 
     def getAllInteractions(self):
         if pmi.workerIsActive():
             return {k: self.getInteraction(v) for k, v in self._interaction2id.items()}
-
-    def getNameOfInteraction(self, number):
-        if pmi.workerIsActive():
-            for name, iid in self._interaction2id.items():
-                if iid == number:
-                    return name
-    
-    def getInteractionNames2Ids(self):
-        if pmi.workerIsActive():
-            return self._interaction2id
-
 
     def getNumberOfInteractions(self):
 
@@ -199,6 +181,12 @@ class SystemLocal(_espressopp.System):
     def getInteractionByName(self, name):
         if pmi.workerIsActive():
             return self.getInteraction(self._interaction2id[name])
+
+    def getNameOfInteraction(self, number):
+        if pmi.workerIsActive():
+            for name, iid in self._interaction2id.items():
+                if iid == number:
+                    return name
 
     def scaleVolume(self, *args):
 
@@ -239,7 +227,5 @@ if pmi.isController:
       pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
       pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
             'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
-            'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction',
-                 'getInteractionNames2Ids']
+            'getAllInteractions', 'getInteractionByName', 'getNameOfInteraction']
     )
-
