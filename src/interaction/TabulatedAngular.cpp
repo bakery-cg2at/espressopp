@@ -79,6 +79,7 @@ namespace espressopp {
                       shared_ptr <FixedTripleList>,
                       shared_ptr <TabulatedAngular> >())
                 .def("setPotential", &FixedTripleListTabulatedAngular::setPotential)
+                .def("getPotential", &FixedTripleListTabulatedAngular::getPotential)
                 .def("getFixedTripleList", &FixedTripleListTabulatedAngular::getFixedTripleList);
 
             class_< FixedTripleListTypesTabulatedAngular, bases< Interaction > >
@@ -97,6 +98,7 @@ namespace espressopp {
                       bool
                      >())
                 .def("setPotential", &FixedTripleListAdressTabulatedAngular::setPotential)
+                .def("getPotential", &FixedTripleListAdressTabulatedAngular::getPotential)
                 .def("getFixedTripleList", &FixedTripleListAdressTabulatedAngular::getFixedTripleList);
 
         }

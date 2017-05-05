@@ -143,7 +143,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTabulatedAngularLocal',
-            pmicall = ['setPotential', 'getFixedTripleList']
+            pmicall = ['setPotential', 'getFixedTripleList', 'getPotential']
             )
 
     class FixedTripleListTypesTabulatedAngular(Interaction):
@@ -157,5 +157,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListAdressTabulatedAngularLocal',
-            pmicall = ['setPotential', 'getFixedTripleList']
+            pmicall = ['setPotential', 'getFixedTripleList', 'getPotential']
             )
