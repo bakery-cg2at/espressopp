@@ -209,7 +209,7 @@ computeEnergy() {
     if (forcescale12 > 0.0) {
       const Potential &potential = getPotential(type1, type2);
       real e1 = forcescale12*potential._computeEnergy(p1, p2);
-      if (isnan(e1))
+      if (std::isnan(e1))
         e1 = 0.0;
       es += e1;
       LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << es);
