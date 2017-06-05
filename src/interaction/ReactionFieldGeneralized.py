@@ -263,7 +263,7 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHybridReactionFieldGeneralizedLocal',
             pmicall = ['setPotential','getPotential'],
-            pmiproperty = ['scale_factor']
+            pmiproperty = ['scale_factor', 'max_force']
         )
 
     class VerletListAdressReactionFieldGeneralized(Interaction):

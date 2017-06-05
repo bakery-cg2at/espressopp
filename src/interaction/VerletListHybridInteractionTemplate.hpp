@@ -1,24 +1,24 @@
 /*
   Copyright (C) 2016
       Jakub Krajniak (jkrajniak at gmail.com)
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// ESPP_CLASS 
+// ESPP_CLASS
 #ifndef _INTERACTION_VERLETLISTHYBRIDINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTHYBRIDINTERACTIONTEMPLATE_HPP
 
@@ -92,6 +92,13 @@ class VerletListHybridInteractionTemplate: public Interaction {
 
   real scaleFactor() { return scaleFactor_; }
 
+  void setMaxForce(real s) {
+      maxForce_ = s;
+      hasMaxForce_ = s > 0.0;
+  }
+
+  real maxForce() { return maxForce_; }
+
   virtual void addForces();
   virtual real computeEnergy();
   virtual real computeEnergyAA();
@@ -112,6 +119,8 @@ class VerletListHybridInteractionTemplate: public Interaction {
 
   bool cgPotential;
   real scaleFactor_;
+  real maxForce_;
+  bool hasMaxForce_;
   // not needed esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
 };
 
@@ -149,6 +158,16 @@ addForces() {
       const Potential &potential = getPotential(type1, type2);
       Real3D force(0.0);
       if (potential._computeForce(force, p1, p2)) {
+        if (hasMaxForce_) {
+          if (force.isNaNInf()) {
+            force = 0.0;
+          } else {
+            real abs_force = force.abs();
+            if (abs_force > maxForce_) {
+              force = (force / abs_force) * maxForce_;
+            }
+          }
+        }
         p1.force() += forcescale12 * force;
         p2.force() -= forcescale12 * force;
         LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
@@ -189,7 +208,10 @@ computeEnergy() {
 
     if (forcescale12 > 0.0) {
       const Potential &potential = getPotential(type1, type2);
-      es += forcescale12*potential._computeEnergy(p1, p2);
+      real e1 = forcescale12*potential._computeEnergy(p1, p2);
+      if (isnan(e1))
+        e1 = 0.0;
+      es += e1;
       LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << es);
     }
   }

@@ -79,6 +79,8 @@ namespace espressopp {
                 .def("getInteractionMatrix", &VerletListHybridReactionFieldGeneralized::getInteractionMatrix)
                 .add_property("scale_factor", &VerletListHybridReactionFieldGeneralized::scaleFactor,
                               &VerletListHybridReactionFieldGeneralized::setScaleFactor)
+                .add_property("max_force", &VerletListHybridReactionFieldGeneralized::maxForce,
+                              &VerletListHybridReactionFieldGeneralized::setMaxForce)
                 ;
 
             class_<VerletListAdressReactionFieldGeneralized, bases<Interaction> >

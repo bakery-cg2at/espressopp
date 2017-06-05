@@ -324,7 +324,8 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHybridTabulatedLocal',
-            pmicall = ['setPotential','getPotential']
+            pmicall = ['setPotential','getPotential'],
+            pmiproperty = ('scale_factor', 'max_force')
         )
 
     class CellListTabulated(Interaction):

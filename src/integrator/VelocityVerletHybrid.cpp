@@ -18,23 +18,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#include <iomanip>
 #include "python.hpp"
 #include "VelocityVerletHybrid.hpp"
 #include <iomanip>
 #include "iterator/CellListIterator.hpp"
-#include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
-#include "System.hpp"
 #include "storage/Storage.hpp"
-#include "mpi.hpp"
 #include "bc/BC.hpp"
-
-#ifdef VTRACE
-#include "vampirtrace/vt_user.h"
-#else
-#define VT_TRACER(name)
-#endif
 
 namespace espressopp {
 using namespace std;

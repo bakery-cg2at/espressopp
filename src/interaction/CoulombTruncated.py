@@ -198,7 +198,7 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHybridCoulombTruncatedLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList'],
-            pmiproperty = ['scale_factor']
+            pmiproperty = ['scale_factor', 'max_force']
         )
 
     class FixedPairListTypesCoulombTruncated(Interaction):

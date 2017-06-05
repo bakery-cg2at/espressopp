@@ -430,7 +430,7 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHybridLennardJonesLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList'],
-            pmiproperty = ['scale_factor']
+            pmiproperty = ['scale_factor', 'max_force']
         )
 
     class VerletListAdressLennardJones(Interaction):

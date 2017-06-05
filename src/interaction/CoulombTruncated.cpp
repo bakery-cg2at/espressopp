@@ -76,6 +76,8 @@ namespace espressopp {
           .def("getInteractionMatrix", &VerletListHybridCoulombTruncated::getInteractionMatrix)
           .add_property("scale_factor", &VerletListHybridCoulombTruncated::scaleFactor,
                         &VerletListHybridCoulombTruncated::setScaleFactor)
+          .add_property("max_force", &VerletListHybridCoulombTruncated::maxForce,
+                        &VerletListHybridCoulombTruncated::setMaxForce)
           ;
 
       class_<VerletListAdressCoulombTruncated, bases<Interaction> >

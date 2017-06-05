@@ -96,6 +96,8 @@ namespace espressopp {
           .def("getInteractionMatrix", &VerletListHybridTabulated::getInteractionMatrix)
           .add_property("scale_factor", &VerletListHybridTabulated::scaleFactor,
                         &VerletListHybridTabulated::setScaleFactor)
+          .add_property("max_force", &VerletListHybridTabulated::maxForce,
+                        &VerletListHybridTabulated::setMaxForce)
           ;
       class_ <VerletListAdressTabulated, bases <Interaction> >
         ("interaction_VerletListAdressTabulated",

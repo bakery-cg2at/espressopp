@@ -91,6 +91,8 @@ namespace espressopp {
           .def("getInteractionMatrix", &VerletListHybridLennardJones::getInteractionMatrix)
           .add_property("scale_factor", &VerletListHybridLennardJones::scaleFactor,
                                         &VerletListHybridLennardJones::setScaleFactor)
+          .add_property("max_force", &VerletListHybridLennardJones::maxForce,
+                        &VerletListHybridLennardJones::setMaxForce)
           ;
 
       class_< VerletListAdressLennardJones, bases< Interaction > >
