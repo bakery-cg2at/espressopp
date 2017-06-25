@@ -47,6 +47,8 @@ class VerletListHybridInteractionTemplate: public Interaction {
     potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
     ntypes = 0;
     scaleFactor_ = 1.0;
+    hasMaxForce_ = false;
+    maxForce_ = std::numeric_limits<real>::max();
     LOG4ESPP_DEBUG(_Potential::theLogger, "initialize hybrid potential cg=" << cgPotential);
   }
 
