@@ -26,6 +26,7 @@
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "VerletListHadressInteractionTemplate.hpp"
+#include "VerletListHybridInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -42,6 +43,8 @@ namespace espressopp {
         CellListLennardJonesEnergyCapped;
     typedef class FixedPairListInteractionTemplate <LennardJonesEnergyCapped>
         FixedPairListLennardJonesEnergyCapped;
+    typedef class VerletListHybridInteractionTemplate <LennardJonesEnergyCapped>
+        VerletListHybridLennardJonesEnergyCapped;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -99,6 +102,18 @@ namespace espressopp {
           .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJonesEnergyCapped> >())
           .def("setPotential", &FixedPairListLennardJonesEnergyCapped::setPotential);
       ;
+
+      class_< VerletListHybridLennardJonesEnergyCapped, bases< Interaction > >
+          ("interaction_VerletListHybridLennardJonesEnergyCapped", init< shared_ptr<VerletList>, bool >())
+          .def("getVerletList", &VerletListHybridLennardJonesEnergyCapped::getVerletList)
+          .def("setPotential", &VerletListHybridLennardJonesEnergyCapped::setPotential)
+          .def("getPotential", &VerletListHybridLennardJonesEnergyCapped::getPotentialPtr)
+          .def("getInteractionMatrix", &VerletListHybridLennardJonesEnergyCapped::getInteractionMatrix)
+          .add_property("scale_factor", &VerletListHybridLennardJonesEnergyCapped::scaleFactor,
+                        &VerletListHybridLennardJonesEnergyCapped::setScaleFactor)
+          .add_property("max_force", &VerletListHybridLennardJonesEnergyCapped::maxForce,
+                        &VerletListHybridLennardJonesEnergyCapped::setMaxForce)
+          ;
     }
     
   }
