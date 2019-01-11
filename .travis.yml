@@ -8,6 +8,7 @@ services:
 env:
   matrix:
     - DISTRO=ubuntu_rolling EXTERNAL=OFF
+    - DISTRO=ubuntu_rolling EXTERNAL=ON
 
 script:
  - cp -vr docker ${HOME}
@@ -68,4 +69,3 @@ cache:
 
 compiler:
   - gcc
-  - clang
