@@ -183,14 +183,22 @@ class DumpH5MDLocal(io_DumpH5MD):
                 os.rename(filename, new_filename)
                 print('File {} exists, moved to {}'.format(filename, new_filename))
 
-        self.file = pyh5md.File(
-            filename, 'w',
-            creator='espressopp',
-            creator_version=espressopp.VersionLocal().info(),
-            author=author,
-            author_email=email,
-            driver='mpio',
-            comm=MPI.COMM_WORLD)
+        try:
+            self.file = pyh5md.File(
+                filename, 'w',
+                creator='espressopp',
+                creator_version=espressopp.VersionLocal().info(),
+                author=author,
+                author_email=email,
+                driver='mpio',
+                comm=MPI.COMM_WORLD)
+        except AttributeError:
+            self.file = pyh5md.File(
+                filename, 'w',
+                creator='espressopp',
+                creator_version=espressopp.VersionLocal().info(),
+                author=author,
+                author_email=email)
 
         self._system_data()
 
