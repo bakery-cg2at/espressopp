@@ -26,6 +26,7 @@
 #include "DihedralHarmonic.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListTypesInteractionTemplate.hpp"
+#include "FixedQuadrupleListAdressInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -49,6 +50,10 @@ namespace espressopp {
                   init< shared_ptr<System>,
                         shared_ptr<FixedQuadrupleList>,
                         shared_ptr<DihedralHarmonic> >())
+        .def(init< shared_ptr<System>,
+                   shared_ptr<FixedQuadrupleListAdress>,
+                   shared_ptr<DihedralHarmonic>
+                >())
         .def("setPotential", &FixedQuadrupleListDihedralHarmonic::setPotential)
         .def("getPotential", &FixedQuadrupleListDihedralHarmonic::getPotential)
         .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralHarmonic::getFixedQuadrupleList)
@@ -62,6 +67,19 @@ namespace espressopp {
         .def("getPotential", &FixedQuadrupleListTypesDihedralHarmonic::getPotentialPtr)
         .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonic::setFixedQuadrupleList)
         .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralHarmonic::getFixedQuadrupleList);
+      
+      typedef class FixedQuadrupleListAdressInteractionTemplate <DihedralHarmonic>
+          FixedQuadrupleListAdressDihedralHarmonic;
+
+      class_ <FixedQuadrupleListAdressDihedralHarmonic, bases <Interaction> >
+        ("interaction_FixedQuadrupleListAdressDihedralHarmonic", init< shared_ptr<System>,
+            shared_ptr<FixedQuadrupleList>, shared_ptr<DihedralHarmonic>, bool >())
+        .def(init< shared_ptr<System>, shared_ptr<FixedQuadrupleListAdress>,
+            shared_ptr<DihedralHarmonic>, bool>())
+        .def("setPotential", &FixedQuadrupleListAdressDihedralHarmonic::setPotential)
+          .def("getPotential", &FixedQuadrupleListAdressDihedralHarmonic::getPotential)
+        .def("getFixedQuadrupleList",
+            &FixedQuadrupleListAdressDihedralHarmonic::getFixedQuadrupleList);
     }
   }
 }
