@@ -37,11 +37,6 @@ The `N` is a multiplicity.
 
 Reference: http://www.uark.edu/ua/fengwang/DLPOLY2/node49.html
 
-
-
-
-
-
 .. function:: espressopp.interaction.DihedralHarmonicNCos(K, phi0, multiplicity)
 
 		:param K: (default: 0.0)
